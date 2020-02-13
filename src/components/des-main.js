@@ -208,7 +208,8 @@ class DESMain extends connect(store)(LitElement) {
           ${this._hiddenPages.includes('page1') ? html`` : html`<a ?selected="${this._page === 'page1'}" href="/page1">Page One</a>`}
           ${this._hiddenPages.includes('page2') ? html`` : html`<a ?selected="${this._page === 'page2'}" href="/page2">Page Two</a>`}
           ${this._hiddenPages.includes('page3') ? html`` : html`<a ?selected="${this._page === 'page3'}" href="/page3">Page Three</a>`}
-        </nav>
+          ${this._hiddenPages.includes('ticket') ? html`` : html`<a ?selected="${this._page === 'ticket'}" href="/ticket">Des Ticket</a>`}
+          </nav>
       </app-drawer>
 
       <!-- Main content -->
@@ -222,7 +223,9 @@ class DESMain extends connect(store)(LitElement) {
         ${this._hiddenPages.includes('page3') ? 
            html`<des-404 class="page" ?active="${this._page === 'page3'}"></des-404>` : 
            html`<des-page3 class="page" ?active="${this._page === 'page3'}"></des-page3>`}
-        
+        ${this._hiddenPages.includes('ticket') ? 
+           html`<des-404 class="page" ?active="${this._page === 'ticket'}"></des-404>` : 
+           html`<des-ticket class="page" ?active="${this._page === 'ticket'}"></des-ticket>`}
         <des-404 class="page" ?active="${this._page === 'des404'}"></des-404>
       </main>
 

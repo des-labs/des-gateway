@@ -35,6 +35,9 @@ const loadPage = (page,hp) => (dispatch) => {
     case 'page3':
       hp.includes('page3') ?  import('../components/des-404.js') : import('../components/des-pages/des-page3.js');
       break;
+      case 'ticket':
+        hp.includes('ticket') ?  import('../components/des-404.js') : import('../components/des-pages/des-ticket.js');
+        break;
     default:
       page = 'des404';
       import('../components/des-404.js');
