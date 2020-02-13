@@ -41,6 +41,7 @@ class DESMain extends connect(store)(LitElement) {
       _drawerOpened: { type: Boolean },
       _drawerPersisted: { type: Boolean },
       name: {type: String},
+      username: {type: String},
       email: {type: String},
       _hiddenPages: {type: Array},
       _listPages: {type: Array}
@@ -234,10 +235,25 @@ class DESMain extends connect(store)(LitElement) {
 
   constructor() {
     super();
+    console.log('Initializing...');
     this.name = "Matias";
+    this.username = "mck";
     this.email = "mcarras2@illinois.edu"
     this._hiddenPages = [];
     setPassiveTouchGestures(true);
+    const Url="http://localhost:8888/init/";
+    const dataP={
+      username: this.username,
+    };
+    const param = {
+      headers: {'Content-Type': 'application/json',},
+      body: JSON.stringify(dataP),
+      method: "POST"
+    };
+    fetch(Url, param)
+    .then(response => {return response.json();})
+    .then(data => {this._hiddenPages = data.hidden;})
+    .catch((error) => {console.log(error);});
   }
 
   firstUpdated() {
