@@ -9,10 +9,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 */
 
 import { html } from 'lit-element';
-import { PageViewElement } from '../page-view-element.js';
+import { PageViewElement } from './des-base-page.js';
 
 // These are the shared styles needed by this element.
-import { SharedStyles } from '../shared-styles.js';
+import { SharedStyles } from '../styles/shared-styles.js';
 
 class DESPage1 extends PageViewElement {
   static get styles() {

@@ -1,6 +1,7 @@
 import { html,css } from 'lit-element';
-import { PageViewElement } from '../page-view-element.js';
-import { SharedStyles } from '../shared-styles.js';
+import { PageViewElement } from './des-base-page.js';
+import { SharedStyles } from '../styles/shared-styles.js';
+import {config} from '../des-config.js';
 
 
 class DESPage3 extends PageViewElement {
@@ -50,7 +51,7 @@ class DESPage3 extends PageViewElement {
 
   _submit(){
     console.log(this.name);
-    const Url="http://localhost:8888/test/"
+    const Url=config.backEndUrl +  "/test/"
     const dataP={
       name: this.name,
     };
