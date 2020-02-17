@@ -8,6 +8,10 @@ class DESTicket extends PageViewElement {
       // This is the data from the store.
       _clicks: { type: Number },
       _value: { type: Number },
+      resetchecked: { type: Boolean, attribute: true},
+      unlockchecked: { type: Boolean, attribute: true},
+      msg: {type: String},
+      message: {type: String}
     };
   }
 
@@ -24,11 +28,19 @@ class DESTicket extends PageViewElement {
    this.search = "";
    this.email = "";
    this.jiraticket = "";
-   this.reset = "";
-   this.unlock = "";
    this.searchstring = "";
    this.message = "";
    this.status = "";
+   this.msg = "";
+   
+}
+
+updateResetChecked(e) {
+  this.resetchecked = e.target.checked;
+}
+updateUnlockChecked(e) {
+  this.unlockchecked = e.target.checked;
+
 }
 
   render() {
@@ -62,7 +74,7 @@ class DESTicket extends PageViewElement {
           </td>
           </tr>
           </table>
-          <p> ${this.message}</p>
+          <pre> ${this.message}</pre>
         </div>
         <div>
           <p> Enter username or email below to resolve db password request.</p>
@@ -96,9 +108,11 @@ class DESTicket extends PageViewElement {
               Resolution options:
             </td>
             <td class="submit-td">
-            <input type="checkbox" name="reset" .value="${this.reset}"/>
+            <input type="checkbox" id="reset" name="reset" ?checked="${this.checked}"
+                @change="${this.updateResetChecked}"/>
             <label for="reset">Reset/unlock</label>
-            <input type="checkbox" name="unlock" .value="${this.unlock}"/>
+            <input type="checkbox" id="unlock" name="unlock" ?checked="${this.checked}"
+            @change="${this.updateUnlockChecked}"/>
             <label for="unlock">Unlock only</label>
             </td>
             </tr>
@@ -111,12 +125,14 @@ class DESTicket extends PageViewElement {
             </tr>
           </table>          
         </div>
+        <p><font color="red">${this.msg}</font></p>
       </section>
 
     `;
   }
+
   _search(){
-    console.log(this.name);
+    console.log("_search");
     const Url="http://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/search";
     const dataP={
       search_string: this.searchstring,
@@ -153,25 +169,32 @@ class DESTicket extends PageViewElement {
     }
 
   _submit(){
-    console.log(this.name);
+    console.log("_submit");
     const Url="http://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/reset";
     const dataP={
       username: this.username,
       email: this.email,
       jiraticket: this.jira_ticket,
-      reset: "",
-      unlock: "",
+      reset: this.resetchecked,
     };
     const param = {
       headers: {'Content-Type': 'application/json',},
       body: JSON.stringify(dataP),
       method: "POST"
     };
-    fetch(Url, param)
-    .then(response => {return response.json();})
-    .then(data => {this.message = data.message;
+
+    if (this.resetchecked == this.unlockchecked){
+      this.msg = "Please select only one resolution option!"
+      console.log(this.msg)
+    }
+    else {
+      this.msg=""
+      fetch(Url, param)
+      .then(response => {return response.json();})
+      .then(data => {this.message = data.message;
                    this.status = data.status;})
-    .catch((error) => {console.log(error);});
+      .catch((error) => {console.log(error);});
+    }
   }
   
 }
