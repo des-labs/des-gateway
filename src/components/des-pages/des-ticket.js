@@ -133,12 +133,13 @@ updateUnlockChecked(e) {
 
   _search(){
     console.log("_search");
-    const Url="http://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/search";
+    const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/search/";
     const dataP={
       search_string: this.searchstring,
     };
     const param = {
-      headers: {'Content-Type': 'application/json',},
+      headers: {'Content-Type': 'application/json',
+          },
       body: JSON.stringify(dataP),
       method: "POST"
     };
@@ -150,7 +151,7 @@ updateUnlockChecked(e) {
 
     _exists(){
       console.log(this.name);
-      const Url="http://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/exists";
+      const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/exists/";
       const dataP={
         username: this.username,
         email: this.email,
@@ -170,7 +171,7 @@ updateUnlockChecked(e) {
 
   _submit(){
     console.log("_submit");
-    const Url="http://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/reset";
+    const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/reset/";
     const dataP={
       username: this.username,
       email: this.email,
