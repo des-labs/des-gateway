@@ -11,6 +11,7 @@ class DESPage3 extends PageViewElement {
       _clicks: { type: Number },
       _value: { type: Number },
       name: {type: String},
+      time: {type: Number},
       msg: {type: String},
     };
   }
@@ -28,6 +29,7 @@ class DESPage3 extends PageViewElement {
  constructor(){
    super();
    this.name = "Peter";
+   this.time = 30;
    this.msg = "";
 }
 
@@ -39,7 +41,8 @@ class DESPage3 extends PageViewElement {
         <h2>Hidden!</h2>
         </div>
        <div>
-       <input value="${this.name}" @input="${e => this.name = e.target.value}">
+       name: <input value="${this.name}" @input="${e => this.name = e.target.value}">
+       time: <input value="${this.time}" @input="${e => this.time = e.target.value}">
         <p>Result: ${this.name}</p>
         <button @click="${this._submit}">Submit</button>
         <p> ${this.msg}</p>
@@ -51,14 +54,15 @@ class DESPage3 extends PageViewElement {
 
   _submit(){
     console.log(this.name);
-    const Url=config.backEndUrl +  "/test/"
-    const dataP={
-      name: this.name,
-    };
+    const Url=config.backEndUrl +  "/job/submit"
+    const formData = new FormData();
+    formData.append('job', 'test');
+    formData.append('username', this.name);
+    formData.append('time', this.time);
+    const data = new URLSearchParams(formData);
     const param = {
-      headers: {'Content-Type': 'application/json',},
-      body: JSON.stringify(dataP),
-      method: "POST"
+      body: data,
+      method: "PUT"
     };
     fetch(Url, param)
     .then(response => {return response.json();})
