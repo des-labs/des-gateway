@@ -8,10 +8,12 @@ class DESTicket extends PageViewElement {
       // This is the data from the store.
       _clicks: { type: Number },
       _value: { type: Number },
-      resetchecked: { type: Boolean, attribute: true},
-      unlockchecked: { type: Boolean, attribute: true},
+      resetChecked: { type: Boolean, attribute: true},
+      unlockChecked: { type: Boolean, attribute: true},
       msg: {type: String},
-      message: {type: String}
+      searchMessage: {type: String},
+      existsMessage: {type: String},
+      submitMessage: {type: String}
     };
   }
 
@@ -21,28 +23,25 @@ class DESTicket extends PageViewElement {
     ];
   }
 
- 
- constructor(){
-   super();
-   this.username = "";
-   this.search = "";
-   this.email = "";
-   this.jiraticket = "";
-   this.searchstring = "";
-   this.message = "";
-   this.status = "";
-   this.msg = "";
-   
-}
+
+  constructor(){
+    super();
+    this.user = "None";
+    this.email = "None";
+    this.jiraTicket = "None";
+    this.stop = 0;
+    this.msg = "";
+    this.resetChecked = false;
+    this.unlockChecked = false;
+ }
 
 updateResetChecked(e) {
-  this.resetchecked = e.target.checked;
+  this.resetChecked = e.target.checked;
 }
 updateUnlockChecked(e) {
-  this.unlockchecked = e.target.checked;
-
+  this.unlockChecked = e.target.checked;
 }
-
+ 
   render() {
     return html`
 
@@ -56,14 +55,14 @@ updateUnlockChecked(e) {
         <br>
         <br>
        <div>
-          <p>Enter username, email, first or last name to check if user exists.</p>
+          <p>Enter username, email, first or last name to check if user exists:</p>
           <table id="search-table" style="width:100%">
           <tr class="submit-tr">
           <td class="submit-td">
             Search:
           </td>
           <td class="submit-td">
-          <input value="${this.search}" @input="${e => this.search = e.target.value}">
+          <input value="" @input="${e => this.searchString = e.target.value}">
           </td>
           </tr>
           <tr class="submit-tr">
@@ -74,17 +73,17 @@ updateUnlockChecked(e) {
           </td>
           </tr>
           </table>
-          <pre> ${this.message}</pre>
+          <pre> ${this.searchMessage}</pre>
         </div>
         <div>
-          <p> Enter username or email below to resolve db password request.</p>
+          <p> Enter username and email below to resolve db password request:</p>
           <table id="form-submission-table" style="width:100%">
             <tr class="submit-tr">
             <td class="submit-td">
               Username:
             </td>
             <td class="submit-td">
-            <input value="${this.username}" @input="${e => this.username = e.target.value}">
+            <input value="" @input="${e => this.user = e.target.value}">
             </td>
             </tr>
             <tr class="submit-tr">
@@ -92,7 +91,7 @@ updateUnlockChecked(e) {
               Email:
             </td>
             <td class="submit-td">
-            <input value="${this.email}" @input="${e => this.email = e.target.value}">
+            <input value="" @input="${e => this.email = e.target.value}">
             </td>
             </tr>
             <tr class="submit-tr">
@@ -100,7 +99,7 @@ updateUnlockChecked(e) {
               JIRA ticket:
             </td>
             <td class="submit-td">
-            <input value="${this.jiraticket}" @input="${e => this.jiraticket = e.target.value}">
+            <input value="" @input="${e => this.jiraTicket = e.target.value}">
             </td>
             </tr>
             <tr class="submit-tr">
@@ -108,11 +107,11 @@ updateUnlockChecked(e) {
               Resolution options:
             </td>
             <td class="submit-td">
-            <input type="checkbox" id="reset" name="reset" ?checked="${this.checked}"
+            <input type="checkbox" id="reset" name="reset" ?checked="${this.resetChecked}"
                 @change="${this.updateResetChecked}"/>
             <label for="reset">Reset/unlock</label>
-            <input type="checkbox" id="unlock" name="unlock" ?checked="${this.checked}"
-            @change="${this.updateUnlockChecked}"/>
+            <input type="checkbox" id="unlock" name="unlock" ?checked="${this.unlockChecked}"
+                @change="${this.updateUnlockChecked}"/>
             <label for="unlock">Unlock only</label>
             </td>
             </tr>
@@ -126,78 +125,99 @@ updateUnlockChecked(e) {
           </table>          
         </div>
         <p><font color="red">${this.msg}</font></p>
+        <p><font color="red">${this.existsMessage}</font></p>
+        <p>${this.submitMessage}</p>
       </section>
-
     `;
   }
 
   _search(){
     console.log("_search");
-    const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/search/";
+    /*const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/search";*/
+    const Url="http://localhost:5000/api/v1/search/";
     const dataP={
-      search_string: this.searchstring,
+      search_string: this.searchString,
     };
     const param = {
       headers: {'Content-Type': 'application/json',
+        'Authorization': 'Basic ZGVzX3VzZXJzX21hbmFnZXI6ZGVzZG1ydWxlcwo=',
           },
       body: JSON.stringify(dataP),
       method: "POST"
     };
+    console.log(this.searchString);
     fetch(Url, param)
     .then(response => {return response.json();})
-    .then(data => {this.message = data.message;})
+    .then(data => {this.searchMessage = data.message;})
     .catch((error) => {console.log(error);});
   }
 
     _exists(){
-      console.log(this.name);
-      const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/exists/";
+      console.log("_exists");
+      /*const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/exists/";*/
+      const Url="http://localhost:5000/api/v1/exists/";
       const dataP={
-        username: this.username,
+        user: this.user,
         email: this.email,
       };
       const param = {
-        headers: {'Content-Type': 'application/json',},
+        headers: {'Content-Type': 'application/json',
+        'Authorization': 'Basic ZGVzX3VzZXJzX21hbmFnZXI6ZGVzZG1ydWxlcwo=',},
         body: JSON.stringify(dataP),
         method: "POST"
       };
       fetch(Url, param)
       .then(response => {return response.json();})
-      .then(data => {this.username = data.user;
-                      this.email = data.email;
-                      this.count = data.count;})
+      .then(data => {this.existsUser = data.user;
+                     this.existsEmail = data.email;
+                     this.count = data.count;})
       .catch((error) => {console.log(error);});
     }
 
-  _submit(){
+  _submit() {
     console.log("_submit");
-    const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/reset/";
+    if (this.resetChecked == true){
+      this.reset = "True";}
+    else{
+      this.reset = "False"
+    }
+  
+   /* const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/reset/";*/
+    const Url="http://localhost:5000/api/v1/reset/";   
     const dataP={
-      username: this.username,
+      user: this.user,
       email: this.email,
-      jiraticket: this.jira_ticket,
-      reset: this.resetchecked,
+      jira_ticket: this.jiraTicket,
+      reset: this.reset,
     };
     const param = {
-      headers: {'Content-Type': 'application/json',},
+      headers: {'Content-Type': 'application/json',
+                'Authorization': 'Basic ZGVzX3VzZXJzX21hbmFnZXI6ZGVzZG1ydWxlcwo='},
       body: JSON.stringify(dataP),
       method: "POST"
     };
-
-    if (this.resetchecked == this.unlockchecked){
-      this.msg = "Please select only one resolution option!"
-      console.log(this.msg)
+  
+    if (this.resetChecked == this.unlockChecked){
+      this.msg = "Please select only one resolution option!";
+      console.log(this.msg);
+      this.stop = 1;
     }
-    else {
-      this.msg=""
+    if (this.email == undefined | this.user == undefined){
+      this.msg = "Please specify username AND email!";
+      console.log(this.msg);
+      this.stop = 1;
+    }
+   
+    if (this.stop == 0) {
+      this.msg = "";
+
       fetch(Url, param)
       .then(response => {return response.json();})
-      .then(data => {this.message = data.message;
-                   this.status = data.status;})
+      .then(data => {this.submitMessage = data.message;
+                     this.status = data.status;})
       .catch((error) => {console.log(error);});
     }
   }
-  
 }
 
 window.customElements.define('des-ticket', DESTicket);
