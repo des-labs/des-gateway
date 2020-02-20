@@ -22,7 +22,10 @@ import { store } from '../store.js';
 import {
   navigate,
   updateDrawerState,
-  updateDrawerPersist
+  updateDrawerPersist,
+  loginUser,
+  logoutUser,
+  getProfile
 } from '../actions/app.js';
 
 // These are the elements needed by this element.
@@ -38,10 +41,10 @@ class DESMain extends connect(store)(LitElement) {
   static get properties() {
     return {
       appTitle: { type: String },
+      _session: {type: Boolean},
       _page: { type: String },
       _drawerOpened: { type: Boolean },
       _drawerPersisted: { type: Boolean },
-      name: {type: String},
       username: {type: String},
       email: {type: String},
       _accessPages: {type: Array},
@@ -156,20 +159,23 @@ class DESMain extends connect(store)(LitElement) {
           .opened="${this._drawerOpened}"
           .persistent="${this._drawerPersisted}"
           @opened-changed="${this._drawerOpenedChanged}"
+          transition-duration=0
        >
-       <des-sidebar name=${this.name} email=${this.email}></des-sidebar>
+       <des-sidebar username=${this.username} email=${this.email}></des-sidebar>
       
         <nav class="drawer-list">
           <a ?selected="${this._page === 'home'}" href="${config.rootPath + 'home'}">Home</a>
           ${this._accessPages.includes('page1') ?  html`<a ?selected="${this._page === 'page1'}" href="${config.rootPath + 'page1'}">Page One</a>` : html ``}
           ${this._accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.rootPath + 'page2'}">Page Two</a>` : html ``}
           ${this._accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.rootPath + 'page3'}">Page Three</a>` : html ``}
+          <a href="${config.rootPath + 'logout'}">Log out</a>
         </nav>
       
       </app-drawer>
 
       <!-- Main content -->
       <main role="main" class="main-content">
+         <des-login class="page" ?active="${this._page === 'login'}" ></des-login>
          <des-home class="page" ?active="${this._page === 'home'}"></des-home>
         ${this._accessPages.includes('page1') ? 
            html`<des-page1 class="page" ?active="${this._page === 'page1'}"></des-page1>` :
@@ -183,7 +189,8 @@ class DESMain extends connect(store)(LitElement) {
         
         <des-404 class="page" ?active="${this._page === 'des404'}"></des-404>
       </main>
-
+      
+      
       <footer>
         <p> &copy; DESDM Team, 2020</p>
       </footer>
@@ -194,27 +201,29 @@ class DESMain extends connect(store)(LitElement) {
   constructor() {
     super();
     console.log('Initializing...');
-    this.name = "Matias";
-    this.username = "tom";
-    this.email = "mcarras2@illinois.edu"
-    const Url=config.backEndUrl+"/init/";
-    const dataP={
-      username: this.username,
-    };
-    const param = {
-      headers: {'Content-Type': 'application/json',},
-      body: JSON.stringify(dataP),
-      method: "POST"
-    };
-    fetch(Url, param)
-    .then(response => {return response.json();})
-    .then(data => {this._accessPages = data.access;})
-    .catch((error) => {console.log(error);});
+    this._session = false;
+    this._accessPages=['page1', 'page2', 'page3'];
+    this._drawerOpened="false";
+    store.dispatch(getProfile());
+ 
     setPassiveTouchGestures(true);
   }
 
+  _profile(data){
+        this._session = true;
+        this.username = data.username;
+        this.email = data.email;
+        console.log(this._session, this.username, this.email);
+        store.dispatch(loginUser({"username":this.username, "email": this.email, "session": true}));
+        store.dispatch(updateDrawerPersist(true));
+        store.dispatch(updateDrawerState(true));
+    
+  }
+
   firstUpdated() {
-    installRouter((location) => store.dispatch(navigate(decodeURIComponent(location.pathname),this._drawerPersisted, this._accessPages)));
+    console.log('First Updated');
+   console.log("session", this._session);
+    installRouter((location) => store.dispatch(navigate(decodeURIComponent(location.pathname),this._drawerPersisted, this._accessPages, this._session)));
     installMediaQueryWatcher(`(min-width: 460px)`, (matches) => {
         matches ?  this._goWide() :  this._goNarrow()
       })
@@ -232,7 +241,7 @@ class DESMain extends connect(store)(LitElement) {
 
   _goWide(){
     store.dispatch(updateDrawerPersist(true));
-    store.dispatch(updateDrawerState(true));
+    //store.dispatch(updateDrawerState(true));
   }
 
   _goNarrow(){
@@ -249,9 +258,12 @@ class DESMain extends connect(store)(LitElement) {
   }
 
   stateChanged(state) {
+    this._session = state.app.session;
     this._page = state.app.page;
     this._drawerOpened = state.app.drawerOpened;
     this._drawerPersisted = state.app.drawerPersisted;
+    this.username = state.app.username;
+    this.email = state.app.email;
   }
 }
 

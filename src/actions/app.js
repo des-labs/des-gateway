@@ -1,44 +1,76 @@
-/**
-@license
-Copyright (c) 2018 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
-*/
-
 import {config} from '../components/des-config.js';
+import { store } from '../store.js';
+
 export const UPDATE_PAGE = 'UPDATE_PAGE';
 export const UPDATE_DRAWER_STATE = 'UPDATE_DRAWER_STATE';
 export const UPDATE_DRAWER_PERSIST = 'UPDATE_DRAWER_PERSIST';
+export const LOGIN_USER = 'LOGIN_USER';
+export const LOGOUT_USER = 'LOGOUT_USER';
 var root = config.rootPath === '/' ? '/' : config.rootPath.slice(1);
 // TODO: need to fix this usage of ridx
 var ridx = config.rootPath === '/' ? 0 : 1;
 
-export const navigate = (path,persist,hp) => (dispatch) => {
+// TODO: double request to /profile
+const isauth = () => {
+  console.log('is auth?')
+  const token = localStorage.getItem("token");
+  if (token === null){
+    return false;
+  }
+  const Url=config.backEndUrl +  "/profile";
+  const formData = new FormData();
+  formData.append('token', token);
+  const data = new URLSearchParams(formData);
+  const param = { body:data, method: "POST"};
+  return fetch(Url, param).then(resp => resp.json())
+                .then(function(data){
+                  return true;
+                })
+};
+
+export const navigate = (path,persist,ap,session) => (dispatch) => {
+  // is the session active, if not verify auth 
+  const auth = session ? true : isauth();
+  //console.log('auth', auth);
   const path2 = path.slice(-1) === '/' ? path : path.concat('/');
   // TODO: fix
-  const page = path2 === config.rootPath ? 'home' : path2.slice(1).split("/")[ridx];
-  dispatch(loadPage(page, hp));
+  const page0 = path2 === config.rootPath ? 'home' : path2.slice(1).split("/")[ridx];
+  // Auth
+  // in case there is no auth and request page is other than login, after /login --> home
+  // but after /page3 --? page3
+  const temp = page0 === 'login' ? 'home' : page0;
+  // page is the final page, if no auth it should go to login
+  const page = auth ? temp : 'login';
+  dispatch(loadPage(page, ap));
   persist ? '' : dispatch(updateDrawerState(false)) 
   // Close the drawer - in case the *path* change came from a link in the drawer.
   //dispatch(updateDrawerState(false));
 };
 
-const loadPage = (page,hp) => (dispatch) => {
+const loadPage = (page,ap) => (dispatch) => {
   switch(page) {
+    case 'login':
+      import('../components/des-pages/des-login.js').then((module) => {
+        dispatch(updateDrawerState(false));
+        dispatch(updateDrawerPersist(false));
+        });
+      break;
+    case 'logout':
+         localStorage.clear();
+         dispatch(logoutUser());
+        window.location.href = config.rootPath+'login';
+      break;
     case 'home':
       import('../components/des-pages/des-home.js');
       break;
     case 'page1':
-      hp.includes('page1') ?  import('../components/des-pages/des-page1.js') :  import('../components/des-pages/des-404.js') ;
+      ap.includes('page1') ?  import('../components/des-pages/des-page1.js') :  import('../components/des-pages/des-404.js') ;
       break;
     case 'page2':
-      hp.includes('page2') ?  import('../components/des-pages/des-page2.js') : import('../components/des-pages/des-404.js')  ;
+      ap.includes('page2') ?  import('../components/des-pages/des-page2.js') : import('../components/des-pages/des-404.js')  ;
       break;
     case 'page3':
-      hp.includes('page3') ?   import('../components/des-pages/des-page3.js') : import('../components/des-pages/des-404.js') ;
+      ap.includes('page3') ?   import('../components/des-pages/des-page3.js') : import('../components/des-pages/des-404.js') ;
       break;
     default:
       page = 'des404';
@@ -68,4 +100,57 @@ export const updateDrawerPersist = (persisted) => {
     type: UPDATE_DRAWER_PERSIST,
     persisted
   };
+};
+
+export const loginUser = (userObj) => {
+  console.log('logging in...', userObj.username);
+  return {
+    type: LOGIN_USER,
+    username: userObj.username,
+    email: userObj.email,
+    session: userObj.session
+  };
+};
+
+export const logoutUser = () => {
+  console.log('logging out...');
+  return {
+    type: LOGOUT_USER,
+  };
+};
+
+export const getProfile = () => {
+  console.log('getting profile');
+  return dispatch => {
+      const token = localStorage.getItem("token");
+      const Url=config.backEndUrl +  "/profile";
+      const formData = new FormData();
+      formData.append('token', token);
+      const data = new URLSearchParams(formData);
+      const param = { body:data, method: "POST"};
+      if (token) {
+        return fetch(Url, param).then(resp => resp.json())
+                .then(data => {
+                     dispatch(loginUser({"username":data.username, "email": data.email, "session": true}));
+                     dispatch(updateDrawerPersist(true));
+                     dispatch(updateDrawerState(true));
+                     return true;
+                     //import('../components/des-pages/des-home.js');
+                     //dispatch(updatePage('home'));
+                })
+      }
+      else {
+        console.log('no token');
+         //import('../components/des-pages/des-login.js').then((module) => {
+        //dispatch(updateDrawerState(false));
+        //dispatch(updateDrawerPersist(false));
+        //});
+        //dispatch(updatePage('login'));
+        //window.location.href = config.rootPath+'login';
+        //dispatch(loadPage('login', ['home']));
+
+      }
+
+  }
+
 };

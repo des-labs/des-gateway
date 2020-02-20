@@ -8,7 +8,7 @@ import '@polymer/app-layout/app-toolbar/app-toolbar.js';
 class DESSideBar extends LitElement {
   static get properties() {
     return {
-      name: {
+      username: {
         type: String
       },
       email: {
@@ -68,7 +68,7 @@ class DESSideBar extends LitElement {
           <div class="image"></div>
         </div>
         <div class="self-info">
-          <div class="name">${this.name}</div>
+          <div class="name">${this.username}</div>
           <div class="email">${this.email}</div>
         </div>
     </app-toolbar>
