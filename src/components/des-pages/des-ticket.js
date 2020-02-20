@@ -133,7 +133,7 @@ updateUnlockChecked(e) {
 
   _search(){
     console.log("_search");
-    const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/search";
+    const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/search/";
     /*const Url="http://localhost:5000/api/v1/search/";*/
     const dataP={
       search_string: this.searchString,
