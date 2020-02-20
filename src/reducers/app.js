@@ -11,17 +11,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 import {
   UPDATE_PAGE,
   UPDATE_DRAWER_STATE,
-  UPDATE_DRAWER_PERSIST
+  UPDATE_DRAWER_PERSIST,
+  LOGIN_USER,
+  LOGOUT_USER
 } from '../actions/app.js';
 
 const INITIAL_STATE = {
   page: '',
-  drawerOpened: true,
-  drawerPersisted: true,
+  username: '',
+  email: '',
+  session: false,
+  drawerOpened: false,
+  drawerPersisted: false,
 };
 
 const app = (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    case LOGIN_USER:
+      return {
+        ...state,
+        username: action.username,
+        session: action.session,
+        email: action.email
+      };
+    case LOGOUT_USER:
+      return {
+        ...state,
+        username: '',
+        session: false,
+        email: ''
+      };
     case UPDATE_PAGE:
       return {
         ...state,
