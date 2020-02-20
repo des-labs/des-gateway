@@ -17,7 +17,7 @@ const isauth = () => {
   if (token === null){
     return false;
   }
-  const Url=config.backEndUrl +  "/profile";
+  const Url=config.backEndUrl + config.apiPath +  "/profile";
   const formData = new FormData();
   formData.append('token', token);
   const data = new URLSearchParams(formData);
@@ -29,7 +29,7 @@ const isauth = () => {
 };
 
 export const navigate = (path,persist,ap,session) => (dispatch) => {
-  // is the session active, if not verify auth 
+  // is the session active, if not verify auth
   const auth = session ? true : isauth();
   //console.log('auth', auth);
   const path2 = path.slice(-1) === '/' ? path : path.concat('/');
@@ -42,7 +42,7 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
   // page is the final page, if no auth it should go to login
   const page = auth ? temp : 'login';
   dispatch(loadPage(page, ap));
-  persist ? '' : dispatch(updateDrawerState(false)) 
+  persist ? '' : dispatch(updateDrawerState(false))
   // Close the drawer - in case the *path* change came from a link in the drawer.
   //dispatch(updateDrawerState(false));
 };
@@ -123,7 +123,7 @@ export const getProfile = () => {
   console.log('getting profile');
   return dispatch => {
       const token = localStorage.getItem("token");
-      const Url=config.backEndUrl +  "/profile";
+      const Url=config.backEndUrl + config.apiPath +  "/profile";
       const formData = new FormData();
       formData.append('token', token);
       const data = new URLSearchParams(formData);

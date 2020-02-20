@@ -37,7 +37,7 @@ class DESLogin extends connect(store)(PageViewElement) {
 
 _submit(){
   // do request
-  const Url=config.backEndUrl +  "/login"
+  const Url=config.backEndUrl + config.apiPath +  "/login"
   const formData = new FormData();
   formData.append('username', this.username);
   const data = new URLSearchParams(formData);
