@@ -25,7 +25,7 @@ class DESPage3 extends connect(store)(PageViewElement) {
     ];
   }
 
- 
+
  constructor(){
    super();
    this.username = '';
@@ -73,7 +73,7 @@ class DESPage3 extends connect(store)(PageViewElement) {
   stateChanged(state) {
     this.username = state.app.username;
   }
-  
+
 }
 
 window.customElements.define('des-page3', DESPage3);
