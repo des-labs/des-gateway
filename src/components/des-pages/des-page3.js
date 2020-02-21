@@ -25,7 +25,7 @@ class DESPage3 extends connect(store)(PageViewElement) {
     ];
   }
 
- 
+
  constructor(){
    super();
    this.username = '';
@@ -54,7 +54,7 @@ class DESPage3 extends connect(store)(PageViewElement) {
 
   _submit(){
     console.log(this.username);
-    const Url=config.backEndUrl +  "/job/submit"
+    const Url=config.backEndUrl + config.apiPath +  "/job/submit"
     const formData = new FormData();
     formData.append('job', 'test');
     formData.append('username', this.username);
@@ -73,7 +73,7 @@ class DESPage3 extends connect(store)(PageViewElement) {
   stateChanged(state) {
     this.username = state.app.username;
   }
-  
+
 }
 
 window.customElements.define('des-page3', DESPage3);
