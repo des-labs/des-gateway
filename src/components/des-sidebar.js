@@ -1,46 +1,85 @@
-import { LitElement, html, css } from 'lit-element';
+import {
+  LitElement,
+  html,
+  css
+} from 'lit-element';
 import '@polymer/app-layout/app-toolbar/app-toolbar.js';
-import '@polymer/app-layout/app-drawer/app-drawer.js';
 
 class DESSideBar extends LitElement {
-    static get properties() {
-      return {
-        value: { type: Number }
+  static get properties() {
+    return {
+      username: {
+        type: String
+      },
+      email: {
+        type: String
       }
     }
-  
-    static get styles() {
-      return [
-        css`
-            .test { color: red;}
+  }
+  static get styles() {
+    return [
+      css `
+        .info-container {
+          position: relative;
+          border: 2px solid #ccc;
+          border-radius: 50%;
+          height: 90px;
+          padding: 2px;
+          width: 90px;
+          margin: 20px auto;
+      }
+      .info-container .image {
+          background-image: url('images/user.png');
+          background-size: contain;
+          border-radius: 50%;
+          height: 100%;
+          width: 100%;
+          background-repeat: no-repeat;
+          background-position: center;
+      }
+      .self-info {
+          margin: 0 20px;
+          padding-bottom: 20px;
+          border-bottom: 1px solid #CCC;
+          text-align: center;
+      }
+      .self-info .name {
+          font-weight: bold;
+      }
+      .self-info .email {
+          color: #999;
+      }
         `
-      ];
-    }
-  
-    _ClickHandler(e) {
-      this.dispatchEvent(new CustomEvent('clickMenu'));
-    }
-
-    render() {
-      return html`
+    ];
+  }
 
 
+  render() {
+    return html `
 
+      <app-toolbar style="background-color: black;">
+        <iron-image
+        style="width:60px; height:60px;"
+        sizing="cover"
+        src="images/DESDM_logo.png"></iron-image>
+        </app-toolbar>
 
-        <app-toolbar class="toolbar-top" sticky>
-          <button class="menu-btn" title="Menu" @click="${this._ClickHandler}">${menuIcon}</button>
-          <div main-wide-title>DARK ENERGY SURVEY desaccess</div>
-          <div main-narrow-title>DES desaccess</div>
+        <div class="info-container">
+          <div class="image"></div>
+        </div>
+        <div class="self-info">
+          <div class="name">${this.username}</div>
+          <div class="email">${this.email}</div>
+        </div>
     </app-toolbar>
       `;
-    }
-  
-    constructor() {
-      super();
-      this.value = 0;
-    }
-  
-    
   }
-  
-  window.customElements.define('des-sidebar', DESSideBar);
+
+  constructor() {
+    super();
+  }
+
+
+}
+
+window.customElements.define('des-sidebar', DESSideBar);

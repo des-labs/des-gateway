@@ -7,11 +7,12 @@
   "license": "NCSA/UIUC",
   "repository": "",
   "scripts": {
-    "start": "polymer serve --hostname 0.0.0.0 --port 8080",
-    "build": "polymer build --auto-base-path && gulp prpl-server",
-    "build:static": "polymer build",
-    "serve": "prpl-server --root server/build --host 0.0.0.0",
-    "serve:static": "polymer serve --port 5000 build/es5-bundled"
+    "start": "polymer serve --hostname 0.0.0.0 --port 8081",
+    "build": "polymer build --preset=es5-bundled --name=easyweb --base-path=easyweb && gulp prpl-server",
+    "gulp": "gulp prpl-server",
+    "build:static": "polymer build ",
+    "serve": "prpl-server --root server/build --host 0.0.0.0 --port 8081",
+    "serve:static": "polymer serve --port 5000 build/easyweb"
   },
   "dependencies": {
     "@polymer/app-layout": "^3.0.0",

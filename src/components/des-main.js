@@ -22,7 +22,10 @@ import { store } from '../store.js';
 import {
   navigate,
   updateDrawerState,
-  updateDrawerPersist
+  updateDrawerPersist,
+  loginUser,
+  logoutUser,
+  getProfile
 } from '../actions/app.js';
 
 // These are the elements needed by this element.
@@ -32,18 +35,19 @@ import '@polymer/app-layout/app-toolbar/app-toolbar.js';
 import '@polymer/iron-image/iron-image.js';
 import './des-toolbar.js';
 import './des-sidebar.js';
+import {config} from './des-config.js';
 
 class DESMain extends connect(store)(LitElement) {
   static get properties() {
     return {
       appTitle: { type: String },
+      _session: {type: Boolean},
       _page: { type: String },
       _drawerOpened: { type: Boolean },
       _drawerPersisted: { type: Boolean },
-      name: {type: String},
       username: {type: String},
       email: {type: String},
-      _hiddenPages: {type: Array},
+      _accessPages: {type: Array},
       _listPages: {type: Array}
     };
   }
@@ -72,36 +76,6 @@ class DESMain extends connect(store)(LitElement) {
           --app-drawer-selected-color: black;
         }
 
-        .info-container {
-          position: relative;
-          border: 2px solid #ccc;
-          border-radius: 50%;
-          height: 90px;
-          padding: 2px;
-          width: 90px;
-          margin: 20px auto;
-      }
-      .info-container .image {
-          background-image: url('images/user.png');
-          background-size: contain;
-          border-radius: 50%;
-          height: 100%;
-          width: 100%;
-          background-repeat: no-repeat;
-          background-position: center;
-      }
-      .self-info {
-          margin: 0 20px;
-          padding-bottom: 20px;
-          border-bottom: 1px solid #CCC;
-          text-align: center;
-      }
-      .self-info .name {
-          font-weight: bold;
-      }
-      .self-info .email {
-          color: #999;
-      }
 
         app-header {
           position: fixed;
@@ -173,10 +147,7 @@ class DESMain extends connect(store)(LitElement) {
     ];
   }
 
-
-
   render() {
-    // Anything that's related to rendering should be done in here.
     return html`
       <!-- Header -->
       <app-header fixed>
@@ -188,49 +159,43 @@ class DESMain extends connect(store)(LitElement) {
           .opened="${this._drawerOpened}"
           .persistent="${this._drawerPersisted}"
           @opened-changed="${this._drawerOpenedChanged}"
-          >
-        <app-toolbar style="background-color: black;">
-        <iron-image
-        style="width:60px; height:60px;"
-        sizing="cover"
-        src="images/DESDM_logo.png"></iron-image>
-        </app-toolbar>
-
-        <div class="info-container">
-                    <div class="image"></div>
-                </div>
-                <div class="self-info">
-                    <div class="name">${this.name}</div>
-                    <div class="email">${this.email}</div>
-                </div>
-        <br>
+          transition-duration=0
+       >
+       <des-sidebar username=${this.username} email=${this.email}></des-sidebar>
+      
         <nav class="drawer-list">
-          ${this._hiddenPages.includes('page1') ? html`` : html`<a ?selected="${this._page === 'page1'}" href="/page1">Page One</a>`}
-          ${this._hiddenPages.includes('page2') ? html`` : html`<a ?selected="${this._page === 'page2'}" href="/page2">Page Two</a>`}
-          ${this._hiddenPages.includes('page3') ? html`` : html`<a ?selected="${this._page === 'page3'}" href="/page3">Page Three</a>`}
-          ${this._hiddenPages.includes('ticket') ? html`` : html`<a ?selected="${this._page === 'ticket'}" href="/ticket">Des Ticket</a>`}
-          </nav>
+          <a ?selected="${this._page === 'home'}" href="${config.rootPath + 'home'}">Home</a>
+          ${this._accessPages.includes('page1') ?  html`<a ?selected="${this._page === 'page1'}" href="${config.rootPath + 'page1'}">Page One</a>` : html ``}
+          ${this._accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.rootPath + 'page2'}">Page Two</a>` : html ``}
+          ${this._accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.rootPath + 'page3'}">Page Three</a>` : html ``}
+          ${this._accessPages.includes('ticket') ?  html`<a ?selected="${this._page === 'ticket'}" href="${config.rootPath + 'ticket'}">DES Ticket</a>` : html ``}
+          <a href="${config.rootPath + 'logout'}">Log out</a>
+        </nav>
       </app-drawer>
 
       <!-- Main content -->
       <main role="main" class="main-content">
-        ${this._hiddenPages.includes('page1') ? 
-           html`<des-404 class="page" ?active="${this._page === 'page1'}"></des-404>` : 
-           html`<des-page1 class="page" ?active="${this._page === 'page1'}"></des-page1>`}
-        ${this._hiddenPages.includes('page2') ? 
-           html`<des-404 class="page" ?active="${this._page === 'page2'}"></des-404>` : 
-           html`<des-page2 class="page" ?active="${this._page === 'page2'}"></des-page2>`}
-        ${this._hiddenPages.includes('page3') ? 
-           html`<des-404 class="page" ?active="${this._page === 'page3'}"></des-404>` : 
-           html`<des-page3 class="page" ?active="${this._page === 'page3'}"></des-page3>`}
-        ${this._hiddenPages.includes('ticket') ? 
-           html`<des-404 class="page" ?active="${this._page === 'ticket'}"></des-404>` : 
-           html`<des-ticket class="page" ?active="${this._page === 'ticket'}"></des-ticket>`}
+         <des-login class="page" ?active="${this._page === 'login'}" ></des-login>
+         <des-home class="page" ?active="${this._page === 'home'}"></des-home>
+        ${this._accessPages.includes('page1') ? 
+           html`<des-page1 class="page" ?active="${this._page === 'page1'}"></des-page1>` :
+           html`<des-404 class="page" ?active="${this._page === 'page1'}"></des-404>`}
+        ${this._accessPages.includes('page2') ? 
+           html`<des-page2 class="page" ?active="${this._page === 'page2'}"></des-page2>` :
+           html`<des-404 class="page" ?active="${this._page === 'page2'}"></des-404>` }
+        ${this._accessPages.includes('page3') ? 
+           html`<des-page3 class="page" ?active="${this._page === 'page3'}"></des-page3>` :
+           html`<des-404 class="page" ?active="${this._page === 'page3'}"></des-404>`} 
+         ${this._accessPages.includes('ticket') ? 
+           html`<des-ticket class="page" ?active="${this._page === 'ticket'}"></des-ticket>` :
+           html`<des-404 class="page" ?active="${this._page === 'ticket'}"></des-404>`} 
+       
         <des-404 class="page" ?active="${this._page === 'des404'}"></des-404>
       </main>
-
+      
+      
       <footer>
-        <p>DESDM Team</p>
+        <p> &copy; DESDM Team, 2020</p>
       </footer>
 
     `;
@@ -239,28 +204,29 @@ class DESMain extends connect(store)(LitElement) {
   constructor() {
     super();
     console.log('Initializing...');
-    this.name = "Matias";
-    this.username = "mck";
-    this.email = "mcarras2@illinois.edu"
-    this._hiddenPages = [];
+    this._session = false;
+    this._accessPages=['page1', 'page2', 'page3'];
+    this._drawerOpened="false";
+    store.dispatch(getProfile());
+ 
     setPassiveTouchGestures(true);
-    const Url="http://localhost:8888/init/";
-    const dataP={
-      username: this.username,
-    };
-    const param = {
-      headers: {'Content-Type': 'application/json',},
-      body: JSON.stringify(dataP),
-      method: "POST"
-    };
-    fetch(Url, param)
-    .then(response => {return response.json();})
-    .then(data => {this._hiddenPages = data.hidden;})
-    .catch((error) => {console.log(error);});
+  }
+
+  _profile(data){
+        this._session = true;
+        this.username = data.username;
+        this.email = data.email;
+        console.log(this._session, this.username, this.email);
+        store.dispatch(loginUser({"username":this.username, "email": this.email, "session": true}));
+        store.dispatch(updateDrawerPersist(true));
+        store.dispatch(updateDrawerState(true));
+    
   }
 
   firstUpdated() {
-    installRouter((location) => store.dispatch(navigate(decodeURIComponent(location.pathname),this._drawerPersisted, this._hiddenPages)));
+    console.log('First Updated');
+   console.log("session", this._session);
+    installRouter((location) => store.dispatch(navigate(decodeURIComponent(location.pathname),this._drawerPersisted, this._accessPages, this._session)));
     installMediaQueryWatcher(`(min-width: 460px)`, (matches) => {
         matches ?  this._goWide() :  this._goNarrow()
       })
@@ -278,7 +244,7 @@ class DESMain extends connect(store)(LitElement) {
 
   _goWide(){
     store.dispatch(updateDrawerPersist(true));
-    store.dispatch(updateDrawerState(true));
+    //store.dispatch(updateDrawerState(true));
   }
 
   _goNarrow(){
@@ -295,9 +261,12 @@ class DESMain extends connect(store)(LitElement) {
   }
 
   stateChanged(state) {
+    this._session = state.app.session;
     this._page = state.app.page;
     this._drawerOpened = state.app.drawerOpened;
     this._drawerPersisted = state.app.drawerPersisted;
+    this.username = state.app.username;
+    this.email = state.app.email;
   }
 }
 

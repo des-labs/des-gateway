@@ -1,15 +1,17 @@
 import { html,css } from 'lit-element';
-import { PageViewElement } from '../page-view-element.js';
-import { SharedStyles } from '../shared-styles.js';
+import { PageViewElement } from './des-base-page.js';
+import { connect } from 'pwa-helpers/connect-mixin.js';
+import { SharedStyles } from '../styles/shared-styles.js';
+import {config} from '../des-config.js';
+import { store } from '../../store.js';
 
 
-class DESPage3 extends PageViewElement {
+class DESPage3 extends connect(store)(PageViewElement) {
   static get properties() {
     return {
-      // This is the data from the store.
-      _clicks: { type: Number },
       _value: { type: Number },
-      name: {type: String},
+      username: {type: String},
+      time: {type: Number},
       msg: {type: String},
     };
   }
@@ -26,7 +28,8 @@ class DESPage3 extends PageViewElement {
  
  constructor(){
    super();
-   this.name = "Peter";
+   this.username = '';
+   this.time = 30;
    this.msg = "";
 }
 
@@ -38,7 +41,8 @@ class DESPage3 extends PageViewElement {
         <h2>Hidden!</h2>
         </div>
        <div>
-       <input value="${this.name}" @input="${e => this.name = e.target.value}">
+       name: <input value="${this.username}" @input="${e => this.name = e.target.value}">
+       time: <input value="${this.time}" @input="${e => this.time = e.target.value}">
         <p>Result: ${this.name}</p>
         <button @click="${this._submit}">Submit</button>
         <p> ${this.msg}</p>
@@ -49,20 +53,25 @@ class DESPage3 extends PageViewElement {
   }
 
   _submit(){
-    console.log(this.name);
-    const Url="http://localhost:8888/test/"
-    const dataP={
-      name: this.name,
-    };
+    console.log(this.username);
+    const Url=config.backEndUrl +  "/job/submit"
+    const formData = new FormData();
+    formData.append('job', 'test');
+    formData.append('username', this.username);
+    formData.append('time', this.time);
+    const data = new URLSearchParams(formData);
     const param = {
-      headers: {'Content-Type': 'application/json',},
-      body: JSON.stringify(dataP),
-      method: "POST"
+      body: data,
+      method: "PUT"
     };
     fetch(Url, param)
     .then(response => {return response.json();})
     .then(data => {this.msg = data.msg;})
     .catch((error) => {console.log(error);});
+  }
+  
+  stateChanged(state) {
+    this.username = state.app.username;
   }
   
 }
