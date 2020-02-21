@@ -141,7 +141,7 @@ class DESMain extends connect(store)(LitElement) {
             margin-left: 256px;
           }
 
-       
+
         }
       `
     ];
@@ -162,8 +162,9 @@ class DESMain extends connect(store)(LitElement) {
           transition-duration=0
        >
        <des-sidebar username=${this.username} email=${this.email}></des-sidebar>
-      
+
         <nav class="drawer-list">
+<<<<<<< HEAD
           <a ?selected="${this._page === 'home'}" href="${config.rootPath + 'home'}">Home</a>
           ${this._accessPages.includes('page1') ?  html`<a ?selected="${this._page === 'page1'}" href="${config.rootPath + 'page1'}">Page One</a>` : html ``}
           ${this._accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.rootPath + 'page2'}">Page Two</a>` : html ``}
@@ -171,29 +172,43 @@ class DESMain extends connect(store)(LitElement) {
           ${this._accessPages.includes('ticket') ?  html`<a ?selected="${this._page === 'ticket'}" href="${config.rootPath + 'ticket'}">DES Ticket</a>` : html ``}
           <a href="${config.rootPath + 'logout'}">Log out</a>
         </nav>
+=======
+          <a ?selected="${this._page === 'home'}" href="${config.rootPath + '/home'}">Home</a>
+          ${this._accessPages.includes('page1') ?  html`<a ?selected="${this._page === 'page1'}" href="${config.rootPath + '/page1'}">Page One</a>` : html ``}
+          ${this._accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.rootPath + '/page2'}">Page Two</a>` : html ``}
+          ${this._accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.rootPath + '/page3'}">Page Three</a>` : html ``}
+          <a href="${config.rootPath + '/logout'}">Log out</a>
+        </nav>
+
+>>>>>>> master
       </app-drawer>
 
       <!-- Main content -->
       <main role="main" class="main-content">
          <des-login class="page" ?active="${this._page === 'login'}" ></des-login>
          <des-home class="page" ?active="${this._page === 'home'}"></des-home>
-        ${this._accessPages.includes('page1') ? 
+        ${this._accessPages.includes('page1') ?
            html`<des-page1 class="page" ?active="${this._page === 'page1'}"></des-page1>` :
            html`<des-404 class="page" ?active="${this._page === 'page1'}"></des-404>`}
-        ${this._accessPages.includes('page2') ? 
+        ${this._accessPages.includes('page2') ?
            html`<des-page2 class="page" ?active="${this._page === 'page2'}"></des-page2>` :
            html`<des-404 class="page" ?active="${this._page === 'page2'}"></des-404>` }
-        ${this._accessPages.includes('page3') ? 
+        ${this._accessPages.includes('page3') ?
            html`<des-page3 class="page" ?active="${this._page === 'page3'}"></des-page3>` :
+<<<<<<< HEAD
            html`<des-404 class="page" ?active="${this._page === 'page3'}"></des-404>`} 
          ${this._accessPages.includes('ticket') ? 
            html`<des-ticket class="page" ?active="${this._page === 'ticket'}"></des-ticket>` :
            html`<des-404 class="page" ?active="${this._page === 'ticket'}"></des-404>`} 
        
+=======
+           html`<des-404 class="page" ?active="${this._page === 'page3'}"></des-404>`}
+
+>>>>>>> master
         <des-404 class="page" ?active="${this._page === 'des404'}"></des-404>
       </main>
-      
-      
+
+
       <footer>
         <p> &copy; DESDM Team, 2020</p>
       </footer>
@@ -208,7 +223,7 @@ class DESMain extends connect(store)(LitElement) {
     this._accessPages=['page1', 'page2', 'page3'];
     this._drawerOpened="false";
     store.dispatch(getProfile());
- 
+
     setPassiveTouchGestures(true);
   }
 
@@ -220,7 +235,7 @@ class DESMain extends connect(store)(LitElement) {
         store.dispatch(loginUser({"username":this.username, "email": this.email, "session": true}));
         store.dispatch(updateDrawerPersist(true));
         store.dispatch(updateDrawerState(true));
-    
+
   }
 
   firstUpdated() {

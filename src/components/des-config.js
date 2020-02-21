@@ -1,4 +1,5 @@
 export const config = {
-    "backEndUrl" : "http://localhost:8989",
-    "rootPath"  : "/easyweb/"
+    "backEndUrl" : "https://dev2.desapps.cosmology.illinois.edu",
+    "rootPath"  : "/easyweb",
+    "apiPath"  : "/easyweb-api"
 }
