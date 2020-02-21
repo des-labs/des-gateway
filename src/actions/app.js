@@ -58,7 +58,7 @@ const loadPage = (page,ap) => (dispatch) => {
     case 'logout':
          localStorage.clear();
          dispatch(logoutUser());
-        window.location.href = config.rootPath+'login';
+        window.location.href = config.rootPath+'/login';
       break;
     case 'home':
       import('../components/des-pages/des-home.js');
@@ -146,7 +146,7 @@ export const getProfile = () => {
         //dispatch(updateDrawerPersist(false));
         //});
         //dispatch(updatePage('login'));
-        //window.location.href = config.rootPath+'login';
+        //window.location.href = config.rootPath+'/login';
         //dispatch(loadPage('login', ['home']));
 
       }

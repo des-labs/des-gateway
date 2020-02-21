@@ -164,11 +164,11 @@ class DESMain extends connect(store)(LitElement) {
        <des-sidebar username=${this.username} email=${this.email}></des-sidebar>
 
         <nav class="drawer-list">
-          <a ?selected="${this._page === 'home'}" href="${config.rootPath + 'home'}">Home</a>
-          ${this._accessPages.includes('page1') ?  html`<a ?selected="${this._page === 'page1'}" href="${config.rootPath + 'page1'}">Page One</a>` : html ``}
-          ${this._accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.rootPath + 'page2'}">Page Two</a>` : html ``}
-          ${this._accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.rootPath + 'page3'}">Page Three</a>` : html ``}
-          <a href="${config.rootPath + 'logout'}">Log out</a>
+          <a ?selected="${this._page === 'home'}" href="${config.rootPath + '/home'}">Home</a>
+          ${this._accessPages.includes('page1') ?  html`<a ?selected="${this._page === 'page1'}" href="${config.rootPath + '/page1'}">Page One</a>` : html ``}
+          ${this._accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.rootPath + '/page2'}">Page Two</a>` : html ``}
+          ${this._accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.rootPath + '/page3'}">Page Three</a>` : html ``}
+          <a href="${config.rootPath + '/logout'}">Log out</a>
         </nav>
 
       </app-drawer>
