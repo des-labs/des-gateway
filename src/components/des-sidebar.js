@@ -13,6 +13,9 @@ class DESSideBar extends LitElement {
       },
       email: {
         type: String
+      },
+      name: {
+        type: String
       }
     }
   }
@@ -68,7 +71,7 @@ class DESSideBar extends LitElement {
           <div class="image"></div>
         </div>
         <div class="self-info">
-          <div class="name">${this.username}</div>
+          <div class="name">${this.name}</div>
           <div class="email">${this.email}</div>
         </div>
     </app-toolbar>
