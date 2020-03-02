@@ -108,6 +108,7 @@ export const loginUser = (userObj) => {
     type: LOGIN_USER,
     username: userObj.username,
     email: userObj.email,
+    name: userObj.name,
     session: userObj.session
   };
 };
@@ -131,7 +132,8 @@ export const getProfile = () => {
       if (token) {
         return fetch(Url, param).then(resp => resp.json())
                 .then(data => {
-                     dispatch(loginUser({"username":data.username, "email": data.email, "session": true}));
+                     dispatch(loginUser({"username":data.username, "email": data.email,
+                     "name": data.name, "session": true}));
                      dispatch(updateDrawerPersist(true));
                      dispatch(updateDrawerState(true));
                      return true;

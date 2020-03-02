@@ -46,6 +46,7 @@ class DESMain extends connect(store)(LitElement) {
       _drawerOpened: { type: Boolean },
       _drawerPersisted: { type: Boolean },
       username: {type: String},
+      name: {type: String},
       email: {type: String},
       _accessPages: {type: Array},
       _listPages: {type: Array}
@@ -161,7 +162,7 @@ class DESMain extends connect(store)(LitElement) {
           @opened-changed="${this._drawerOpenedChanged}"
           transition-duration=0
        >
-       <des-sidebar username=${this.username} email=${this.email}></des-sidebar>
+       <des-sidebar name=${this.name} email=${this.email}></des-sidebar>
 
         <nav class="drawer-list">
           <a ?selected="${this._page === 'home'}" href="${config.rootPath + '/home'}">Home</a>
@@ -213,8 +214,9 @@ class DESMain extends connect(store)(LitElement) {
         this._session = true;
         this.username = data.username;
         this.email = data.email;
+        this.name = data.name;
         console.log(this._session, this.username, this.email);
-        store.dispatch(loginUser({"username":this.username, "email": this.email, "session": true}));
+        store.dispatch(loginUser({"name": this.name, "username":this.username, "email": this.email, "session": true}));
         store.dispatch(updateDrawerPersist(true));
         store.dispatch(updateDrawerState(true));
 
@@ -264,6 +266,7 @@ class DESMain extends connect(store)(LitElement) {
     this._drawerPersisted = state.app.drawerPersisted;
     this.username = state.app.username;
     this.email = state.app.email;
+    this.name = state.app.name;
   }
 }
 
