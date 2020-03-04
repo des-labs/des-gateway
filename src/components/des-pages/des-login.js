@@ -62,7 +62,6 @@ _submit(){
   this.shadowRoot.getElementById("loginSpinner").active=true;
   const Url=config.backEndUrl + config.apiPath +  "/login"
   const formData = new FormData();
-  console.log(this.username, this._passwd);
   formData.append('username', this.username);
   formData.append('password', this._passwd);
   formData.append('database', this.database);
