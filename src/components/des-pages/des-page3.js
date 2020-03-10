@@ -38,7 +38,7 @@ class DESPage3 extends connect(store)(PageViewElement) {
 
       <section>
         <div>
-        <h2>Hidden!</h2>
+        <h2>Submit test job</h2>
         </div>
        <div>
        name: <input value="${this.username}" @input="${e => this.name = e.target.value}">
@@ -69,7 +69,7 @@ class DESPage3 extends connect(store)(PageViewElement) {
     .then(data => {this.msg = data.msg;})
     .catch((error) => {console.log(error);});
   }
-  
+
   stateChanged(state) {
     this.username = state.app.username;
   }

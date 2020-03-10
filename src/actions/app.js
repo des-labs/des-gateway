@@ -6,9 +6,9 @@ export const UPDATE_DRAWER_STATE = 'UPDATE_DRAWER_STATE';
 export const UPDATE_DRAWER_PERSIST = 'UPDATE_DRAWER_PERSIST';
 export const LOGIN_USER = 'LOGIN_USER';
 export const LOGOUT_USER = 'LOGOUT_USER';
-var root = config.rootPath === '/' ? '/' : config.rootPath.slice(1);
+// var root = config.rootPath === '/' || config.rootPath === '' ? '/' : config.rootPath.slice(1);
 // TODO: need to fix this usage of ridx
-var ridx = config.rootPath === '/' ? 0 : 1;
+var ridx = config.rootPath === '/' || config.rootPath === '' ? 0 : 1;
 
 // TODO: double request to /profile
 const isauth = () => {
@@ -58,7 +58,7 @@ const loadPage = (page,ap) => (dispatch) => {
     case 'logout':
          localStorage.clear();
          dispatch(logoutUser());
-        window.location.href = config.rootPath+'/login';
+        window.location.href = config.frontEndUrl + config.rootPath+'/login';
       break;
     case 'home':
       import('../components/des-pages/des-home.js');
