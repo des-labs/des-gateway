@@ -72,6 +72,9 @@ const loadPage = (page,ap) => (dispatch) => {
     case 'page3':
       ap.includes('page3') ?   import('../components/des-pages/des-page3.js') : import('../components/des-pages/des-404.js') ;
       break;
+    case 'page4':
+      ap.includes('page4') ?   import('../components/des-pages/des-page4.js') : import('../components/des-pages/des-404.js') ;
+      break;
     default:
       page = 'des404';
       import('../components/des-pages/des-404.js');
