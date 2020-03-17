@@ -72,8 +72,8 @@ const loadPage = (page,ap) => (dispatch) => {
     case 'page3':
       ap.includes('page3') ?   import('../components/des-pages/des-page3.js') : import('../components/des-pages/des-404.js') ;
       break;
-    case 'page4':
-      ap.includes('page4') ?   import('../components/des-pages/des-page4.js') : import('../components/des-pages/des-404.js') ;
+    case 'query-test':
+      ap.includes('query-test') ?   import('../components/des-pages/des-query-test.js') : import('../components/des-pages/des-404.js') ;
       break;
     case 'ticket':
       ap.includes('ticket') ?   import('../components/des-pages/des-ticket.js') : import('../components/des-pages/des-404.js') ;

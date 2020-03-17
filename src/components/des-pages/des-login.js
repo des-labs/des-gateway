@@ -77,7 +77,7 @@ _submit(){
       store.dispatch(loginUser({"name": data.name, "username": data.username, "email":data.email, "session": true}));
       store.dispatch(updateDrawerState(true));
       store.dispatch(updateDrawerPersist(true));
-      store.dispatch(navigate(decodeURIComponent(location.pathname) ,true,  ['page1', 'page2', 'page3', 'ticket'], true));
+      store.dispatch(navigate(decodeURIComponent(location.pathname) ,true,  ['page1', 'page2', 'page3', 'query-test', 'ticket'], true));
     }
     else {
       localStorage.clear();

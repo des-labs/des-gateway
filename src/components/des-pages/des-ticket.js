@@ -1,6 +1,6 @@
 import { html,css } from 'lit-element';
 import { PageViewElement } from '../page-view-element.js';
-import { SharedStyles } from '../shared-styles.js';
+import { SharedStyles } from '../styles/shared-styles.js';
 
 class DESTicket extends PageViewElement {
   static get properties() {
@@ -41,7 +41,7 @@ updateResetChecked(e) {
 updateUnlockChecked(e) {
   this.unlockChecked = e.target.checked;
 }
- 
+
   render() {
     return html`
 
@@ -122,7 +122,7 @@ updateUnlockChecked(e) {
             <button @click="${this._submit}">Submit</button>
             </td>
             </tr>
-          </table>          
+          </table>
         </div>
         <p><font color="red">${this.msg}</font></p>
         <p><font color="red">${this.existsMessage}</font></p>
@@ -181,7 +181,7 @@ updateUnlockChecked(e) {
     else{
       this.reset = "False"
     }
-  
+
     const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/reset/";
     /*const Url="http://localhost:5000/api/v1/reset/";*/
     const dataP={
@@ -196,7 +196,7 @@ updateUnlockChecked(e) {
       body: JSON.stringify(dataP),
       method: "POST"
     };
-  
+
     if (this.resetChecked == this.unlockChecked){
       this.msg = "Please select only one resolution option!";
       console.log(this.msg);
@@ -207,7 +207,7 @@ updateUnlockChecked(e) {
       console.log(this.msg);
       this.stop = 1;
     }
-   
+
     if (this.stop == 0) {
       this.msg = "";
 
