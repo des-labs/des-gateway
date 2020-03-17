@@ -165,12 +165,13 @@ class DESMain extends connect(store)(LitElement) {
        <des-sidebar name=${this.name} email=${this.email}></des-sidebar>
 
         <nav class="drawer-list">
-          <a ?selected="${this._page === 'home'}" href="${config.rootPath + '/home'}">Home</a>
-          ${this._accessPages.includes('page1') ?  html`<a ?selected="${this._page === 'page1'}" href="${config.rootPath + '/page1'}">Page One</a>` : html ``}
-          ${this._accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.rootPath + '/page2'}">Page Two</a>` : html ``}
-          ${this._accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.rootPath + '/page3'}">Page Three</a>` : html ``}
-          ${this._accessPages.includes('ticket') ?  html`<a ?selected="${this._page === 'ticket'}" href="${config.rootPath + '/ticket'}">DES Ticket</a>` : html ``}
-          <a href="${config.rootPath + '/logout'}">Log out</a>
+          <a ?selected="${this._page === 'home'}" href="${config.frontEndUrl + config.rootPath + '/home'}">Home</a>
+          ${this._accessPages.includes('page1') ?  html`<a ?selected="${this._page === 'page1'}" href="${config.frontEndUrl + config.rootPath + '/page1'}">Page One</a>` : html ``}
+          ${this._accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.frontEndUrl + config.rootPath + '/page2'}">Page Two</a>` : html ``}
+          ${this._accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.frontEndUrl + config.rootPath + '/page3'}">Page Three</a>` : html ``}
+          ${this._accessPages.includes('page4') ?  html`<a ?selected="${this._page === 'page4'}" href="${config.frontEndUrl + config.rootPath + '/page4'}">Page Four</a>` : html ``}
+          ${this._accessPages.includes('page4') ?  html`<a ?selected="${this._page === 'ticket'}" href="${config.frontEndUrl + config.rootPath + '/ticket'}">DES Ticket</a>` : html ``}
+          <a href="${config.frontEndUrl + config.rootPath + '/logout'}">Log out</a>
         </nav>
 
       </app-drawer>
@@ -188,6 +189,9 @@ class DESMain extends connect(store)(LitElement) {
         ${this._accessPages.includes('page3') ?
            html`<des-page3 class="page" ?active="${this._page === 'page3'}"></des-page3>` :
            html`<des-404 class="page" ?active="${this._page === 'page3'}"></des-404>`}
+        ${this._accessPages.includes('page4') ?
+           html`<des-page4 class="page" ?active="${this._page === 'page4'}"></des-page4>` :
+           html`<des-404 class="page" ?active="${this._page === 'page4'}"></des-404>`}
         ${this._accessPages.includes('ticket') ?
            html`<des-page3 class="page" ?active="${this._page === 'ticket'}"></des-page3>` :
            html`<des-404 class="page" ?active="${this._page === 'ticket'}"></des-404>`}
@@ -207,7 +211,7 @@ class DESMain extends connect(store)(LitElement) {
     super();
     console.log('Initializing...');
     this._session = false;
-    this._accessPages=['page1', 'page2', 'page3'];
+    this._accessPages=['page1', 'page2', 'page3', 'page4'];
     this._drawerOpened="false";
     store.dispatch(getProfile());
 
