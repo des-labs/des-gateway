@@ -169,6 +169,7 @@ class DESMain extends connect(store)(LitElement) {
           ${this._accessPages.includes('page1') ?  html`<a ?selected="${this._page === 'page1'}" href="${config.rootPath + '/page1'}">Page One</a>` : html ``}
           ${this._accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.rootPath + '/page2'}">Page Two</a>` : html ``}
           ${this._accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.rootPath + '/page3'}">Page Three</a>` : html ``}
+          ${this._accessPages.includes('ticket') ?  html`<a ?selected="${this._page === 'ticket'}" href="${config.rootPath + '/ticket'}">DES Ticket</a>` : html ``}
           <a href="${config.rootPath + '/logout'}">Log out</a>
         </nav>
 
@@ -187,6 +188,9 @@ class DESMain extends connect(store)(LitElement) {
         ${this._accessPages.includes('page3') ?
            html`<des-page3 class="page" ?active="${this._page === 'page3'}"></des-page3>` :
            html`<des-404 class="page" ?active="${this._page === 'page3'}"></des-404>`}
+        ${this._accessPages.includes('ticket') ?
+           html`<des-page3 class="page" ?active="${this._page === 'ticket'}"></des-page3>` :
+           html`<des-404 class="page" ?active="${this._page === 'ticket'}"></des-404>`}
 
         <des-404 class="page" ?active="${this._page === 'des404'}"></des-404>
       </main>
