@@ -12,9 +12,10 @@ var ridx = config.rootPath === '/' || config.rootPath === '' ? 0 : 1;
 
 // TODO: double request to /profile
 const isauth = () => {
-  console.log('is auth?')
+  console.log('is auth?');
   const token = localStorage.getItem("token");
   if (token === null){
+    console.log('no: no token');
     return false;
   }
   const Url=config.backEndUrl + config.apiPath +  "/profile";
@@ -24,7 +25,8 @@ const isauth = () => {
   const param = { body:data, method: "POST"};
   return fetch(Url, param).then(resp => resp.json())
                 .then(function(data){
-                  return true;
+                  if (data.status=='ok') {return true;}
+                  else {return false;}
                 })
 };
 
@@ -142,13 +144,21 @@ export const getProfile = () => {
       if (token) {
         return fetch(Url, param).then(resp => resp.json())
                 .then(data => {
-                     dispatch(loginUser({"username":data.username, "email": data.email,
-                     "name": data.name, "session": true}));
-                     dispatch(updateDrawerPersist(true));
-                     dispatch(updateDrawerState(true));
-                     return true;
-                     //import('../components/des-pages/des-home.js');
-                     //dispatch(updatePage('home'));
+                     console.log(data);
+                     if (data.status =='ok'){
+                      dispatch(loginUser({"username":data.username, "email": data.email,
+                      "name": data.name, "session": true}));
+                      dispatch(updateDrawerPersist(true));
+                      dispatch(updateDrawerState(true));
+                      return true;
+                      //import('../components/des-pages/des-home.js');
+                      //dispatch(updatePage('home'));
+                     }
+                     else {
+                      dispatch(loadPage('logout', ''));
+                      return false;
+                     }
+
                 })
       }
       else {
