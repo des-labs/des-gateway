@@ -53,7 +53,7 @@ class DESPage3 extends connect(store)(PageViewElement) {
   }
 
   _submit(){
-    console.log(this.username);
+    var token=localStorage.getItem("token");
     const Url=config.backEndUrl + config.apiPath +  "/job/submit"
     const formData = new FormData();
     formData.append('job', 'test');
@@ -62,11 +62,12 @@ class DESPage3 extends connect(store)(PageViewElement) {
     const data = new URLSearchParams(formData);
     const param = {
       body: data,
-      method: "PUT"
+      method: "PUT",
+      headers: {'Authorization': 'Bearer ' + token}
     };
     fetch(Url, param)
     .then(response => {return response.json();})
-    .then(data => {this.msg = data.msg;})
+    .then(data => {this.msg = data.message;})
     .catch((error) => {console.log(error);});
   }
 

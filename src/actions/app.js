@@ -134,7 +134,11 @@ export const getProfile = () => {
       const formData = new FormData();
       formData.append('token', token);
       const data = new URLSearchParams(formData);
-      const param = { body:data, method: "POST"};
+      const param = { 
+        body:data, 
+        method: "POST",
+        headers: {'Authorization': 'Bearer ' + token}
+      };
       if (token) {
         return fetch(Url, param).then(resp => resp.json())
                 .then(data => {
