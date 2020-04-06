@@ -118,7 +118,7 @@ class DESMain extends connect(store)(LitElement) {
 
         .main-content {
           padding-top: 64px;
-          min-height: 100vh;
+          min-height: 80vh;
         }
 
         .page {

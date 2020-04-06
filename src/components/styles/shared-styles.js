@@ -5,6 +5,18 @@ export const SharedStyles = css`
     box-sizing: border-box;
   }
 
+
+  paper-button.des-button {
+      background-color: #3F51B5;
+      color: white;
+      width: 150px;
+      text-transform: none;
+      --paper-button-raised-keyboard-focus: {
+        background-color: #3D5AFE !important;
+        color: white !important;
+      };
+  }
+
   section {
     padding: 24px;
     background: var(--app-section-odd-color);
