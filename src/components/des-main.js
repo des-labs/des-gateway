@@ -118,7 +118,7 @@ class DESMain extends connect(store)(LitElement) {
 
         .main-content {
           padding-top: 64px;
-          min-height: 100vh;
+          min-height: 80vh;
         }
 
         .page {
@@ -171,7 +171,6 @@ class DESMain extends connect(store)(LitElement) {
           ${this._accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.frontEndUrl + config.rootPath + '/page3'}">Submit test job</a>` : html ``}
           ${this._accessPages.includes('query-test') ?  html`<a ?selected="${this._page === 'query-test'}" href="${config.frontEndUrl + config.rootPath + '/query-test'}">DB query test</a>` : html ``}
           ${this._accessPages.includes('ticket') ?  html`<a ?selected="${this._page === 'ticket'}" href="${config.frontEndUrl + config.rootPath + '/ticket'}">DES Ticket</a>` : html ``}
-          <a href="${config.frontEndUrl + config.rootPath + '/logout'}">Log out</a>
         </nav>
 
       </app-drawer>
