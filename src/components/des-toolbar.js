@@ -8,6 +8,9 @@ import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
 import '@polymer/paper-item/paper-item.js';
 import '@polymer/paper-listbox/paper-listbox.js';
 import '@polymer/paper-menu-button/paper-menu-button.js';
+import '@polymer/paper-dialog/paper-dialog.js';
+import './des-update-info.js';
+import './des-update-pwd.js';
 import { menuIcon } from './des-icons.js';
 import {config} from './des-config.js';
 import { store } from '../store.js';
@@ -22,6 +25,7 @@ class DESToolBar extends  connect(store)(LitElement) {
     static get styles() {
       return [
         css`
+
         .toolbar-top {
           background-color: black;
           font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -99,10 +103,38 @@ class DESToolBar extends  connect(store)(LitElement) {
     _ClickHandler(e) {
       this.dispatchEvent(new CustomEvent('clickMenu'));
     }
+    _ProfileDialog(e){
+      this.shadowRoot.getElementById("UpdateProfileDialog").open();
+    }
+    _PasswordDialog(e){
+      this.shadowRoot.getElementById("ChangePasswordDialog").open();
+    }
+    patchOverlay(e){
+      //if (e.target.withBackdrop) {
+      //  e.target.parentNode.insertBefore(e.target._backdrop, e.target);
+     // }
+      const overlay = document.querySelector('iron-overlay-backdrop');
+      //const diag = this.shadowRoot.getElementById("UpdateProfileDialog");
+      e.target.parentNode.insertBefore(overlay, e.target);
+      overlay.style.position = "fixed";
+      overlay.style.height = "2000px";
+      overlay.style.width = "3000px";
+      overlay.style.left = "0px";
+
+    }
+
 
 
     render() {
       return html`
+      <paper-dialog  id="UpdateProfileDialog" with-backdrop  @iron-overlay-opened="${this.patchOverlay}" >
+      <des-update-info></des-update-info>
+      </paper-dialog>
+
+      <paper-dialog  id="ChangePasswordDialog" with-backdrop  @iron-overlay-opened="${this.patchOverlay}" >
+      <des-update-pwd></des-update-pwd>
+      </paper-dialog>
+
         <app-toolbar class="toolbar-top" sticky>
           <button class="menu-btn" title="Menu" @click="${this._ClickHandler}">${menuIcon}</button>
           <div main-wide-title>DARK ENERGY SURVEY desaccess</div>
@@ -113,7 +145,8 @@ class DESToolBar extends  connect(store)(LitElement) {
             <iron-icon class="profile-icon" icon="account-circle" slot="dropdown-trigger"></iron-icon>
             <iron-icon style="margin-left:-5px;" icon="arrow-drop-down" slot="dropdown-trigger" alt="menu"></iron-icon>
         <paper-listbox class="profile-listbox" slot="dropdown-content">
-          <paper-item class="profileItem"  disabled> Change Profile</paper-item>
+          <paper-item class="profileItem"  @click="${this._ProfileDialog}"> Update Profile</paper-item>
+          <paper-item class="profileItem"  @click="${this._PasswordDialog}"> Change Password</paper-item>
           <paper-item class="profileItem" @click="${this._ClickHandler}" >
           <a href="${config.frontEndUrl + config.rootPath + '/logout'}">Log out</a>
         </paper-item>

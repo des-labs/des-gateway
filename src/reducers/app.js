@@ -21,6 +21,7 @@ const INITIAL_STATE = {
   username: '',
   email: '',
   name: '',
+  db: '',
   lastname: '',
   session: false,
   drawerOpened: false,
@@ -35,6 +36,7 @@ const app = (state = INITIAL_STATE, action) => {
         username: action.username,
         session: action.session,
         name: action.name,
+        db: action.db,
         lastname: action.lastname,
         email: action.email
       };
@@ -44,6 +46,7 @@ const app = (state = INITIAL_STATE, action) => {
         username: '',
         name: '',
         lastname: '',
+        db: '',
         session: false,
         email: ''
       };

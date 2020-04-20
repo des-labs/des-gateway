@@ -7,6 +7,7 @@ import '@polymer/paper-input/paper-input.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-card/paper-card.js';
 import '@polymer/paper-spinner/paper-spinner.js';
+import '@cwmr/paper-password-input/paper-password-input.js'
 import { loginUser,
          logoutUser,
          navigate,
@@ -50,19 +51,8 @@ class DESLogin extends connect(store)(PageViewElement) {
           background-size: cover;
         }
         
-        .container {
-          text-align: center;
-          @apply(--layout-horizontal);
-          @apply(--layout-center-justified);
-        }
+ 
 
-        .errormessage{
-          display: block;
-          color : red;
-          font-size: 0.9em;
-          text-align: center;
-          word-wrap: break-word;
-        }
 
       `
     ];
@@ -86,7 +76,8 @@ class DESLogin extends connect(store)(PageViewElement) {
 
 
         <paper-input always-float-label label="Username"  @input="${e => this.username = e.target.value}"></paper-input>
-        <paper-input always-float-label label="Password"  type="password" @input="${e => this._passwd = e.target.value}"></paper-input>
+        <paper-password-input always-float-label label="Password"  type="password" @input="${e => this._passwd = e.target.value}">
+        </paper-password-input>
         <br>
 
 
@@ -138,7 +129,8 @@ _submit(){
   .then(data => {
     if (data.status == 'ok'){
       localStorage.setItem("token", data.token);
-      store.dispatch(loginUser({"name": data.name, "username": data.username, "lastname": data.lastname, "email":data.email, "session": true}));
+      store.dispatch(loginUser({"name": data.name, "username": data.username, 
+      "lastname": data.lastname, "email":data.email, "session": true, "db": data.db}));
       store.dispatch(updateDrawerState(true));
       store.dispatch(updateDrawerPersist(true));
       store.dispatch(navigate(decodeURIComponent(location.pathname) ,true,  ['page1', 'page2', 'page3', 'query-test', 'ticket'], true));

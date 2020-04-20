@@ -117,6 +117,7 @@ export const loginUser = (userObj) => {
     username: userObj.username,
     email: userObj.email,
     name: userObj.name,
+    db: userObj.db,
     lastname: userObj.lastname,
     session: userObj.session
   };
@@ -147,8 +148,8 @@ export const getProfile = () => {
                 .then(data => {
                      console.log(data);
                      if (data.status =='ok'){
-                      dispatch(loginUser({"username":data.username, "email": data.email,
-                      "name": data.name, "session": true}));
+                      dispatch(loginUser({"username":data.username, "lastname": data.lastname, "email": data.email,
+                      "name": data.name, "session": true, "db": data.db}));
                       dispatch(updateDrawerPersist(true));
                       dispatch(updateDrawerState(true));
                       return true;
