@@ -21,6 +21,8 @@ const INITIAL_STATE = {
   username: '',
   email: '',
   name: '',
+  db: '',
+  lastname: '',
   session: false,
   drawerOpened: false,
   drawerPersisted: false,
@@ -34,6 +36,8 @@ const app = (state = INITIAL_STATE, action) => {
         username: action.username,
         session: action.session,
         name: action.name,
+        db: action.db,
+        lastname: action.lastname,
         email: action.email
       };
     case LOGOUT_USER:
@@ -41,6 +45,8 @@ const app = (state = INITIAL_STATE, action) => {
         ...state,
         username: '',
         name: '',
+        lastname: '',
+        db: '',
         session: false,
         email: ''
       };

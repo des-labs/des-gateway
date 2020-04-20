@@ -17,6 +17,20 @@ export const SharedStyles = css`
       };
   }
 
+  paper-button.des-button[disabled] {
+    background: #eaeaea;
+    color: #a8a8a8;
+    cursor: auto;
+    pointer-events: none;
+}
+
+  .container {
+    text-align: center;
+    @apply(--layout-horizontal);
+    @apply(--layout-center-justified);
+  }
+
+
   section {
     padding: 24px;
     background: var(--app-section-odd-color);
@@ -56,4 +70,12 @@ export const SharedStyles = css`
     font-size: 30px;
     line-height: 64px;
   }
+  
+  .errormessage{
+          display: block;
+          color : red;
+          font-size: 0.9em;
+          text-align: center;
+          word-wrap: break-word;
+        }
 `;

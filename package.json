@@ -14,12 +14,15 @@
     "serve:static": "polymer serve --port 5000 build/default"
   },
   "dependencies": {
+    "@cwmr/paper-password-input": "^3.0.1",
     "@polymer/app-layout": "^3.0.0",
     "@polymer/iron-ajax": "^3.0.1",
     "@polymer/iron-icons": "^3.0.1",
     "@polymer/iron-image": "^3.0.2",
+    "@polymer/iron-validator-behavior": "^3.0.1",
     "@polymer/paper-button": "^3.0.1",
     "@polymer/paper-card": "^3.0.1",
+    "@polymer/paper-dialog": "^3.0.1",
     "@polymer/paper-dropdown-menu": "^3.1.0",
     "@polymer/paper-icon-button": "^3.0.2",
     "@polymer/paper-input": "^3.2.0",
@@ -34,7 +37,8 @@
     "pwa-helpers": "^0.9.0",
     "redux": "^4.0.0",
     "redux-thunk": "^2.3.0",
-    "reselect": "^4.0.0"
+    "reselect": "^4.0.0",
+    "web-dialog": "0.0.11"
   },
   "devDependencies": {
     "@polymer/test-fixture": "^4.0.2",
