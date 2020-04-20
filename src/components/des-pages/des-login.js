@@ -99,7 +99,8 @@ class DESLogin extends connect(store)(PageViewElement) {
         <div class="errormessage"> <b>${this.msg}</b></div>
         <br>
         </div>
-            <a href="https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/" style="font-size: 11px; margin-left: 5px;"> Forgot Password? </a>
+            <div class="card-content"><a href="https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/" style="font-size: 11px; margin-left: 5px;" target="_blank"> Forgot Password? </a>
+            </div>
       </div>
 
         </div>
@@ -137,7 +138,7 @@ _submit(){
   .then(data => {
     if (data.status == 'ok'){
       localStorage.setItem("token", data.token);
-      store.dispatch(loginUser({"name": data.name, "username": data.username, "email":data.email, "session": true}));
+      store.dispatch(loginUser({"name": data.name, "username": data.username, "lastname": data.lastname, "email":data.email, "session": true}));
       store.dispatch(updateDrawerState(true));
       store.dispatch(updateDrawerPersist(true));
       store.dispatch(navigate(decodeURIComponent(location.pathname) ,true,  ['page1', 'page2', 'page3', 'query-test', 'ticket'], true));

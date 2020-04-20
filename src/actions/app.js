@@ -117,6 +117,7 @@ export const loginUser = (userObj) => {
     username: userObj.username,
     email: userObj.email,
     name: userObj.name,
+    lastname: userObj.lastname,
     session: userObj.session
   };
 };
