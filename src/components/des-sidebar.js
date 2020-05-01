@@ -65,15 +65,14 @@ class DESSideBar extends LitElement {
         style="width:60px; height:60px;"
         sizing="cover"
         src="images/DESDM_logo.png"></iron-image>
-
-        <div class="info-container">
-          <div class="image"></div>
-        </div>
-        <div class="self-info">
-          <div class="name">${this.name}</div>
-          <div class="email">${this.email}</div>
-        </div>
-    </app-toolbar>
+      </app-toolbar>
+      <div class="info-container">
+        <div class="image"></div>
+      </div>
+      <div class="self-info">
+        <div class="name">${this.name}</div>
+        <div class="email">${this.email}</div>
+      </div>
       `;
   }
 
