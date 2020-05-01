@@ -65,7 +65,6 @@ class DESSideBar extends LitElement {
         style="width:60px; height:60px;"
         sizing="cover"
         src="images/DESDM_logo.png"></iron-image>
-        </app-toolbar>
 
         <div class="info-container">
           <div class="image"></div>

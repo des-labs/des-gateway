@@ -12,8 +12,9 @@ import { loginUser,
          logoutUser,
          navigate,
          updateDrawerPersist,
-         updateDrawerState } from '../../actions/app.js';
-import {config} from '../des-config.js';
+         updateDrawerState,
+         getAccessPages } from '../../actions/app.js';
+import {config, rbac_bindings} from '../des-config.js';
 
 
 class DESLogin extends connect(store)(PageViewElement) {
@@ -129,11 +130,11 @@ _submit(){
   .then(data => {
     if (data.status == 'ok'){
       localStorage.setItem("token", data.token);
-      store.dispatch(loginUser({"name": data.name, "username": data.username, 
-      "lastname": data.lastname, "email":data.email, "session": true, "db": data.db}));
+      store.dispatch(loginUser({"name": data.name, "username": data.username,
+      "lastname": data.lastname, "email":data.email, "session": true, "db": data.db, "roles": data.roles}));
       store.dispatch(updateDrawerState(true));
       store.dispatch(updateDrawerPersist(true));
-      store.dispatch(navigate(decodeURIComponent(location.pathname) ,true,  ['page1', 'page2', 'page3', 'query-test', 'ticket'], true));
+      store.dispatch(navigate(decodeURIComponent(location.pathname) ,true, getAccessPages(data.roles), true));
     }
     else {
       localStorage.clear();

@@ -1,4 +1,4 @@
-import {config} from '../components/des-config.js';
+import {config, rbac_bindings} from '../components/des-config.js';
 import { store } from '../store.js';
 
 export const UPDATE_PAGE = 'UPDATE_PAGE';
@@ -119,7 +119,8 @@ export const loginUser = (userObj) => {
     name: userObj.name,
     db: userObj.db,
     lastname: userObj.lastname,
-    session: userObj.session
+    session: userObj.session,
+    roles: userObj.roles
   };
 };
 
@@ -138,8 +139,8 @@ export const getProfile = () => {
       const formData = new FormData();
       formData.append('token', token);
       const data = new URLSearchParams(formData);
-      const param = { 
-        body:data, 
+      const param = {
+        body:data,
         method: "POST",
         headers: {'Authorization': 'Bearer ' + token}
       };
@@ -149,7 +150,7 @@ export const getProfile = () => {
                      console.log(data);
                      if (data.status =='ok'){
                       dispatch(loginUser({"username":data.username, "lastname": data.lastname, "email": data.email,
-                      "name": data.name, "session": true, "db": data.db}));
+                      "name": data.name, "session": true, "db": data.db, "roles": data.roles}));
                       dispatch(updateDrawerPersist(true));
                       dispatch(updateDrawerState(true));
                       return true;
@@ -177,4 +178,20 @@ export const getProfile = () => {
 
   }
 
+};
+
+export const getAccessPages = (roles) => {
+  var ap = []
+  for (var i=0; i < rbac_bindings.length; i++) {
+    if (roles.indexOf(rbac_bindings[i]["role_name"]) !== -1) {
+      var pages = rbac_bindings[i]["pages"]
+      for (var j=0; j < pages.length; j++) {
+        var page = pages[j]
+        if (ap.indexOf(page) === -1) {
+          ap.push(page)
+        }
+      }
+    }
+  }
+  return ap
 };

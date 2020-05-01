@@ -25,7 +25,8 @@ import {
   updateDrawerPersist,
   loginUser,
   logoutUser,
-  getProfile
+  getProfile,
+  getAccessPages
 } from '../actions/app.js';
 
 // These are the elements needed by this element.
@@ -35,7 +36,7 @@ import '@polymer/app-layout/app-toolbar/app-toolbar.js';
 import '@polymer/iron-image/iron-image.js';
 import './des-toolbar.js';
 import './des-sidebar.js';
-import {config} from './des-config.js';
+import {config, rbac_bindings } from './des-config.js';
 
 class DESMain extends connect(store)(LitElement) {
   static get properties() {
@@ -49,7 +50,8 @@ class DESMain extends connect(store)(LitElement) {
       name: {type: String},
       email: {type: String},
       _accessPages: {type: Array},
-      _listPages: {type: Array}
+      _listPages: {type: Array},
+      roles: {type: Array}
     };
   }
 
@@ -210,11 +212,22 @@ class DESMain extends connect(store)(LitElement) {
     super();
     console.log('Initializing...');
     this._session = false;
-    this._accessPages=['page1', 'page2', 'page3', 'query-test', 'ticket'];
-    this._drawerOpened="false";
     store.dispatch(getProfile());
-
+    this._accessPages=[];
+    this._drawerOpened="false";
     setPassiveTouchGestures(true);
+  }
+
+  stateChanged(state) {
+    this._session = state.app.session;
+    this._page = state.app.page;
+    this._drawerOpened = state.app.drawerOpened;
+    this._drawerPersisted = state.app.drawerPersisted;
+    this.username = state.app.username;
+    this.email = state.app.email;
+    this.name = state.app.name;
+    this.roles = state.app.roles;
+    this._accessPages=getAccessPages(this.roles)
   }
 
   _profile(data){
@@ -266,15 +279,6 @@ class DESMain extends connect(store)(LitElement) {
     store.dispatch(updateDrawerState(e.target.opened));
   }
 
-  stateChanged(state) {
-    this._session = state.app.session;
-    this._page = state.app.page;
-    this._drawerOpened = state.app.drawerOpened;
-    this._drawerPersisted = state.app.drawerPersisted;
-    this.username = state.app.username;
-    this.email = state.app.email;
-    this.name = state.app.name;
-  }
 }
 
 window.customElements.define('des-main', DESMain);
