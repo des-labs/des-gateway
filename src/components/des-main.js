@@ -172,6 +172,7 @@ class DESMain extends connect(store)(LitElement) {
           ${this._accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.frontEndUrl + config.rootPath + '/page2'}">Page Two</a>` : html ``}
           ${this._accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.frontEndUrl + config.rootPath + '/page3'}">Submit test job</a>` : html ``}
           ${this._accessPages.includes('query-test') ?  html`<a ?selected="${this._page === 'query-test'}" href="${config.frontEndUrl + config.rootPath + '/query-test'}">DB query test</a>` : html ``}
+          ${this._accessPages.includes('cutout') ?  html`<a ?selected="${this._page === 'cutout'}" href="${config.frontEndUrl + config.rootPath + '/cutout'}">Cutout</a>` : html ``}
           ${this._accessPages.includes('ticket') ?  html`<a ?selected="${this._page === 'ticket'}" href="${config.frontEndUrl + config.rootPath + '/ticket'}">DES Ticket</a>` : html ``}
         </nav>
 
@@ -193,6 +194,9 @@ class DESMain extends connect(store)(LitElement) {
         ${this._accessPages.includes('query-test') ?
            html`<des-query-test class="page" ?active="${this._page === 'query-test'}"></des-query-test>` :
            html`<des-404 class="page" ?active="${this._page === 'query-test'}"></des-404>`}
+        ${this._accessPages.includes('cutout') ?
+           html`<des-cutout class="page" ?active="${this._page === 'cutout'}"></des-cutout>` :
+           html`<des-404 class="page" ?active="${this._page === 'cutout'}"></des-404>`}
         ${this._accessPages.includes('ticket') ?
            html`<des-ticket class="page" ?active="${this._page === 'ticket'}"></des-ticket>` :
            html`<des-404 class="page" ?active="${this._page === 'ticket'}"></des-404>`}

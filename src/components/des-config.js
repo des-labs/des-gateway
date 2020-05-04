@@ -1,10 +1,3 @@
-export const configProd = {
-    "backEndUrl" : "https://dev2.desapps.cosmology.illinois.edu",
-    "frontEndUrl" : "https://dev2.desapps.cosmology.illinois.edu",
-    "rootPath"  : "",
-    "apiPath"  : "/easyweb/api"
-}
-
 export const configLocal = {
     "backEndUrl" : "http://localhost:8888",
     "frontEndUrl" : "",
@@ -14,17 +7,8 @@ export const configLocal = {
 
 export const config = configLocal;
 
-export const rbac_bindings = [
-    {
-        "role_name": "admin",
-        "pages": ['page1', 'page2', 'page3', 'query-test', 'ticket']
-    },
-    {
-        "role_name": "collaborator",
-        "pages": ['page1', 'page2', 'page3', 'query-test']
-    },
-    {
-        "role_name": "public",
-        "pages": ['page1', 'page2', 'page3']
-    },
-]
+// The `rbac.js` file contains the role-based access control information for
+// displaying pages based on the authenticated user's roles. This file must be
+// provided. In deployment it is mounted from a ConfigMap.
+import { rbac_bindings } from './rbac.js'
+export { rbac_bindings } from './rbac.js'
