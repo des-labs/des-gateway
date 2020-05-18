@@ -24,6 +24,7 @@ const INITIAL_STATE = {
   db: '',
   lastname: '',
   roles: [],
+  accessPages: [],
   session: false,
   drawerOpened: false,
   drawerPersisted: false
@@ -40,7 +41,8 @@ const app = (state = INITIAL_STATE, action) => {
         db: action.db,
         lastname: action.lastname,
         email: action.email,
-        roles: action.roles
+        roles: action.roles,
+        accessPages: action.accessPages
       };
     case LOGOUT_USER:
       return {
@@ -51,7 +53,8 @@ const app = (state = INITIAL_STATE, action) => {
         db: '',
         session: false,
         email: '',
-        roles: []
+        roles: [],
+        accessPages: []
       };
     case UPDATE_PAGE:
       return {

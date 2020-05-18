@@ -21,12 +21,12 @@ import { store } from '../store.js';
 // These are the actions needed by this element.
 import {
   navigate,
+  loadPage,
   updateDrawerState,
   updateDrawerPersist,
   loginUser,
   logoutUser,
-  getProfile,
-  getAccessPages
+  getProfile
 } from '../actions/app.js';
 
 // These are the elements needed by this element.
@@ -36,7 +36,7 @@ import '@polymer/app-layout/app-toolbar/app-toolbar.js';
 import '@polymer/iron-image/iron-image.js';
 import './des-toolbar.js';
 import './des-sidebar.js';
-import {config, rbac_bindings } from './des-config.js';
+import { config } from './des-config.js';
 
 class DESMain extends connect(store)(LitElement) {
   static get properties() {
@@ -49,7 +49,7 @@ class DESMain extends connect(store)(LitElement) {
       username: {type: String},
       name: {type: String},
       email: {type: String},
-      _accessPages: {type: Array},
+      accessPages: {type: Array},
       _listPages: {type: Array},
       roles: {type: Array}
     };
@@ -165,15 +165,14 @@ class DESMain extends connect(store)(LitElement) {
           transition-duration=0
        >
        <des-sidebar name=${this.name} email=${this.email}></des-sidebar>
-
         <nav class="drawer-list">
           <a ?selected="${this._page === 'home'}" href="${config.frontEndUrl + config.rootPath + '/home'}">Home</a>
-          ${this._accessPages.includes('page1') ?  html`<a ?selected="${this._page === 'page1'}" href="${config.frontEndUrl + config.rootPath + '/page1'}">Page One</a>` : html ``}
-          ${this._accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.frontEndUrl + config.rootPath + '/page2'}">Page Two</a>` : html ``}
-          ${this._accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.frontEndUrl + config.rootPath + '/page3'}">Submit test job</a>` : html ``}
-          ${this._accessPages.includes('db-access') ?  html`<a ?selected="${this._page === 'db-access'}" href="${config.frontEndUrl + config.rootPath + '/db-access'}">DB access</a>` : html ``}
-          ${this._accessPages.includes('cutout') ?  html`<a ?selected="${this._page === 'cutout'}" href="${config.frontEndUrl + config.rootPath + '/cutout'}">Cutout</a>` : html ``}
-          ${this._accessPages.includes('ticket') ?  html`<a ?selected="${this._page === 'ticket'}" href="${config.frontEndUrl + config.rootPath + '/ticket'}">DES Ticket</a>` : html ``}
+          ${this.accessPages.includes('page1') ?  html`<a ?selected="${this._page === 'page1'}" href="${config.frontEndUrl + config.rootPath + '/page1'}">Page One</a>` : html ``}
+          ${this.accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.frontEndUrl + config.rootPath + '/page2'}">Page Two</a>` : html ``}
+          ${this.accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.frontEndUrl + config.rootPath + '/page3'}">Submit test job</a>` : html ``}
+          ${this.accessPages.includes('db-access') ?  html`<a ?selected="${this._page === 'db-access'}" href="${config.frontEndUrl + config.rootPath + '/db-access'}">DB access</a>` : html ``}
+          ${this.accessPages.includes('cutout') ?  html`<a ?selected="${this._page === 'cutout'}" href="${config.frontEndUrl + config.rootPath + '/cutout'}">Cutout</a>` : html ``}
+          ${this.accessPages.includes('ticket') ?  html`<a ?selected="${this._page === 'ticket'}" href="${config.frontEndUrl + config.rootPath + '/ticket'}">DES Ticket</a>` : html ``}
         </nav>
 
       </app-drawer>
@@ -182,22 +181,22 @@ class DESMain extends connect(store)(LitElement) {
       <main role="main" class="main-content">
          <des-login class="page" ?active="${this._page === 'login'}" ></des-login>
          <des-home class="page" ?active="${this._page === 'home'}"></des-home>
-        ${this._accessPages.includes('page1') ?
+        ${this.accessPages.includes('page1') ?
            html`<des-page1 class="page" ?active="${this._page === 'page1'}"></des-page1>` :
            html`<des-404 class="page" ?active="${this._page === 'page1'}"></des-404>`}
-        ${this._accessPages.includes('page2') ?
+        ${this.accessPages.includes('page2') ?
            html`<des-page2 class="page" ?active="${this._page === 'page2'}"></des-page2>` :
            html`<des-404 class="page" ?active="${this._page === 'page2'}"></des-404>` }
-        ${this._accessPages.includes('page3') ?
+        ${this.accessPages.includes('page3') ?
            html`<des-page3 class="page" ?active="${this._page === 'page3'}"></des-page3>` :
            html`<des-404 class="page" ?active="${this._page === 'page3'}"></des-404>`}
-        ${this._accessPages.includes('db-access') ?
+        ${this.accessPages.includes('db-access') ?
            html`<des-db-access class="page" ?active="${this._page === 'db-access'}"></des-db-access>` :
            html`<des-404 class="page" ?active="${this._page === 'db-access'}"></des-404>`}
-        ${this._accessPages.includes('cutout') ?
+        ${this.accessPages.includes('cutout') ?
            html`<des-cutout class="page" ?active="${this._page === 'cutout'}"></des-cutout>` :
            html`<des-404 class="page" ?active="${this._page === 'cutout'}"></des-404>`}
-        ${this._accessPages.includes('ticket') ?
+        ${this.accessPages.includes('ticket') ?
            html`<des-ticket class="page" ?active="${this._page === 'ticket'}"></des-ticket>` :
            html`<des-404 class="page" ?active="${this._page === 'ticket'}"></des-404>`}
 
@@ -217,7 +216,6 @@ class DESMain extends connect(store)(LitElement) {
     console.log('Initializing...');
     this._session = false;
     store.dispatch(getProfile());
-    this._accessPages=[];
     this._drawerOpened="false";
     setPassiveTouchGestures(true);
   }
@@ -231,7 +229,7 @@ class DESMain extends connect(store)(LitElement) {
     this.email = state.app.email;
     this.name = state.app.name;
     this.roles = state.app.roles;
-    this._accessPages=getAccessPages(this.roles)
+    this.accessPages = state.app.accessPages;
   }
 
   _profile(data){
@@ -249,7 +247,6 @@ class DESMain extends connect(store)(LitElement) {
   firstUpdated() {
     console.log('First Updated');
     console.log("session", this._session);
-    installRouter((location) => store.dispatch(navigate(decodeURIComponent(location.pathname),this._drawerPersisted, this._accessPages, this._session)));
     installMediaQueryWatcher(`(min-width: 460px)`, (matches) => {
       matches ?  this._goWide() :  this._goNarrow()
     })
@@ -262,6 +259,9 @@ class DESMain extends connect(store)(LitElement) {
         title: pageTitle,
         description: pageTitle
       });
+    }
+    if (changedProps.has('accessPages')) {
+      installRouter((location) => store.dispatch(navigate(decodeURIComponent(location.pathname),this._drawerPersisted, this.accessPages, this._session)));
     }
   }
 

@@ -52,7 +52,7 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
   //dispatch(updateDrawerState(false));
 };
 
-const loadPage = (page,ap) => (dispatch) => {
+export const loadPage = (page,ap) => (dispatch) => {
   switch(page) {
     case 'login':
       import('../components/des-pages/des-login.js').then((module) => {
@@ -81,9 +81,7 @@ const loadPage = (page,ap) => (dispatch) => {
       ap.includes('db-access') ?   import('../components/des-pages/des-db-access.js') : import('../components/des-pages/des-404.js') ;
       break;
     case 'cutout':
-      console.log('loading cutout...')
       ap.includes('cutout') ?   import('../components/des-pages/des-cutout.js') : import('../components/des-pages/des-404.js') ;
-      // window.location.href = config.frontEndUrl + config.rootPath+'/home';
       break;
     case 'ticket':
       ap.includes('ticket') ?   import('../components/des-pages/des-ticket.js') : import('../components/des-pages/des-404.js') ;
@@ -129,7 +127,8 @@ export const loginUser = (userObj) => {
     db: userObj.db,
     lastname: userObj.lastname,
     session: userObj.session,
-    roles: userObj.roles
+    roles: userObj.roles,
+    accessPages: getAccessPages(userObj.roles)
   };
 };
 
