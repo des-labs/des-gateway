@@ -8,7 +8,7 @@ export const LOGIN_USER = 'LOGIN_USER';
 export const LOGOUT_USER = 'LOGOUT_USER';
 // var root = config.rootPath === '/' || config.rootPath === '' ? '/' : config.rootPath.slice(1);
 // TODO: need to fix this usage of ridx
-var ridx = config.rootPath === '/' || config.rootPath === '' ? 0 : 1;
+// var ridx = config.rootPath === '/' || config.rootPath === '' ? 0 : 1;
 
 // TODO: double request to /profile
 const isauth = () => {
@@ -33,18 +33,21 @@ const isauth = () => {
 export const navigate = (path,persist,ap,session) => (dispatch) => {
   // is the session active, if not verify auth
   const auth = session ? true : isauth();
-  //console.log('auth', auth);
-  const path2 = path.slice(-1) === '/' ? path : path.concat('/');
-  // TODO: fix
-  const page0 = path2 === config.rootPath ? 'home' : path2.slice(1).split("/")[ridx];
-  // Auth
-  // in case there is no auth and request page is other than login, after /login --> home
-  // but after /page3 --? page3
-  const temp = page0 === 'login' ? 'home' : page0;
-  // page is the final page, if no auth it should go to login
-  const page = auth ? temp : 'login';
+  if (auth === false) {
+    dispatch(loadPage('login', ap));
+    return;
+  }
+  var pathParts = path.replace(/\/+$/, '').split('/');
+  var page = 'home';
+
+  if (!((pathParts.length === 1 && pathParts[0] === '') || (pathParts.length > 1 && pathParts[1] === config.rootPath))) {
+    page = pathParts.splice(-1)[0];
+    if (page === 'login') {
+      page = 'home';
+    }
+  }
   dispatch(loadPage(page, ap));
-  persist ? '' : dispatch(updateDrawerState(false))
+  persist ? '' : dispatch(updateDrawerState(false));
   // Close the drawer - in case the *path* change came from a link in the drawer.
   //dispatch(updateDrawerState(false));
 };
@@ -58,8 +61,8 @@ const loadPage = (page,ap) => (dispatch) => {
         });
       break;
     case 'logout':
-         localStorage.clear();
-         dispatch(logoutUser());
+        localStorage.clear();
+        dispatch(logoutUser());
         window.location.href = config.frontEndUrl + config.rootPath+'/login';
       break;
     case 'home':
@@ -74,11 +77,13 @@ const loadPage = (page,ap) => (dispatch) => {
     case 'page3':
       ap.includes('page3') ?   import('../components/des-pages/des-page3.js') : import('../components/des-pages/des-404.js') ;
       break;
-    case 'query-test':
-      ap.includes('query-test') ?   import('../components/des-pages/des-query-test.js') : import('../components/des-pages/des-404.js') ;
+    case 'db-access':
+      ap.includes('db-access') ?   import('../components/des-pages/des-db-access.js') : import('../components/des-pages/des-404.js') ;
       break;
     case 'cutout':
+      console.log('loading cutout...')
       ap.includes('cutout') ?   import('../components/des-pages/des-cutout.js') : import('../components/des-pages/des-404.js') ;
+      // window.location.href = config.frontEndUrl + config.rootPath+'/home';
       break;
     case 'ticket':
       ap.includes('ticket') ?   import('../components/des-pages/des-ticket.js') : import('../components/des-pages/des-404.js') ;
@@ -87,7 +92,8 @@ const loadPage = (page,ap) => (dispatch) => {
       page = 'des404';
       import('../components/des-pages/des-404.js');
   }
-
+  // history.pushState({}, '', location.origin + '/' + page)
+  // console.log('pushing state: ' + location.origin + '/' + page)
   dispatch(updatePage(page));
 };
 

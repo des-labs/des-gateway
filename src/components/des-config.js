@@ -1,7 +1,7 @@
 export const configLocal = {
     "backEndUrl" : "http://localhost:8888",
     "frontEndUrl" : "",
-    "rootPath"  : "/easyweb",
+    "rootPath"  : "",
     "apiPath"  : ""
 }
 

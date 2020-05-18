@@ -51,8 +51,8 @@ class DESLogin extends connect(store)(PageViewElement) {
           background: url('images/DESDM_logo.png');
           background-size: cover;
         }
-        
- 
+
+
 
 
       `
@@ -134,7 +134,7 @@ _submit(){
       "lastname": data.lastname, "email":data.email, "session": true, "db": data.db, "roles": data.roles}));
       store.dispatch(updateDrawerState(true));
       store.dispatch(updateDrawerPersist(true));
-      store.dispatch(navigate(decodeURIComponent(location.pathname) ,true, getAccessPages(data.roles), true));
+      store.dispatch(navigate(decodeURIComponent(window.location.pathname.replace(/\/+$/, '')) ,true, getAccessPages(data.roles), true));
     }
     else {
       localStorage.clear();

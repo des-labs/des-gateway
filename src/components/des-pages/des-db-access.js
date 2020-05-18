@@ -8,7 +8,7 @@ import '@vanillawc/wc-codemirror/index.js';
 import '@vanillawc/wc-codemirror/mode/sql/sql.js';
 
 
-class DESQueryTest extends connect(store)(PageViewElement) {
+class DESDbAccessTest extends connect(store)(PageViewElement) {
   static get properties() {
     return {
       _value: { type: Number },
@@ -104,7 +104,7 @@ class DESQueryTest extends connect(store)(PageViewElement) {
             color: white !important;
           };
         }
-        
+
         paper-button[disabled] {
             background: #eaeaea;
             color: #a8a8a8;
@@ -261,4 +261,4 @@ class DESQueryTest extends connect(store)(PageViewElement) {
 
 }
 
-window.customElements.define('des-query-test', DESQueryTest);
+window.customElements.define('des-db-access', DESDbAccessTest);
