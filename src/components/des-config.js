@@ -1,11 +1,11 @@
-export const configLocal = {
-    "backEndUrl" : "http://localhost:8888",
-    "frontEndUrl" : "",
-    "rootPath"  : "",
-    "apiPath"  : ""
+export const configProd = {
+  "backEndUrl" : "{{BACKEND_BASE_URL}}",
+  "frontEndUrl" : "{{FRONTEND_BASE_URL}}",
+  "rootPath"  : "{{WEB_ROOT_PATH}}",
+  "apiPath"  : "{{API_ROOT_PATH}}"
 }
 
-export const config = configLocal;
+export const config = configProd;
 
 // The `rbac.js` file contains the role-based access control information for
 // displaying pages based on the authenticated user's roles. This file must be

@@ -8,7 +8,7 @@
   "repository": "",
   "scripts": {
     "start": "polymer serve --hostname 0.0.0.0 --port 8080",
-    "build": "polymer build --base-path=easyweb --name=easyweb --preset=es5-bundled && gulp prpl-server",
+    "build": "{{SCRIPTS_BUILD}}",
     "build:static": "polymer build ",
     "serve": "prpl-server --root server/build --host 0.0.0.0 --port 8080",
     "serve:static": "polymer serve --port 5000 build/default"
