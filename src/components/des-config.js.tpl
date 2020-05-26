@@ -1,8 +1,8 @@
 export const config = {
-  "backEndUrl" : "http://127.0.0.1:8888",
-  "frontEndUrl" : "http://127.0.0.1:8080",
-  "rootPath"  : "",
-  "apiPath"  : ""
+  "backEndUrl" : "{{BACKEND_BASE_URL}}",
+  "frontEndUrl" : "{{FRONTEND_BASE_URL}}",
+  "rootPath"  : "{{WEB_ROOT_PATH}}",
+  "apiPath"  : "{{API_ROOT_PATH}}"
 }
 
 // The `rbac.js` file contains the role-based access control information for
