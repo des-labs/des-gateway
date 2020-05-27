@@ -6,3 +6,4 @@ server/build/
 .codesync
 package-lock.json
 rbac.js
+package.json
