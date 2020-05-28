@@ -180,6 +180,17 @@ class DESCutout extends connect(store)(PageViewElement) {
     `;
   }
 
+  _loadLegacyCode(path) {
+    return new Promise((yay, nah) => {
+      const s = document.createElement('script');
+     s.src = path;
+     s.async = s.defer = true;
+     s.onload = () => yay();
+     s.onerror = e => nah(e);
+     document.head.appendChild(s);
+    });
+  }
+
   _fileChange(event) {
     console.log(event.target)
     this.csvFile = this.shadowRoot.getElementById('csv-upload').files[0];
@@ -191,7 +202,23 @@ class DESCutout extends connect(store)(PageViewElement) {
       var text = reader.result;
       console.log(text);
       that.shadowRoot.getElementById('coadd-id-textarea').value = text;
-      var parsedCsvFile = Papa.parse(this.csvFile);
+      var parsedData = []
+      that._loadLegacyCode('node_modules/papaparse/papaparse.min.js').then(() => {
+        window.Papa.parse(that.csvFile, {
+          delimiter: ',',
+          header: true,
+          skipEmptyLines: true,
+          step: function(results, parser) {
+            console.log("Row data:", results.data);
+            console.log("Row errors:", results.errors);
+            parsedData.push(results.data)
+          },
+          complete: function(result, file) {
+            console.log("Parsing complete:", result.data, file);
+            console.log("parsedData: ", parsedData);
+          }
+        });
+      });
     }
     reader.readAsText(this.csvFile);
   }
