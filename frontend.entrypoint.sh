@@ -8,7 +8,10 @@ sed -i "s#{{API_ROOT_PATH}}#${API_ROOT_PATH}#g" src/components/des-config.js
 sed -i "s#{{FRONTEND_BASE_URL}}#${FRONTEND_BASE_URL}#g" src/components/des-config.js
 sed -i "s#{{WEB_ROOT_PATH}}#${WEB_ROOT_PATH}#g" src/components/des-config.js
 
-npm install
+
+if [[ "$LOCAL_DEV" == "true" ]]; then
+	npm install
+fi
 
 if [[ "$NPM_SCRIPT" == "build" ]]; then
 	npm run build
