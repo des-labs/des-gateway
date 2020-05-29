@@ -140,6 +140,10 @@ class DESCutout extends connect(store)(PageViewElement) {
               @apply(--layout-horizontal);
               @apply(--layout-center-justified);
           }
+
+          #csv-file-msg {
+            color: red;
+          }
         `,
     ];
   }
@@ -169,33 +173,59 @@ class DESCutout extends connect(store)(PageViewElement) {
                 <iron-autogrow-textarea id="coadd-id-textarea" max-rows="15" rows=12 placeholder="COADD_OBJECT_ID\n61407318\n61407582" value=""></iron-autogrow-textarea>
             </div>
             <div>
-                <iron-autogrow-textarea id="radec-id-textarea" max-rows="15" rows=12 placeholder="RA,DEC\n21.5,3.48\n36.6,-15.68" value=""></iron-autogrow-textarea>
+                <iron-autogrow-textarea id="coords-textarea" max-rows="15" rows=12 placeholder="RA,DEC\n21.5,3.48\n36.6,-15.68" value=""></iron-autogrow-textarea>
             </div>
         </iron-pages>
 
         <input type="file" id="csv-upload" @change="${e => this._fileChange(e)}" accept=".csv, .CSV" />
-
+        <div id="csv-file-msg"></div>
 
     </section>
     `;
   }
 
   _fileChange(event) {
-    console.log(event.target)
     this.csvFile = this.shadowRoot.getElementById('csv-upload').files[0];
-    // this.csvFile = file
-    console.log('csvfile: ' + this.csvFile);
     var reader = new FileReader();
     var that = this;
     reader.onload = function(e) {
       var text = reader.result;
-      console.log(text);
-      that.shadowRoot.getElementById('coadd-id-textarea').value = text;
-      var parsedCsvFile = Papa.parse(this.csvFile);
+      that._validateCsvFile(text)
     }
     reader.readAsText(this.csvFile);
   }
 
+  _validateCsvFile(csvText) {
+
+    const Url=config.backEndUrl + config.apiPath +  "/page/cutout/csv/validate"
+    const param = {
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        csvText: csvText,
+      }),
+      method: "POST"
+    };
+    var that = this;
+    fetch(Url, param)
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      if (data.status === "ok") {
+        if (data.type === "coords") {
+          var textareaID = 'coords-textarea'
+          that.tabIdx = 1
+        } else {
+          var textareaID = 'coadd-id-textarea'
+          that.tabIdx = 0
+        }
+        that.shadowRoot.getElementById(textareaID).value = data.csv;
+          that.shadowRoot.getElementById('csv-file-msg').innerHTML = '';
+      } else {
+        that.shadowRoot.getElementById('csv-file-msg').innerHTML = data.msg;
+      }
+    })
+  }
   stateChanged(state) {
     this.username = state.app.username;
   }
