@@ -196,7 +196,6 @@ class DESCutout extends connect(store)(PageViewElement) {
   }
 
   _validateCsvFile(csvText) {
-
     const Url=config.backEndUrl + config.apiPath +  "/page/cutout/csv/validate"
     const param = {
       headers: {'Content-Type': 'application/json'},
