@@ -25,11 +25,14 @@ class DESCutout extends connect(store)(PageViewElement) {
     return {
       _value: { type: Number },
       username: {type: String},
-      query: {type: String},
+      db: {type: String},
       msg: {type: String},
       tabIdx: { type: Number },
+      xsize: { type: Number },
+      ysize: { type: Number },
       csvFile: {type: String},
       positions: {type: String},
+      release: {type: String},
       rgb_bands: {type: Object},
       fits_bands: {type: Object},
       rgb_types_stiff: {type: Boolean},
@@ -44,7 +47,10 @@ class DESCutout extends connect(store)(PageViewElement) {
     return [
       SharedStyles,
       css`
-
+          h2 {
+            text-align: left;
+            font-size: 1.5rem;
+          }
           /* coadd table layout */
           table#coadd-table {
               /*border: 1px solid #ddd;*/
@@ -160,7 +166,7 @@ class DESCutout extends connect(store)(PageViewElement) {
   constructor(){
     super();
     this.username = '';
-    this.query = '';
+    this.db = '';
     this.msg = "";
     this.positions = "";
     this.tabIdx = 0;
@@ -196,6 +202,9 @@ class DESCutout extends connect(store)(PageViewElement) {
     this.rgb_types_lupton = false;
     this.fits_all_toggle = false;
     this.submit_disabled = true;
+    this.xsize = 1.0
+    this.ysize = 1.0
+    this.release = "Y6A1"
   }
 
   render() {
@@ -205,11 +214,11 @@ class DESCutout extends connect(store)(PageViewElement) {
         <h2>Positions and data set</h2>
         <div>
           <label id="data-release-tag">Data release tag:</label>
-          <paper-radio-group selected="Y6A1" aria-labelledby="data-release-tag">
-            <paper-radio-button name="Y6A1">Y6A1</paper-radio-button>
-            <paper-radio-button name="Y3A2">Y3A2</paper-radio-button>
-            <paper-radio-button name="Y1A1">Y1A1</paper-radio-button>
-            <paper-radio-button name="SVA1">SVA1</paper-radio-button>
+          <paper-radio-group selected="${this.release}" aria-labelledby="data-release-tag">
+            <paper-radio-button @change="${e => this.release = e.target.name}" name="Y6A1">Y6A1</paper-radio-button>
+            <paper-radio-button @change="${e => this.release = e.target.name}" name="Y3A2">Y3A2</paper-radio-button>
+            <paper-radio-button @change="${e => this.release = e.target.name}" name="Y1A1">Y1A1</paper-radio-button>
+            <paper-radio-button @change="${e => this.release = e.target.name}" name="SVA1">SVA1</paper-radio-button>
           </paper-radio-group>
         </div>
         <div>
@@ -278,8 +287,8 @@ class DESCutout extends connect(store)(PageViewElement) {
         </div>
         <h3>Cutout size (arcminutes)</h3>
         <div>
-          X &nbsp;<paper-slider id="bc_xsizeSlider" pin min="0.1" max="12" max-markers="10" step="0.1" value="1.0" expand editable></paper-slider>
-          Y &nbsp;<paper-slider id="bc_ysizeSlider" pin min="0.1" max="12" max-markers="10" step="0.1" value="1.0" expand editable></paper-slider>
+          X &nbsp;<paper-slider @change="${e => this.xsize = e.target.value}" id="bc_xsizeSlider" pin min="0.1" max="12" max-markers="10" step="0.1" value="${this.xsize}" expand editable></paper-slider>
+          Y &nbsp;<paper-slider @change="${e => this.ysize = e.target.value}" id="bc_ysizeSlider" pin min="0.1" max="12" max-markers="10" step="0.1" value="${this.ysize}" expand editable></paper-slider>
         </div>
     </section>
     <section>
@@ -293,12 +302,64 @@ class DESCutout extends connect(store)(PageViewElement) {
     </section>
     <section>
     <div>
-      <paper-button raised  class="indigo"  id="bc_submitJobButton" ?disabled="${this.submit_disabled}" on-tap="_submitJob">
-        <i class="fa fa-cogs"></i> &nbsp;  &nbsp;Submit Job
+      <paper-button raised  class="indigo"  id="bc_submitJobButton" ?disabled="${this.submit_disabled}" @click="${e => this._submitJob(e)}">
+        Submit Job
       </paper-button>
     </div>
     </section>
     `;
+  }
+
+  _submitJob(event) {
+    const Url=config.backEndUrl + config.apiPath +  "/job/submit"
+    const param = {
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem("token")
+      },
+      body: JSON.stringify({
+        job: 'cutout',
+        username: this.username,
+        release: this.release,
+        db: this.db,
+        positions: this.positions,
+        xsize: this.xsize,
+        ysize: this.ysize,
+        make_fits: this.fits,
+        make_rgb_stiff: this.rgb_types_stiff,
+        make_rgb_lupton: this.rgb_types_lupton,
+        colors_rgb: this._getSelectedBands(this.rgb_bands).join(','),
+        colors_fits: this._getSelectedBands(this.fits_bands).join(','),
+        // TODO: Implement Lupton RGB format options
+        // rgb_minimum: null,
+        // rgb_stretch: null,
+        // rgb_asinh: null,
+        return_list: true
+      })
+    };
+    var that = this;
+    fetch(Url, param)
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      if (data.status === "ok") {
+        console.log(JSON.stringify(data));
+      } else {
+        console.log('ERROR: ' + JSON.stringify(data));
+      }
+    });
+  }
+
+  _getSelectedBands(bandObj) {
+    var bands = [];
+    for (var b in bandObj.checked) {
+      if (bandObj.checked[b]) {
+        bands.push(b);
+      }
+    }
+    return bands;
   }
 
   _validateForm() {
@@ -463,6 +524,7 @@ class DESCutout extends connect(store)(PageViewElement) {
   }
   stateChanged(state) {
     this.username = state.app.username;
+    this.db = state.app.db;
   }
 
   _updateTabbedContent(event) {
@@ -478,6 +540,7 @@ class DESCutout extends connect(store)(PageViewElement) {
       console.log(`${propName} changed. oldValue: ${oldValue}`);
     });
     this._validateForm();
+    console.log(this.db);
   }
 }
 
