@@ -158,6 +158,14 @@ class DESCutout extends connect(store)(PageViewElement) {
               @apply(--layout-center-justified);
           }
 
+          #rgb_bands_selector: {
+            display: none;
+          }
+
+          #fits_bands_selector: {
+            display: none;
+          }
+
         `,
     ];
   }
@@ -173,9 +181,9 @@ class DESCutout extends connect(store)(PageViewElement) {
     this.csvFile = '';
     this.rgb_bands = {
       "checked": {
-        "g": false,
-        "r": false,
-        "i": false,
+        "g": true,
+        "r": true,
+        "i": true,
         "z": false,
         "y": false
       },
@@ -189,9 +197,9 @@ class DESCutout extends connect(store)(PageViewElement) {
     };
     this.fits_bands = {
       "checked": {
-        "g": false,
-        "r": false,
-        "i": false,
+        "g": true,
+        "r": true,
+        "i": true,
         "z": false,
         "y": false
       }
@@ -253,22 +261,21 @@ class DESCutout extends connect(store)(PageViewElement) {
         <p>Check all desired output files. FITS format requires selection of one or more bands. RGB color images require selection of exactly three bands.</p>
         <h3>FITS format</h3>
         <div style="float: none;">
-        <p>FITS format requires selection of one or more bands.</p>
+        <p>FITS format requires selection of <span id="criterion-fits-band-selected">one or more bands</span>.</p>
         <paper-checkbox @change="${e => this._updateFitsBands(e)}" ?checked="${this.fits}">FITS (FITS format)</paper-checkbox>&nbsp;&nbsp;&nbsp;&nbsp;
-        <paper-checkbox @change="${e => this._selectAllFitsBands(e)}" ?checked="${this.fits_all_toggle}" ?disabled="${!this.fits}" style="font-weight: bold;" id="bc_all_toggle">Select All/None</paper-checkbox>&nbsp;
-        </div>
-        <div style="float: none;">
-          &nbsp;
-          &nbsp;
-          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'g')}" ?checked="${this.fits_bands.checked.g}" ?disabled="${!this.fits}" class="bandbox" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'r')}" ?checked="${this.fits_bands.checked.r}" ?disabled="${!this.fits}" class="bandbox" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'i')}" ?checked="${this.fits_bands.checked.i}" ?disabled="${!this.fits}" class="bandbox" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'z')}" ?checked="${this.fits_bands.checked.z}" ?disabled="${!this.fits}" class="bandbox" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'y')}" ?checked="${this.fits_bands.checked.y}" ?disabled="${!this.fits}" class="bandbox" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
 
         </div>
+        <div id="fits_bands_selector">
+          Bands: &nbsp;&nbsp;
+          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'g')}" ?checked="${this.fits_bands.checked.g}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
+          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'r')}" ?checked="${this.fits_bands.checked.r}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
+          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'i')}" ?checked="${this.fits_bands.checked.i}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
+          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'z')}" ?checked="${this.fits_bands.checked.z}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
+          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'y')}" ?checked="${this.fits_bands.checked.y}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
+          <paper-checkbox id="select-all-bands-toggle" @change="${e => this._selectAllFitsBands(e)}" ?checked="${this.fits_all_toggle}" ?disabled="${!this.fits}" style="font-weight: bold; padding-left: 2rem;" id="bc_all_toggle">Select All/None</paper-checkbox>&nbsp;
+        </div>
         <h3>Color image format</h3>
-        <p>RGB color images require selection of exactly three bands.</p>
+        <p>RGB color images require selection of <span id="criterion-three-bands">exactly three bands</span>.</p>
         <div>
           <paper-checkbox @change="${e => this._updateRgbTypes(e, 'stiff')}" ?checked="${this.rgb_types_stiff}">Color image (RGB: STIFF format)</paper-checkbox>
         </div>
@@ -276,14 +283,13 @@ class DESCutout extends connect(store)(PageViewElement) {
           <paper-checkbox @change="${e => this._updateRgbTypes(e, 'lupton')}" ?checked="${this.rgb_types_lupton}">Color image (RGB: Lupton method)</paper-checkbox>
         </div>
 
-        <div style="float: none;">
-          &nbsp;
-          &nbsp;
-          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'g')}" ?checked="${this.rgb_bands.checked.g}" ?disabled="${this.rgb_bands.disabled.g}" class="bandbox" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'r')}" ?checked="${this.rgb_bands.checked.r}" ?disabled="${this.rgb_bands.disabled.r}" class="bandbox" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'i')}" ?checked="${this.rgb_bands.checked.i}" ?disabled="${this.rgb_bands.disabled.i}" class="bandbox" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'z')}" ?checked="${this.rgb_bands.checked.z}" ?disabled="${this.rgb_bands.disabled.z}" class="bandbox" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'y')}" ?checked="${this.rgb_bands.checked.y}" ?disabled="${this.rgb_bands.disabled.y}" class="bandbox" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
+        <div id="rgb_bands_selector" style="display: none;">
+          Bands: &nbsp;&nbsp;
+          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'g')}" ?checked="${this.rgb_bands.checked.g}" ?disabled="${this.rgb_bands.disabled.g}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
+          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'r')}" ?checked="${this.rgb_bands.checked.r}" ?disabled="${this.rgb_bands.disabled.r}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
+          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'i')}" ?checked="${this.rgb_bands.checked.i}" ?disabled="${this.rgb_bands.disabled.i}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
+          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'z')}" ?checked="${this.rgb_bands.checked.z}" ?disabled="${this.rgb_bands.disabled.z}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
+          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'y')}" ?checked="${this.rgb_bands.checked.y}" ?disabled="${this.rgb_bands.disabled.y}" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
         </div>
         <h3>Cutout size (arcminutes)</h3>
         <div>
@@ -362,15 +368,29 @@ class DESCutout extends connect(store)(PageViewElement) {
     return bands;
   }
 
+  _toggleValidWarning(elementId, valid) {
+    if (valid) {
+      this.shadowRoot.getElementById(elementId).style['font-weight'] = 'normal';
+      this.shadowRoot.getElementById(elementId).style.color = 'black';
+    } else {
+      this.shadowRoot.getElementById(elementId).style['font-weight'] = 'bold';
+      this.shadowRoot.getElementById(elementId).style.color = 'red';
+    }
+
+  }
   _validateForm() {
     var validForm = true;
     validForm = this.positions !== "" && validForm;
     validForm = (this.fits || this.rgb_types_stiff || this.rgb_types_lupton) && validForm;
     if (this.fits) {
-      validForm = this._bandsSelected(this.fits_bands) > 0 && validForm;
+      var criterion = this._bandsSelected(this.fits_bands) > 0
+      validForm = criterion && validForm;
+      this._toggleValidWarning('criterion-fits-band-selected', criterion);
     }
     if (this.rgb_types_stiff || this.rgb_types_lupton) {
-      validForm = this._bandsSelected(this.rgb_bands) === 3 && validForm;
+      var criterion = this._bandsSelected(this.rgb_bands) === 3
+      validForm = criterion && validForm;
+      this._toggleValidWarning('criterion-three-bands', criterion);
     }
     // Enable/disable submit button
     this.submit_disabled = !validForm;
@@ -394,10 +414,13 @@ class DESCutout extends connect(store)(PageViewElement) {
       for (var b in this.rgb_bands.disabled) {
         this.rgb_bands.disabled[b] = true;
       }
+      this.shadowRoot.getElementById('rgb_bands_selector').style.display = 'none';
     } else {
+      this.shadowRoot.getElementById('rgb_bands_selector').style.display = 'block';
       for (var b in this.rgb_bands.disabled) {
         this.rgb_bands.disabled[b] = false;
       }
+      this._ensureThreeRgbBands();
     }
   }
 
@@ -426,9 +449,7 @@ class DESCutout extends connect(store)(PageViewElement) {
 
   _updateFitsBandsSelection(event, band) {
     this.fits_bands.checked[band] = event.target.checked;
-    console.log('fits toggle: ' + this.fits_all_toggle);
     if (this.fits_bands.checked[band] === false) {
-      console.log('unchecked a band');
       this.fits_all_toggle = false;
     } else {
       var allChecked = true;
@@ -441,27 +462,19 @@ class DESCutout extends connect(store)(PageViewElement) {
     var temp = this.fits_bands;
     this.fits_bands =  {};
     this.fits_bands =  temp;
-    console.log(JSON.stringify(this.fits_bands));
 
   }
 
-  _updateRgbSelection(event, band) {
-    // event.target.disabled = true
-    // console.log('checked: '+ event.target.checked)
-    // console.log('disabled: '+ event.target.disabled)
-    // console.log(band)
-    this.rgb_bands.checked[band] = event.target.checked;
+  _ensureThreeRgbBands() {
     var numChecked = 0;
     for (var b in this.rgb_bands.checked) {
       if (this.rgb_bands.checked[b]) {
         numChecked += 1;
       }
     }
-    // console.log('numChecked = ' + numChecked);
     if (numChecked > 2) {
       for (var b in this.rgb_bands.disabled) {
         if (!this.rgb_bands.checked[b]) {
-          console.log('disabling ' + b);
           this.rgb_bands.disabled[b] = true;
         }
       }
@@ -470,12 +483,14 @@ class DESCutout extends connect(store)(PageViewElement) {
         this.rgb_bands.disabled[b] = false;
       }
     }
+  }
+  _updateRgbSelection(event, band) {
+    this.rgb_bands.checked[band] = event.target.checked;
+    this._ensureThreeRgbBands();
     // This hack seems necessary to trigger the hasChanged() function for the property
     var temp = this.rgb_bands;
     this.rgb_bands =  {};
     this.rgb_bands =  temp;
-
-    console.log(JSON.stringify(this.rgb_bands))
   }
 
   _fileChange(event) {
@@ -536,11 +551,17 @@ class DESCutout extends connect(store)(PageViewElement) {
   // }
 
   updated(changedProps) {
-    changedProps.forEach((oldValue, propName) => {
-      console.log(`${propName} changed. oldValue: ${oldValue}`);
-    });
+    // changedProps.forEach((oldValue, propName) => {
+    //   console.log(`${propName} changed. oldValue: ${oldValue}`);
+    // });
     this._validateForm();
-    console.log(this.db);
+    if (this.fits) {
+      this.shadowRoot.getElementById('fits_bands_selector').style.display = 'block';
+      // this.shadowRoot.getElementById('select-all-bands-toggle').style.display = 'inline-block';
+    } else {
+      this.shadowRoot.getElementById('fits_bands_selector').style.display = 'none';
+      // this.shadowRoot.getElementById('select-all-bands-toggle').style.display = 'none';
+    }
   }
 }
 
