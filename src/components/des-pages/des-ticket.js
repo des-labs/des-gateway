@@ -133,15 +133,12 @@ updateUnlockChecked(e) {
 
   _search(){
     console.log("_search");
-    const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/search/";
+    const Url="https://deslabs.ncsa.illinois.edu/desticket/api/v1/search/";
     /*const Url="http://localhost:5000/api/v1/search/";*/
     const dataP={
       search_string: this.searchString,
     };
     const param = {
-      headers: {'Content-Type': 'application/json',
-        'Authorization': 'Basic ZGVzX3VzZXJzX21hbmFnZXI6ZGVzZG1ydWxlcwo=',
-          },
       body: JSON.stringify(dataP),
       method: "POST"
     };
@@ -154,15 +151,13 @@ updateUnlockChecked(e) {
 
     _exists(){
       console.log("_exists");
-      const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/exists/";
+      const Url="https://deslabs.ncsa.illinois.edu/desticket/api/v1/exists/";
       /*const Url="http://localhost:5000/api/v1/exists/";*/
       const dataP={
         user: this.user,
         email: this.email,
       };
       const param = {
-        headers: {'Content-Type': 'application/json',
-        'Authorization': 'Basic ZGVzX3VzZXJzX21hbmFnZXI6ZGVzZG1ydWxlcwo=',},
         body: JSON.stringify(dataP),
         method: "POST"
       };
@@ -182,7 +177,7 @@ updateUnlockChecked(e) {
       this.reset = "False"
     }
 
-    const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/reset/";
+    const Url="https://deslabs.ncsa.illinois.edu/desticket/api/v1/reset/";
     /*const Url="http://localhost:5000/api/v1/reset/";*/
     const dataP={
       user: this.user,
@@ -191,8 +186,6 @@ updateUnlockChecked(e) {
       reset: this.reset,
     };
     const param = {
-      headers: {'Content-Type': 'application/json',
-                'Authorization': 'Basic ZGVzX3VzZXJzX21hbmFnZXI6ZGVzZG1ydWxlcwo='},
       body: JSON.stringify(dataP),
       method: "POST"
     };
