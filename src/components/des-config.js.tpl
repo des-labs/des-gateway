@@ -2,7 +2,8 @@ export const config = {
   "backEndUrl" : "{{BACKEND_BASE_URL}}",
   "frontEndUrl" : "{{FRONTEND_BASE_URL}}",
   "rootPath"  : "{{WEB_ROOT_PATH}}",
-  "apiPath"  : "{{API_ROOT_PATH}}"
+  "apiPath"  : "{{API_ROOT_PATH}}",
+  "ticketAuth": "{{TICKET_AUTH}}",
 }
 
 // The `rbac.js` file contains the role-based access control information for

@@ -1,6 +1,7 @@
 import { html,css } from 'lit-element';
 import { PageViewElement } from '../page-view-element.js';
 import { SharedStyles } from '../styles/shared-styles.js';
+import {config} from '../des-config.js';
 
 class DESTicket extends PageViewElement {
   static get properties() {
@@ -13,7 +14,8 @@ class DESTicket extends PageViewElement {
       msg: {type: String},
       searchMessage: {type: String},
       existsMessage: {type: String},
-      submitMessage: {type: String}
+      submitMessage: {type: String},
+      ticketAuth: {type: String},
     };
   }
 
@@ -33,6 +35,7 @@ class DESTicket extends PageViewElement {
     this.msg = "";
     this.resetChecked = false;
     this.unlockChecked = false;
+    this.ticketAuth = 'Basic ' + config.ticketAuth
  }
 
 updateResetChecked(e) {
@@ -139,6 +142,8 @@ updateUnlockChecked(e) {
       search_string: this.searchString,
     };
     const param = {
+      headers: {'Content-Type': 'application/json',
+        'Authorization': this.ticketAuth,},
       body: JSON.stringify(dataP),
       method: "POST"
     };
@@ -158,6 +163,8 @@ updateUnlockChecked(e) {
         email: this.email,
       };
       const param = {
+        headers: {'Content-Type': 'application/json',
+        'Authorization': this.ticketAuth,}, 
         body: JSON.stringify(dataP),
         method: "POST"
       };
@@ -186,6 +193,8 @@ updateUnlockChecked(e) {
       reset: this.reset,
     };
     const param = {
+      headers: {'Content-Type': 'application/json',
+        'Authorization': this.ticketAuth,},
       body: JSON.stringify(dataP),
       method: "POST"
     };
