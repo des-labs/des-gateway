@@ -15,33 +15,14 @@ import '@polymer/iron-autogrow-textarea/iron-autogrow-textarea.js';
 import '@polymer/paper-radio-group/paper-radio-group.js';
 import '@polymer/paper-radio-button/paper-radio-button.js';
 import '@polymer/paper-slider/paper-slider.js';
+import '@polymer/paper-toast/paper-toast.js';
+import '@polymer/paper-spinner/paper-spinner.js';
 import { SharedStyles } from '../styles/shared-styles.js';
 import {config} from '../des-config.js';
 import { store } from '../../store.js';
 
 
 class DESCutout extends connect(store)(PageViewElement) {
-  static get properties() {
-    return {
-      _value: { type: Number },
-      username: {type: String},
-      db: {type: String},
-      msg: {type: String},
-      tabIdx: { type: Number },
-      xsize: { type: Number },
-      ysize: { type: Number },
-      csvFile: {type: String},
-      positions: {type: String},
-      release: {type: String},
-      rgb_bands: {type: Object},
-      fits_bands: {type: Object},
-      rgb_types_stiff: {type: Boolean},
-      rgb_types_lupton: {type: Boolean},
-      fits_all_toggle: {type: Boolean},
-      fits: {type: Boolean},
-      submit_disabled: {type: Boolean}
-    };
-  }
 
   static get styles() {
     return [
@@ -166,19 +147,72 @@ class DESCutout extends connect(store)(PageViewElement) {
             display: none;
           }
 
+          .toast-position {
+              /* right: 50%; */
+          }
+          .toast-error {
+            --paper-toast-color: #FFD2D2 ;
+            --paper-toast-background-color: #D8000C;
+          }
+          .toast-success {
+            --paper-toast-color:  #DFF2BF;
+            --paper-toast-background-color: #4F8A10;
+          }
+          .invalid-form-element {
+            color: red;
+            border-color: red;
+            border-width: 1px;
+            border-style: dashed;
+          }
         `,
+
     ];
   }
 
+  static get properties() {
+    return {
+      _value: { type: Number },
+      username: {type: String},
+      email: {type: String},
+      db: {type: String},
+      msg: {type: String},
+      tabIdx: { type: Number },
+      xsize: { type: Number },
+      ysize: { type: Number },
+      csvFile: {type: String},
+      positions: {type: String},
+      customJobName: {type: String},
+      release: {type: String},
+      validEmail: {type: Boolean},
+      rgb_bands: {type: Object},
+      fits_bands: {type: Object},
+      rgb_types_stiff: {type: Boolean},
+      rgb_types_lupton: {type: Boolean},
+      fits_all_toggle: {type: Boolean},
+      fits: {type: Boolean},
+      submit_disabled: {type: Boolean}
+    };
+  }
 
   constructor(){
     super();
     this.username = '';
+    this.email = '';
     this.db = '';
     this.msg = "";
     this.positions = "";
     this.tabIdx = 0;
     this.csvFile = '';
+    this.customJobName = '';
+    this.validEmail = false;
+    this.fits = false;
+    this.rgb_types_stiff = false;
+    this.rgb_types_lupton = false;
+    this.fits_all_toggle = false;
+    this.submit_disabled = true;
+    this.xsize = 1.0
+    this.ysize = 1.0
+    this.release = "Y6A1"
     this.rgb_bands = {
       "checked": {
         "g": true,
@@ -204,15 +238,6 @@ class DESCutout extends connect(store)(PageViewElement) {
         "y": false
       }
     };
-
-    this.fits = false;
-    this.rgb_types_stiff = false;
-    this.rgb_types_lupton = false;
-    this.fits_all_toggle = false;
-    this.submit_disabled = true;
-    this.xsize = 1.0
-    this.ysize = 1.0
-    this.release = "Y6A1"
   }
 
   render() {
@@ -230,7 +255,7 @@ class DESCutout extends connect(store)(PageViewElement) {
           </paper-radio-group>
         </div>
         <div>
-          <paper-tabs id="tab-selector" selected="${this.tabIdx}" @click="${this._updateTabbedContent}">
+          <paper-tabs id="tab-selector" selected="${this.tabIdx}" @click="${e => this._updateTabbedContent(e)}">
             <paper-tab>by COADD ID</paper-tab>
             <paper-tab>by RA/DEC coordinates</paper-tab>
           </paper-tabs>
@@ -251,8 +276,9 @@ class DESCutout extends connect(store)(PageViewElement) {
               <span style="overflow-x: auto; overflow-wrap: break-word;">Upload CSV file</span>
               <input type="file" class="upload" id="csv-upload" @change="${e => this._fileChange(e)}" accept=".csv, .CSV" />
             </paper-button>
+            <span id="csv-file-msg" style="padding-left: 2rem;"></span>
           </div>
-          <div id="csv-file-msg"></div>
+
         </div>
     </section>
 
@@ -301,48 +327,98 @@ class DESCutout extends connect(store)(PageViewElement) {
         <h2>Options</h2>
         <div>
           <p>Provide a custom job name:</p>
-          <paper-input always-float-label id="bc_validname" name="name" label="Job Name" value="" style = "max-width: 500px; padding-left:2rem;"></paper-input>
+          <paper-input @change="${(e) => {this.customJobName = e.target.value; console.log(e.target.value);}}" always-float-label id="bc_validname" name="name" label="Job Name" placeholder="My_Custom_Job_Name-12" value="${this.customJobName}" style="max-width: 500px; padding-left:2rem;"></paper-input>
           <p>Receive an email when the files are ready for download:</p>
-          <paper-checkbox style="font-size:16px; padding-left:2rem; padding-top:15px;" id="bc_send_email">Email when complete</paper-checkbox>&nbsp;&nbsp;
+          <div id="email-options">
+            <!-- <p id="email-options-invalid" style="display: none; color: red;">Please enter a valid email address.</p> -->
+            <paper-checkbox
+              @change="${(e) => {this._updateEmailOption(e)}}"
+              style="font-size:16px; padding-left:2rem; padding-top:15px;"
+              id="send-email">Email when complete</paper-checkbox>
+            <paper-input
+              @change="${(e) => {this.email = e.target.value;}}"
+              always-float-label
+              disabled
+              id="custom-email"
+              name="name"
+              label="Email Address"
+              style="max-width: 500px; padding-left:2rem;"
+              placeholder="${this.email}"
+              value="${this.email}"></paper-input>
+          </div>
         </div>
     </section>
     <section>
     <div>
-      <paper-button raised  class="indigo"  id="bc_submitJobButton" ?disabled="${this.submit_disabled}" @click="${e => this._submitJob(e)}">
+      <paper-button raised  class="indigo"  id="bc_submitJobButton" ?disabled="${this.submit_disabled}" @click="${e => this._submit(e)}">
         Submit Job
       </paper-button>
+      <paper-spinner id="submit-spinner" class="big"></paper-spinner>
+
+      <paper-toast class="toast-position toast-success" id="toast-job-success" text="Job has been submitted!" duration="7000"> </paper-toast>
+      <paper-toast class="toast-position toast-error" id="toast-job-failure" text="ERROR! There was an error. Please try again" duration="7000"> </paper-toast>
     </div>
     </section>
     `;
   }
 
-  _submitJob(event) {
+  _updateEmailOption(event) {
+    this.shadowRoot.getElementById('custom-email').disabled = !event.target.checked;
+    this._validateEmail();
+  }
+
+  _toggleSpinner(active, callback) {
+
+    this.submit_disabled = active;
+    this.shadowRoot.getElementById('submit-spinner').active = active;
+    callback();
+  }
+
+  _submit(event) {
+    if (!this.submit_disabled) {
+      // var that = this;
+      this._toggleSpinner(true, () => {
+        this._submitJob(() => {
+          this._toggleSpinner(false, () => {});
+        });
+      });
+    }
+  }
+
+  _submitJob(callback) {
     const Url=config.backEndUrl + config.apiPath +  "/job/submit"
+    var body = {
+      job: 'cutout',
+      username: this.username,
+      release: this.release,
+      db: this.db,
+      positions: this.positions,
+      xsize: this.xsize,
+      ysize: this.ysize,
+      make_fits: this.fits,
+      make_rgb_stiff: this.rgb_types_stiff,
+      make_rgb_lupton: this.rgb_types_lupton,
+      colors_rgb: this._getSelectedBands(this.rgb_bands).join(','),
+      colors_fits: this._getSelectedBands(this.fits_bands).join(','),
+      // TODO: Implement Lupton RGB format options
+      // rgb_minimum: null,
+      // rgb_stretch: null,
+      // rgb_asinh: null,
+      return_list: true
+    };
+    if (this.shadowRoot.getElementById('send-email').checked) {
+      body.email = this.email;
+    }
+    if (this.customJobName !== '') {
+      body.job_name = this.customJobName;
+    }
     const param = {
       method: "PUT",
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + localStorage.getItem("token")
       },
-      body: JSON.stringify({
-        job: 'cutout',
-        username: this.username,
-        release: this.release,
-        db: this.db,
-        positions: this.positions,
-        xsize: this.xsize,
-        ysize: this.ysize,
-        make_fits: this.fits,
-        make_rgb_stiff: this.rgb_types_stiff,
-        make_rgb_lupton: this.rgb_types_lupton,
-        colors_rgb: this._getSelectedBands(this.rgb_bands).join(','),
-        colors_fits: this._getSelectedBands(this.fits_bands).join(','),
-        // TODO: Implement Lupton RGB format options
-        // rgb_minimum: null,
-        // rgb_stretch: null,
-        // rgb_asinh: null,
-        return_list: true
-      })
+      body: JSON.stringify(body)
     };
     var that = this;
     fetch(Url, param)
@@ -351,10 +427,14 @@ class DESCutout extends connect(store)(PageViewElement) {
     })
     .then(data => {
       if (data.status === "ok") {
-        console.log(JSON.stringify(data));
+        that.shadowRoot.getElementById('toast-job-success').text = 'Job submitted';
+        that.shadowRoot.getElementById('toast-job-success').show();
       } else {
-        console.log('ERROR: ' + JSON.stringify(data));
+        that.shadowRoot.getElementById('toast-job-failure').text = 'Error submitting job';
+        that.shadowRoot.getElementById('toast-job-failure').show();
       }
+      console.log(JSON.stringify(data));
+      callback();
     });
   }
 
@@ -379,6 +459,8 @@ class DESCutout extends connect(store)(PageViewElement) {
 
   }
   _validateForm() {
+    // this.submit_disabled = false;
+    // return(true);
     var validForm = true;
     validForm = this.positions !== "" && validForm;
     validForm = (this.fits || this.rgb_types_stiff || this.rgb_types_lupton) && validForm;
@@ -392,6 +474,29 @@ class DESCutout extends connect(store)(PageViewElement) {
       validForm = criterion && validForm;
       this._toggleValidWarning('criterion-three-bands', criterion);
     }
+    if (this.tabIdx === 0) {
+      var textareaID = 'coadd-id-textarea';
+    } else {
+      var textareaID = 'coords-textarea';
+    }
+    var currentText = this.shadowRoot.getElementById(textareaID).value;
+    if (this.positions !== currentText) {
+      this._validateCsvFile(currentText);
+    }
+    var criterion = this.positions === currentText
+    validForm = criterion && validForm;
+
+    var criterion = this._validateEmail();
+    validForm = criterion && validForm;
+    if (this.validEmail) {
+      this.shadowRoot.getElementById('email-options').classList.remove('invalid-form-element');
+    } else {
+      var that = this;
+      this._toast(false, 'Please enter a valid email address.', () => {
+        that.shadowRoot.getElementById('email-options').classList.add('invalid-form-element');
+      });
+    }
+
     // Enable/disable submit button
     this.submit_disabled = !validForm;
   }
@@ -527,41 +632,89 @@ class DESCutout extends connect(store)(PageViewElement) {
           var textareaID = 'coadd-id-textarea'
           that.tabIdx = 0
         }
-        that.shadowRoot.getElementById(textareaID).value = data.csv;
         that.positions = data.csv;
+        that.shadowRoot.getElementById(textareaID).value = data.csv;
         that.shadowRoot.getElementById('csv-file-msg').innerHTML = 'Positions validated and processed.';
         that.shadowRoot.getElementById('csv-file-msg').style.color = 'green';
+        that.shadowRoot.getElementById(textareaID).style['border-color'] = 'green';
       } else {
-        that.shadowRoot.getElementById('csv-file-msg').innerHTML = data.msg;
+        that.positions = 'INVALID';
+        that.shadowRoot.getElementById('csv-file-msg').innerHTML = 'Please use valid CSV syntax and column headers.';
         that.shadowRoot.getElementById('csv-file-msg').style.color = 'red';
+        that.shadowRoot.getElementById('coadd-id-textarea').style['border-color'] = 'red';
+        that.shadowRoot.getElementById('coords-textarea').style['border-color'] = 'red';
       }
     })
-  }
-  stateChanged(state) {
-    this.username = state.app.username;
-    this.db = state.app.db;
   }
 
   _updateTabbedContent(event) {
     this.tabIdx = this.shadowRoot.getElementById('tab-selector').selected;
   }
 
-  // firstUpdated() {
-  //   console.log('First Updated: '+ JSON.stringify(this.rgb_bands.checked));
-  // }
+  _toast(status, msg, callback) {
+    if (status) {
+      var elId = 'toast-job-success';
+    } else {
+      var elId = 'toast-job-failure';
+    }
+    this.shadowRoot.getElementById(elId).text = msg;
+    this.shadowRoot.getElementById(elId).show();
+    callback();
+  }
+
+  _validateEmail(){
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (this.shadowRoot.getElementById('send-email').checked) {
+      this.validEmail = re.test(String(this.email).toLowerCase());
+    } else {
+      this.validEmail = true;
+    }
+    return this.validEmail;
+  }
+
+  stateChanged(state) {
+    this.username = state.app.username;
+    this.db = state.app.db;
+    this.email = state.app.email;
+  }
+
+  firstUpdated() {
+    var that = this;
+    this.shadowRoot.getElementById('coadd-id-textarea').addEventListener('blur', function (event) {
+      that._validateForm();
+    });
+    this.shadowRoot.getElementById('coords-textarea').addEventListener('blur', function (event) {
+      that._validateForm();
+    });
+  }
 
   updated(changedProps) {
-    // changedProps.forEach((oldValue, propName) => {
-    //   console.log(`${propName} changed. oldValue: ${oldValue}`);
-    // });
-    this._validateForm();
-    if (this.fits) {
-      this.shadowRoot.getElementById('fits_bands_selector').style.display = 'block';
-      // this.shadowRoot.getElementById('select-all-bands-toggle').style.display = 'inline-block';
-    } else {
-      this.shadowRoot.getElementById('fits_bands_selector').style.display = 'none';
-      // this.shadowRoot.getElementById('select-all-bands-toggle').style.display = 'none';
-    }
+    changedProps.forEach((oldValue, propName) => {
+      // console.log(`${propName} changed. oldValue: ${oldValue}`);
+      switch (propName) {
+        case 'submit_disabled':
+          this.shadowRoot.getElementById('bc_submitJobButton').disabled = this.submit_disabled;
+          break;
+        case 'fits':
+          if (this.fits) {
+            this.shadowRoot.getElementById('fits_bands_selector').style.display = 'block';
+          } else {
+            this.shadowRoot.getElementById('fits_bands_selector').style.display = 'none';
+          }
+        case 'customJobName':
+          var originalName = this.customJobName;
+          var validJobName = this.customJobName.replace(/[^a-z0-9_\-]/gi,'_').substring(0,128);
+          this.customJobName = validJobName;
+          if (originalName !== validJobName) {
+            this._toast(false, 'Please use only valid characters (a-z, _, -, 0-9) in custom job names. Maximum length is 128 characters.', () => {});
+          }
+        case 'email':
+          this._validateEmail();
+        default:
+          // Assume that we want to revalidate the form when a property changes
+          this._validateForm();
+      }
+    });
   }
 }
 
