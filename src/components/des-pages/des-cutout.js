@@ -326,8 +326,8 @@ class DESCutout extends connect(store)(PageViewElement) {
     <section>
         <h2>Options</h2>
         <div>
-          <p>Provide a custom job name:</p>
-          <paper-input @change="${(e) => {this.customJobName = e.target.value; console.log(e.target.value);}}" always-float-label id="bc_validname" name="name" label="Job Name" placeholder="My_Custom_Job_Name-12" value="${this.customJobName}" style="max-width: 500px; padding-left:2rem;"></paper-input>
+          <p id="custom-job-option">Provide a custom job name:</p>
+          <paper-input @change="${(e) => {this.customJobName = e.target.value; console.log(e.target.value);}}" always-float-label id="bc_validname" name="name" label="Job Name" placeholder="my-custom-job.12" value="${this.customJobName}" style="max-width: 500px; padding-left:2rem;"></paper-input>
           <p>Receive an email when the files are ready for download:</p>
           <div id="email-options">
             <!-- <p id="email-options-invalid" style="display: none; color: red;">Please enter a valid email address.</p> -->
@@ -703,11 +703,11 @@ class DESCutout extends connect(store)(PageViewElement) {
           }
         case 'customJobName':
           var originalName = this.customJobName;
-          var validJobName = this.customJobName.replace(/[^a-z0-9_\-]/gi,'_').substring(0,128);
-          this.customJobName = validJobName;
-          if (originalName !== validJobName) {
-            this._toast(false, 'Please use only valid characters (a-z, _, -, 0-9) in custom job names. Maximum length is 128 characters.', () => {});
+          var isValidJobName = this.customJobName === '' || (this.customJobName.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])*(\.[a-z0-9]([-a-z0-9]*[a-z0-9])*)*$/g) && this.customJobName.length < 129);
+          if (!isValidJobName) {
+            this._toast(false, "Custom job name must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character. Maximum length is 128 characters.", () => {});
           }
+          this._toggleValidWarning('custom-job-option', isValidJobName);
         case 'email':
           this._validateEmail();
         default:
