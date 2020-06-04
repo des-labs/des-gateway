@@ -1,6 +1,7 @@
 import { html,css } from 'lit-element';
 import { PageViewElement } from '../page-view-element.js';
 import { SharedStyles } from '../styles/shared-styles.js';
+import {config} from '../des-config.js';
 
 class DESTicket extends PageViewElement {
   static get properties() {
@@ -13,7 +14,8 @@ class DESTicket extends PageViewElement {
       msg: {type: String},
       searchMessage: {type: String},
       existsMessage: {type: String},
-      submitMessage: {type: String}
+      submitMessage: {type: String},
+      ticketAuth: {type: String},
     };
   }
 
@@ -33,6 +35,7 @@ class DESTicket extends PageViewElement {
     this.msg = "";
     this.resetChecked = false;
     this.unlockChecked = false;
+    this.ticketAuth = 'Basic ' + config.ticketAuth
  }
 
 updateResetChecked(e) {
@@ -133,15 +136,14 @@ updateUnlockChecked(e) {
 
   _search(){
     console.log("_search");
-    const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/search/";
+    const Url="https://deslabs.ncsa.illinois.edu/desticket/api/v1/search/";
     /*const Url="http://localhost:5000/api/v1/search/";*/
     const dataP={
       search_string: this.searchString,
     };
     const param = {
       headers: {'Content-Type': 'application/json',
-        'Authorization': 'Basic ZGVzX3VzZXJzX21hbmFnZXI6ZGVzZG1ydWxlcwo=',
-          },
+        'Authorization': this.ticketAuth,},
       body: JSON.stringify(dataP),
       method: "POST"
     };
@@ -154,7 +156,7 @@ updateUnlockChecked(e) {
 
     _exists(){
       console.log("_exists");
-      const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/exists/";
+      const Url="https://deslabs.ncsa.illinois.edu/desticket/api/v1/exists/";
       /*const Url="http://localhost:5000/api/v1/exists/";*/
       const dataP={
         user: this.user,
@@ -162,7 +164,7 @@ updateUnlockChecked(e) {
       };
       const param = {
         headers: {'Content-Type': 'application/json',
-        'Authorization': 'Basic ZGVzX3VzZXJzX21hbmFnZXI6ZGVzZG1ydWxlcwo=',},
+        'Authorization': this.ticketAuth,}, 
         body: JSON.stringify(dataP),
         method: "POST"
       };
@@ -182,7 +184,7 @@ updateUnlockChecked(e) {
       this.reset = "False"
     }
 
-    const Url="https://deslabs.ncsa.illinois.edu:32000/desticket/api/v1/reset/";
+    const Url="https://deslabs.ncsa.illinois.edu/desticket/api/v1/reset/";
     /*const Url="http://localhost:5000/api/v1/reset/";*/
     const dataP={
       user: this.user,
@@ -192,7 +194,7 @@ updateUnlockChecked(e) {
     };
     const param = {
       headers: {'Content-Type': 'application/json',
-                'Authorization': 'Basic ZGVzX3VzZXJzX21hbmFnZXI6ZGVzZG1ydWxlcwo='},
+        'Authorization': this.ticketAuth,},
       body: JSON.stringify(dataP),
       method: "POST"
     };
