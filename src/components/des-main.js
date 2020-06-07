@@ -172,6 +172,7 @@ class DESMain extends connect(store)(LitElement) {
           ${this.accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.frontEndUrl + config.rootPath + '/page3'}">Submit test job</a>` : html ``}
           ${this.accessPages.includes('db-access') ?  html`<a ?selected="${this._page === 'db-access'}" href="${config.frontEndUrl + config.rootPath + '/db-access'}">DB access</a>` : html ``}
           ${this.accessPages.includes('cutout') ?  html`<a ?selected="${this._page === 'cutout'}" href="${config.frontEndUrl + config.rootPath + '/cutout'}">Cutout</a>` : html ``}
+          ${this.accessPages.includes('status') ?  html`<a ?selected="${this._page === 'status'}" href="${config.frontEndUrl + config.rootPath + '/status'}">Job status</a>` : html ``}
           ${this.accessPages.includes('ticket') ?  html`<a ?selected="${this._page === 'ticket'}" href="${config.frontEndUrl + config.rootPath + '/ticket'}">DES Ticket</a>` : html ``}
         </nav>
 
@@ -196,6 +197,9 @@ class DESMain extends connect(store)(LitElement) {
         ${this.accessPages.includes('cutout') ?
            html`<des-cutout class="page" ?active="${this._page === 'cutout'}"></des-cutout>` :
            html`<des-404 class="page" ?active="${this._page === 'cutout'}"></des-404>`}
+        ${this.accessPages.includes('status') ?
+           html`<des-job-status class="page" ?active="${this._page === 'status'}"></des-job-status>` :
+           html`<des-404 class="page" ?active="${this._page === 'status'}"></des-404>`}
         ${this.accessPages.includes('ticket') ?
            html`<des-ticket class="page" ?active="${this._page === 'ticket'}"></des-ticket>` :
            html`<des-404 class="page" ?active="${this._page === 'ticket'}"></des-404>`}

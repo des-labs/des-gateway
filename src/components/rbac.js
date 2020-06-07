@@ -1,6 +1,6 @@
 
 const pages_public = []
-const pages_collaborator = [...pages_public, 'page3', 'db-access', 'cutout']
+const pages_collaborator = [...pages_public, 'page3', 'db-access', 'cutout', 'status']
 const pages_admin = [...pages_collaborator, 'ticket']
 
 export const rbac_bindings = [

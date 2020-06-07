@@ -83,6 +83,9 @@ export const loadPage = (page,ap) => (dispatch) => {
     case 'cutout':
       ap.includes('cutout') ?   import('../components/des-pages/des-cutout.js') : import('../components/des-pages/des-404.js') ;
       break;
+    case 'status':
+      ap.includes('status') ?   import('../components/des-pages/des-job-status.js') : import('../components/des-pages/des-404.js') ;
+      break;
     case 'ticket':
       ap.includes('ticket') ?   import('../components/des-pages/des-ticket.js') : import('../components/des-pages/des-404.js') ;
       break;
