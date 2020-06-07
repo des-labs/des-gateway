@@ -8,13 +8,18 @@ import '@vanillawc/wc-codemirror/index.js';
 import '@vanillawc/wc-codemirror/mode/sql/sql.js';
 
 
-class DESDbAccessTest extends connect(store)(PageViewElement) {
+class DESDbAccess extends connect(store)(PageViewElement) {
   static get properties() {
     return {
       _value: { type: Number },
       username: {type: String},
       query: {type: String},
       msg: {type: String},
+      submit_disabled: {type: Boolean},
+      validEmail: {type: Boolean},
+      validOutputFile: {type: Object},
+      validCompression: {type: Boolean},
+      compressChecked: {type: Boolean}
     };
   }
 
@@ -134,6 +139,11 @@ class DESDbAccessTest extends connect(store)(PageViewElement) {
     this.username = '';
     this.query = '';
     this.msg = "";
+    this.submit_disabled = true;
+    this.validEmail = false;
+    this.validOutputFile = {file: '',valid: false};
+    this.compressChecked = false;
+    this.validCompression = false;
   }
 
   queryBox() {
@@ -157,20 +167,20 @@ class DESDbAccessTest extends connect(store)(PageViewElement) {
                 <td class="query-td-2">
                     <div class="query-btn">
                         <div class="btn-wrap">
-                            <paper-button id="subQuery" class="indigo medium" raised disabled on-tap="_submitQuery">Submit Job</paper-button>
+                            <paper-button id="subQuery" class="indigo medium" raised disabled @tap="${this._submitQuery}">Submit Job</paper-button>
                         </div>
 
                         <div class="btn-wrap">
-                            <paper-button class="indigo medium" raised on-tap="clearQueryBox">Clear</paper-button>
+                            <paper-button class="indigo medium" raised @tap="${this._clearQueryBox}">Clear</paper-button>
 
                         </div>
 
                         <div class="btn-wrap">
-                            <paper-button class="indigo medium" raised on-tap="_checkSyntax">Check</paper-button>
+                            <paper-button class="indigo medium" raised @tap="${this._checkSyntax}">Check</paper-button>
                         </div>
 
                         <div class="btn-wrap">
-                            <paper-button id="QuickQuery" class="indigo medium" raised on-tap="_quickSubmit">Quick</paper-button>
+                            <paper-button id="QuickQuery" class="indigo medium" raised @tap="${this._quickSubmit}">Quick</paper-button>
                         </div>
 
                         <div class="btn-wrap">
@@ -193,17 +203,12 @@ class DESDbAccessTest extends connect(store)(PageViewElement) {
             </tr>
             <tr class="query-tr" >
                 <td class="query-td" colspan="2">
-                    <span>Output file (.csv, .fits or .h5). Enable in order to submit.</span>
+                    <span>Output file (.csv, .fits or .h5).</span>
                 </td>
             </tr>
             <tr class="query-tr">
                 <td class="query-td">
-                    <paper-input style="margin-left:13px; margin-bottom: 14px; margin-top: -10px;" id="inputOutputFile" disabled required auto-validate label="Output file" ></paper-input>
-
-                </td>
-                <td class="query-td">
-                    <paper-toggle-button class="queryButton" id="inputOutputCheck" noink on-tap="_enableOutputFile" style="margin-top: -10px">
-                    </paper-toggle-button>
+                    <paper-input style="margin-left:13px; margin-bottom: 14px; margin-top: -10px;" id="inputOutputFile" @change="${this._validateOutputFile}"  label="Output file" ></paper-input>
                 </td>
             </tr>
 
@@ -215,7 +220,8 @@ class DESDbAccessTest extends connect(store)(PageViewElement) {
 
             <tr class="query-tr">
                 <td class="query-td" colspan="2">
-                    <paper-checkbox id="compress-box" style="margin-top: 18px; margin-left:10px;">Compressed files (csv and h5 files). Slightly longer jobs but smaller files</paper-checkbox>
+                <input type="checkbox" id="compress" name="compress" ?checked="${this.compressChecked}"
+                @change="${this._updateCompressChecked}"/>Compress files (.csv and .h5 only).
                 </td>
             </tr>
 
@@ -228,13 +234,7 @@ class DESDbAccessTest extends connect(store)(PageViewElement) {
 
             <tr class="query-tr">
                 <td class="query-td" colspan="2">
-                    <paper-checkbox id="checkemail" style="margin-top: 18px; margin-left:10px;" on-change="_emailcheck">Send email after completion</paper-checkbox>
-                </td>
-            </tr>
-
-            <tr class="query-tr">
-                <td class="query-td" colspan="2">
-                    <paper-input  id="queryemail" name="email" label="Email" value="" style="margin-top: -10px"></paper-input>
+                    <paper-input  id="email" name="email" label="Email" value="" @change="${this._validateEmail}" style="margin-top: -10px"></paper-input>
                 </td>
             </tr>
         </table>
@@ -254,11 +254,125 @@ class DESDbAccessTest extends connect(store)(PageViewElement) {
       </div>
     `;
   }
+  
+  _updateCompressChecked(e){
+    this.compressChecked = e.target.checked;
+  }
+  _clearQueryBox(){
+    this.query = '';
+    this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
+    console.log(this.editor)
+    this.editor.setValue('-- Insert Query --\n\n');
+    this.editor.focus();
+    this.editor.execCommand('goLineDown');
+  }
+
+  _validateOutputFile(){
+    const outputfile = this.shadowRoot.getElementById('inputOutputFile').value
+    if (outputfile.endsWith('.csv') || outputfile.endsWith('.h5') || outputfile.endsWith('.fits')){
+      this.validOutputFile = {file: outputfile,valid: true}
+    } 
+    else { 
+      this.validOutputFile = {file: outputfile, valid: false}
+    }
+  }
+
+  _validateSyntax(){
+    this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
+    this.query = this.editor.getValue();
+  }
+
+  _validateEmail(){
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    var validEmail = re.test(String(this.shadowRoot.getElementById('email').value).toLowerCase()); 
+    if (validEmail){
+      this.validEmail = true
+    }
+    else{
+      this.validEmail = false
+    }
+  }
+
+  _validateForm() {
+
+    const outputfile = this.shadowRoot.getElementById('inputOutputFile').value
+    if (this.compressChecked == false){
+      this.validCompression = true
+    }
+    else if (this.compressChecked && (outputfile.endsWith('.csv') || outputfile.endsWith('.h5'))){
+      this.validCompression = true
+    }
+    else { this.validCompression = false }
+
+   
+    var validForm = (this.validEmail && this.validOutputFile.valid && this.validCompression)
+    // Enable/disable submit button
+    this.submit_disabled = !validForm;
+  }
 
   stateChanged(state) {
     this.username = state.app.username;
+    this.db = state.app.db;
+    this.email = state.app.email;
+  }
+  
+  _quickSubmit(){
+    console.log("_quickSubmit");
+    const Url=config.backEndUrl + config.apiPath +  "/job/submit";
+    this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
+    this.query = this.editor.doc.getValue();
+    var body = {
+      job: 'query',
+      username: this.username,
+      query: this.query,
+      msg: this.msg,
+      quick: 'true'
+    };
+    const param = {
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem("token")
+      },
+    body: JSON.stringify(body)
+    };
+
+    fetch(Url, param)
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      if (data.status === "ok") {
+        this.shadowRoot.getElementById('toast-job-success').text = 'Job submitted';
+        this.shadowRoot.getElementById('toast-job-success').show();
+      } else {
+        this.shadowRoot.getElementById('toast-job-failure').text = 'Error submitting job';
+        this.shadowRoot.getElementById('toast-job-failure').show();
+      }
+      console.log(JSON.stringify(data));
+      callback();
+    });
+  }
+
+  _submitQuery(){
+    this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
+    this.query = this.editor.doc.getValue();
+
+    if (this.shadowRoot.getElementById('inputOutputFile').valid = true){
+         }
+    
+  }
+
+  updated(changedProps) {
+    this._validateForm();
+    if (this.submit_disabled){
+      this.shadowRoot.getElementById('subQuery').disabled = true
+    }
+    else {
+      this.shadowRoot.getElementById('subQuery').disabled = false
+    }
+    
   }
 
 }
-
-window.customElements.define('des-db-access', DESDbAccessTest);
+window.customElements.define('des-db-access', DESDbAccess);
