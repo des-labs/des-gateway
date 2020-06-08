@@ -195,6 +195,10 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   _updateGridData(jobs) {
     let gridItems = []
     let ctr = 0
+    // If there are no jobs in the returned list, allow an empty table
+    if (jobs.length === 0) {
+      this.shadowRoot.querySelector('vaadin-grid').items = gridItems;
+    }
     jobs.forEach((item, index, array) => {
       let job = {};
       job.id = item.job_id;
@@ -217,6 +221,31 @@ class DESJobStatus extends connect(store)(PageViewElement) {
 
   _deleteJob(jobId) {
     console.log(`Deleting job "${jobId}"...`);
+    const Url=config.backEndUrl + config.apiPath +  "/job/delete"
+    let body = {
+      'job-id': jobId,
+    };
+    const param = {
+      method: "DELETE",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem("token")
+      },
+      body: JSON.stringify(body)
+    };
+    var that = this;
+    fetch(Url, param)
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      if (data.status === "ok") {
+        console.log(JSON.stringify(data));
+        that._updateStatus();
+      } else {
+        console.log(JSON.stringify(data));
+      }
+    });
   }
 
   stateChanged(state) {

@@ -217,7 +217,6 @@ class DESMain extends connect(store)(LitElement) {
 
   constructor() {
     super();
-    console.log('Initializing...');
     this._session = false;
     store.dispatch(getProfile());
     this._drawerOpened="false";
@@ -236,21 +235,7 @@ class DESMain extends connect(store)(LitElement) {
     this.accessPages = state.app.accessPages;
   }
 
-  _profile(data){
-        this._session = true;
-        this.username = data.username;
-        this.email = data.email;
-        this.name = data.name;
-        console.log(this._session, this.username, this.email);
-        store.dispatch(loginUser({"name": this.name, "username":this.username, "email": this.email, "session": true}));
-        store.dispatch(updateDrawerPersist(true));
-        store.dispatch(updateDrawerState(true));
-
-  }
-
   firstUpdated() {
-    console.log('First Updated');
-    console.log("session", this._session);
     installMediaQueryWatcher(`(min-width: 460px)`, (matches) => {
       matches ?  this._goWide() :  this._goNarrow()
     })
