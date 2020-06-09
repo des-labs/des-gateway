@@ -216,7 +216,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   }
 
   _cancelJob(jobId) {
-    console.log(`Canceling job "${jobId}"...`);
+    this._deleteJob(jobId);
   }
 
   _deleteJob(jobId) {
