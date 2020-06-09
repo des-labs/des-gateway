@@ -165,11 +165,11 @@ class DESDbAccess extends connect(store)(PageViewElement) {
             <col width="30%">
             <tr class="query-tr">
                 <td class="query-td-2">
-                    <div class="query-btn">
-                        <div class="btn-wrap">
-                            <paper-button id="subQuery" class="indigo medium" raised disabled @tap="${this._submitQuery}">Submit Job</paper-button>
+                        <div class="query-btn">
+                          <paper-button id="subQuery" class="indigo medium" raised disabled @tap="${this._submitQuery}">Submit Job</paper-button>
+                    
                         </div>
-
+              
                         <div class="btn-wrap">
                             <paper-button class="indigo medium" raised @tap="${this._clearQueryBox}">Clear</paper-button>
 
@@ -181,6 +181,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
 
                         <div class="btn-wrap">
                             <paper-button id="QuickQuery" class="indigo medium" raised @tap="${this._quickSubmit}">Quick</paper-button>
+                        
                         </div>
 
                         <div class="btn-wrap">
@@ -252,6 +253,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
         ${this.queryBox()}
         ${this.queryControls()}
       </div>
+      <pre> ${this.results}</pre>
     `;
   }
   
@@ -319,13 +321,22 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   _quickSubmit(){
     console.log("_quickSubmit");
     const Url=config.backEndUrl + config.apiPath +  "/job/submit";
+
+    /* Removing comments from query string */
     this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
-    this.query = this.editor.doc.getValue();
+    var query_lines = this.editor.doc.getValue().split('\n');
+    var i;
+    for (i = 0; i < query_lines.length; i++) { 
+      if (query_lines[i].startsWith('--') == false && query_lines[i] !== "") {
+        this.query = query_lines[i]
+      }
+    }
+   
+    console.log(this.query)
     var body = {
       job: 'query',
       username: this.username,
       query: this.query,
-      msg: this.msg,
       quick: 'true'
     };
     const param = {
@@ -340,27 +351,42 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     fetch(Url, param)
     .then(response => {
       return response.json()
-    })
-    .then(data => {
-      if (data.status === "ok") {
-        this.shadowRoot.getElementById('toast-job-success').text = 'Job submitted';
-        this.shadowRoot.getElementById('toast-job-success').show();
-      } else {
-        this.shadowRoot.getElementById('toast-job-failure').text = 'Error submitting job';
-        this.shadowRoot.getElementById('toast-job-failure').show();
-      }
-      console.log(JSON.stringify(data));
-      callback();
-    });
+    }).then(data => {this.results = data.results;})
+    .catch((error) => {console.log(error);});
   }
 
   _submitQuery(){
-    this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
-    this.query = this.editor.doc.getValue();
+    console.log("_submitQuery");
+    const Url=config.backEndUrl + config.apiPath +  "/job/submit";
 
-    if (this.shadowRoot.getElementById('inputOutputFile').valid = true){
-         }
-    
+     /* Removing comments from query string */
+     this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
+     var query_lines = this.editor.doc.getValue().split('\n');
+     var i;
+     for (i = 0; i < query_lines.length; i++) { 
+       if (query_lines[i].startsWith('--') == false && query_lines[i] !== "") {
+         this.query = query_lines[i]
+       }
+     }
+    var body = {
+      job: 'query',
+      username: this.username,
+      query: this.query,
+    };
+    const param = {
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem("token")
+      },
+    body: JSON.stringify(body)
+    };
+
+    fetch(Url, param)
+    .then(response => {
+      return response.json()
+    })
+   
   }
 
   updated(changedProps) {
