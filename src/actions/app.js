@@ -25,7 +25,11 @@ const isauth = () => {
   const param = { body:data, method: "POST"};
   return fetch(Url, param).then(resp => resp.json())
                 .then(function(data){
-                  if (data.status=='ok') {return true;}
+                  if (data.status=='ok') {
+                    console.log('Updating token via isauth()...');
+                    localStorage.setItem("token", data.new_token);
+                    return true;
+                  }
                   else {return false;}
                 })
 };
@@ -82,6 +86,9 @@ export const loadPage = (page,ap) => (dispatch) => {
       break;
     case 'cutout':
       ap.includes('cutout') ?   import('../components/des-pages/des-cutout.js') : import('../components/des-pages/des-404.js') ;
+      break;
+    case 'status':
+      ap.includes('status') ?   import('../components/des-pages/des-job-status.js') : import('../components/des-pages/des-404.js') ;
       break;
     case 'ticket':
       ap.includes('ticket') ?   import('../components/des-pages/des-ticket.js') : import('../components/des-pages/des-404.js') ;
@@ -140,48 +147,41 @@ export const logoutUser = () => {
 };
 
 export const getProfile = () => {
-  console.log('getting profile');
+  console.log('getting profile...');
   return dispatch => {
       const token = localStorage.getItem("token");
-      const Url=config.backEndUrl + config.apiPath +  "/profile";
-      const formData = new FormData();
-      formData.append('token', token);
-      const data = new URLSearchParams(formData);
-      const param = {
-        body:data,
-        method: "POST",
-        headers: {'Authorization': 'Bearer ' + token}
-      };
       if (token) {
+        console.log('Have token. Fetch /profile...');
+        const Url=config.backEndUrl + config.apiPath +  "/profile";
+        const formData = new FormData();
+        formData.append('token', token);
+        const data = new URLSearchParams(formData);
+        const param = {
+          body:data,
+          method: "POST",
+          headers: {'Authorization': 'Bearer ' + token}
+        };
         return fetch(Url, param).then(resp => resp.json())
-                .then(data => {
-                     console.log(data);
-                     if (data.status =='ok'){
-                      dispatch(loginUser({"username":data.username, "lastname": data.lastname, "email": data.email,
-                      "name": data.name, "session": true, "db": data.db, "roles": data.roles}));
-                      dispatch(updateDrawerPersist(true));
-                      dispatch(updateDrawerState(true));
-                      return true;
-                      //import('../components/des-pages/des-home.js');
-                      //dispatch(updatePage('home'));
-                     }
-                     else {
-                      dispatch(loadPage('logout', ''));
-                      return false;
-                     }
-
-                })
+          .then(data => {
+            console.log(data);
+            if (data.status == 'ok') {
+              console.log('Profile fetched. loginUser...');
+              dispatch(loginUser({"username":data.username, "lastname": data.lastname, "email": data.email,
+              "name": data.name, "session": true, "db": data.db, "roles": data.roles}));
+              console.log('Updating token via getProfile()...');
+              localStorage.setItem("token", data.new_token);
+              dispatch(updateDrawerPersist(true));
+              dispatch(updateDrawerState(true));
+              return true;
+            }
+            else {
+              dispatch(loadPage('logout', ''));
+              return false;
+            }
+          });
       }
       else {
         console.log('no token');
-         //import('../components/des-pages/des-login.js').then((module) => {
-        //dispatch(updateDrawerState(false));
-        //dispatch(updateDrawerPersist(false));
-        //});
-        //dispatch(updatePage('login'));
-        //window.location.href = config.rootPath+'/login';
-        //dispatch(loadPage('login', ['home']));
-
       }
 
   }
