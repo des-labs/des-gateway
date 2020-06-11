@@ -20,7 +20,7 @@ export const SharedStyles = css`
       color: #a8a8a8;
       cursor: auto;
       pointer-events: none;
-      box-shadow: 3px -3px 8px 8px rgba(184,184,184,0.7);
+      /* box-shadow: 3px -3px 8px 8px rgba(184,184,184,0.7); */
   }
   paper-button.des-button {
       background-color: #3F51B5;

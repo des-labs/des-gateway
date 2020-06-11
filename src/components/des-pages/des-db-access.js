@@ -170,14 +170,14 @@ class DESDbAccess extends connect(store)(PageViewElement) {
           background-color: var(--paper-indigo-a250) !important;
           color: white !important;
           };
-          box-shadow: 3px -3px 4px 3px rgba(63,81,181,0.7);
+          /* box-shadow: 3px -3px 4px 3px rgba(63,81,181,0.7); */
         }
         #submit-button[disabled] {
             background: #eaeaea;
             color: #a8a8a8;
             cursor: auto;
             pointer-events: none;
-            box-shadow: 3px -3px 8px 8px rgba(184,184,184,0.7);
+            /* box-shadow: 3px -3px 8px 8px rgba(184,184,184,0.7); */
         }
         .toast-error {
           --paper-toast-color: #FFD2D2 ;
@@ -323,12 +323,12 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   // }
 
   _validateOutputFile(event){
-    const outputfile = event.target.value
+    const outputfile = this.shadowRoot.getElementById('output-filename').value;
     let valid = false;
     switch (true) {
       case (outputfile.endsWith('.csv')):
       case (outputfile.endsWith('.h5')):
-        this.shadowRoot.getElementById('option-compress-files').disabled = false;
+        this.shadowRoot.getElementById('option-compress-files').disabled = this.quickQuery;
         valid = true;
         break;
       case (outputfile.endsWith('.fits')):
@@ -497,6 +497,12 @@ class DESDbAccess extends connect(store)(PageViewElement) {
           break;
         case 'quickQuery':
           this.shadowRoot.getElementById('output-filename').disabled = this.quickQuery;
+          // this.shadowRoot.getElementById('option-compress-files').disabled = this.quickQuery;
+          this._validateOutputFile();
+          this.shadowRoot.getElementById('custom-job-name').disabled = this.quickQuery;
+          // this.validEmail = this._validateEmail(this.email);
+          this.shadowRoot.getElementById('send-email').disabled = this.quickQuery;
+          this.shadowRoot.getElementById('custom-email').disabled = this.quickQuery || !this.shadowRoot.getElementById('send-email').checked;
         case 'email':
           this.validEmail = this._validateEmail(this.email);
         case 'customJobName':

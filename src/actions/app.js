@@ -97,7 +97,7 @@ export const loadPage = (page,ap) => (dispatch) => {
       page = 'des404';
       import('../components/des-pages/des-404.js');
   }
-  // history.pushState({}, '', location.origin + '/' + page)
+  history.pushState({}, '', location.origin + '/' + page)
   // console.log('pushing state: ' + location.origin + '/' + page)
   dispatch(updatePage(page));
 };
