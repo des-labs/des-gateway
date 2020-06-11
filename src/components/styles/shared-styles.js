@@ -54,8 +54,8 @@ export const SharedStyles = css`
 
   section > * {
     max-width: 1000px;
-    margin-right: auto;
-    margin-left: auto;
+    /* margin-right: auto;
+    margin-left: auto; */
   }
 
   section:nth-of-type(even) {

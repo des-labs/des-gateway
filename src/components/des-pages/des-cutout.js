@@ -181,7 +181,7 @@ class DESCutout extends connect(store)(PageViewElement) {
             padding-top: 0;
             padding-bottom: 0;
           }
-          #bc_submitJobButton {
+          #submit-button {
             background-color: var(--paper-indigo-500);
             color: white;
             width: 150px;
@@ -192,7 +192,7 @@ class DESCutout extends connect(store)(PageViewElement) {
             };
             box-shadow: 3px -3px 4px 3px rgba(63,81,181,0.7);
           }
-          #bc_submitJobButton[disabled] {
+          #submit-button[disabled] {
               background: #eaeaea;
               color: #a8a8a8;
               cursor: auto;
@@ -216,8 +216,10 @@ class DESCutout extends connect(store)(PageViewElement) {
   static get properties() {
     return {
       _value: { type: Number },
-      username: {type: String},
-      email: {type: String},
+      // username: {type: String},
+      // email: {type: String},
+      // validEmail: {type: Boolean},
+      // customJobName: {type: String},
       db: {type: String},
       msg: {type: String},
       tabIdx: { type: Number },
@@ -225,9 +227,7 @@ class DESCutout extends connect(store)(PageViewElement) {
       ysize: { type: Number },
       csvFile: {type: String},
       positions: {type: String},
-      customJobName: {type: String},
       release: {type: String},
-      validEmail: {type: Boolean},
       rgb_bands: {type: Object},
       fits_bands: {type: Object},
       rgb_types_stiff: {type: Boolean},
@@ -240,15 +240,15 @@ class DESCutout extends connect(store)(PageViewElement) {
 
   constructor(){
     super();
-    this.username = '';
-    this.email = '';
+    // this.username = '';
+    // this.email = '';
+    // this.customJobName = '';
+    // this.validEmail = false;
     this.db = '';
     this.msg = "";
     this.positions = "";
     this.tabIdx = 0;
     this.csvFile = '';
-    this.customJobName = '';
-    this.validEmail = false;
     this.fits = false;
     this.rgb_types_stiff = false;
     this.rgb_types_lupton = false;
@@ -288,7 +288,7 @@ class DESCutout extends connect(store)(PageViewElement) {
     return html`
     <div>
       <div id="submit-container">
-        <paper-button raised  class="indigo"  id="bc_submitJobButton" ?disabled="${this.submit_disabled}" @click="${e => this._submit(e)}">
+        <paper-button raised  class="indigo"  id="submit-button" ?disabled="${this.submit_disabled}" @click="${e => this._submit(e)}">
           Submit Job
         </paper-button>
         <paper-spinner id="submit-spinner" class="big"></paper-spinner>
@@ -383,8 +383,14 @@ class DESCutout extends connect(store)(PageViewElement) {
       <section>
           <h2>Options</h2>
           <div>
-            <p id="custom-job-option">Provide a custom job name:</p>
-            <paper-input @change="${(e) => {this.customJobName = e.target.value; console.log(e.target.value);}}" always-float-label id="bc_validname" name="name" label="Job Name" placeholder="my-custom-job.12" value="${this.customJobName}" style="max-width: 500px; padding-left:2rem;"></paper-input>
+            <!-- <p id="custom-job-option">Provide a custom job name:</p> -->
+            <paper-input
+              style="max-width: 500px; padding-left:2rem;"
+              placeholder="" value="${this.customJobName}"
+              label="Custom job name (example: my-custom-job.12)"
+              @change="${(e) => {this.customJobName = e.target.value}}"
+              id="custom-job-name" name="custom-job-name"></paper-input>
+            <!-- <paper-input @change="${(e) => {this.customJobName = e.target.value; console.log(e.target.value);}}" always-float-label id="bc_validname" name="name" label="Job Name" placeholder="my-custom-job.12" value="${this.customJobName}" style="max-width: 500px; padding-left:2rem;"></paper-input> -->
             <p>Receive an email when the files are ready for download:</p>
             <div id="email-options">
               <!-- <p id="email-options-invalid" style="display: none; color: red;">Please enter a valid email address.</p> -->
@@ -397,7 +403,7 @@ class DESCutout extends connect(store)(PageViewElement) {
                 always-float-label
                 disabled
                 id="custom-email"
-                name="name"
+                name="custom-email"
                 label="Email Address"
                 style="max-width: 500px; padding-left:2rem;"
                 placeholder="${this.email}"
@@ -414,10 +420,6 @@ class DESCutout extends connect(store)(PageViewElement) {
     `;
   }
 
-  _updateEmailOption(event) {
-    this.shadowRoot.getElementById('custom-email').disabled = !event.target.checked;
-    this._validateEmail();
-  }
 
   _toggleSpinner(active, callback) {
 
@@ -546,7 +548,8 @@ class DESCutout extends connect(store)(PageViewElement) {
     var criterion = this.positions === currentText
     validForm = criterion && validForm;
 
-    var criterion = this._validateEmail();
+    var criterion = this._validateEmail(this.email);
+    this.validEmail = criterion;
     validForm = criterion && validForm;
     if (this.validEmail) {
       this.shadowRoot.getElementById('email-options').classList.remove('invalid-form-element');
@@ -724,16 +727,6 @@ class DESCutout extends connect(store)(PageViewElement) {
     callback();
   }
 
-  _validateEmail(){
-    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if (this.shadowRoot.getElementById('send-email').checked) {
-      this.validEmail = re.test(String(this.email).toLowerCase());
-    } else {
-      this.validEmail = true;
-    }
-    return this.validEmail;
-  }
-
   stateChanged(state) {
     this.username = state.app.username;
     this.db = state.app.db;
@@ -758,7 +751,7 @@ class DESCutout extends connect(store)(PageViewElement) {
       // console.log(`${propName} changed. oldValue: ${oldValue}`);
       switch (propName) {
         case 'submit_disabled':
-          this.shadowRoot.getElementById('bc_submitJobButton').disabled = this.submit_disabled;
+          this.shadowRoot.getElementById('submit-button').disabled = this.submit_disabled;
           break;
         case 'fits':
           if (this.fits) {
@@ -774,7 +767,7 @@ class DESCutout extends connect(store)(PageViewElement) {
           }
           this._toggleValidWarning('custom-job-option', isValidJobName);
         case 'email':
-          this._validateEmail();
+          this.validEmail = this._validateEmail(this.email);
         default:
           // Assume that we want to revalidate the form when a property changes
           this._validateForm();
