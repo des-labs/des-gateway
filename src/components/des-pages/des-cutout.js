@@ -164,6 +164,50 @@ class DESCutout extends connect(store)(PageViewElement) {
             border-width: 1px;
             border-style: dashed;
           }
+
+          .grid-system {
+              display: grid;
+              grid-gap: 1rem;
+              padding: 1rem;
+          }
+          .position-section {
+            grid-template-columns: 70% 30%;
+          }
+          section {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+          }
+          h2 {
+            padding-top: 0;
+            padding-bottom: 0;
+          }
+          #bc_submitJobButton {
+            background-color: var(--paper-indigo-500);
+            color: white;
+            width: 150px;
+            text-transform: none;
+            --paper-button-raised-keyboard-focus: {
+            background-color: var(--paper-indigo-a250) !important;
+            color: white !important;
+            };
+            box-shadow: 3px -3px 4px 3px rgba(63,81,181,0.7);
+          }
+          #bc_submitJobButton[disabled] {
+              background: #eaeaea;
+              color: #a8a8a8;
+              cursor: auto;
+              pointer-events: none;
+              box-shadow: 3px -3px 8px 8px rgba(184,184,184,0.7);
+          }
+
+          #submit-container {
+            position: fixed;
+            left: 250px;
+            bottom: 0%;
+            z-index: 1;
+            /* width: 100%; */
+            /* background-color: white; */
+          }
         `,
 
     ];
@@ -242,123 +286,131 @@ class DESCutout extends connect(store)(PageViewElement) {
 
   render() {
     return html`
-
-    <section>
-        <h2>Positions and data set</h2>
-        <div>
-          <label id="data-release-tag">Data release tag:</label>
-          <paper-radio-group selected="${this.release}" aria-labelledby="data-release-tag">
-            <paper-radio-button @change="${e => this.release = e.target.name}" name="Y6A1">Y6A1</paper-radio-button>
-            <paper-radio-button @change="${e => this.release = e.target.name}" name="Y3A2">Y3A2</paper-radio-button>
-            <paper-radio-button @change="${e => this.release = e.target.name}" name="Y1A1">Y1A1</paper-radio-button>
-            <paper-radio-button @change="${e => this.release = e.target.name}" name="SVA1">SVA1</paper-radio-button>
-          </paper-radio-group>
-        </div>
-        <div>
-          <paper-tabs id="tab-selector" selected="${this.tabIdx}" @click="${e => this._updateTabbedContent(e)}">
-            <paper-tab>by COADD ID</paper-tab>
-            <paper-tab>by RA/DEC coordinates</paper-tab>
-          </paper-tabs>
-
-          <iron-pages selected="${this.tabIdx}">
-              <div>
-                  <iron-autogrow-textarea style="font-family: monospace;" id="coadd-id-textarea" max-rows="10" rows=4 placeholder="COADD_OBJECT_ID\n61407318\n61407582" value=""></iron-autogrow-textarea>
-              </div>
-              <div>
-                  <iron-autogrow-textarea style="font-family: monospace;" id="coords-textarea" max-rows="10" rows=4 placeholder="RA,DEC\n21.5,3.48\n36.6,-15.68" value=""></iron-autogrow-textarea>
-              </div>
-          </iron-pages>
-        </div>
-        <div>
-          <div>
-            &nbsp;&nbsp;
-            <paper-button raised class="indigo" id="bc_uploadFile">
-              <span style="overflow-x: auto; overflow-wrap: break-word;">Upload CSV file</span>
-              <input type="file" class="upload" id="csv-upload" @change="${e => this._fileChange(e)}" accept=".csv, .CSV" />
-            </paper-button>
-            <span id="csv-file-msg" style="padding-left: 2rem;"></span>
-          </div>
-
-        </div>
-    </section>
-
-    <section>
-        <h2>Output format and size</h2>
-        <p>Check all desired output files. FITS format requires selection of one or more bands. RGB color images require selection of exactly three bands.</p>
-        <h3>FITS format</h3>
-        <div style="float: none;">
-        <p>FITS format requires selection of <span id="criterion-fits-band-selected">one or more bands</span>.</p>
-        <paper-checkbox @change="${e => this._updateFitsBands(e)}" ?checked="${this.fits}">FITS (FITS format)</paper-checkbox>&nbsp;&nbsp;&nbsp;&nbsp;
-
-        </div>
-        <div id="fits_bands_selector">
-          Bands: &nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'g')}" ?checked="${this.fits_bands.checked.g}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'r')}" ?checked="${this.fits_bands.checked.r}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'i')}" ?checked="${this.fits_bands.checked.i}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'z')}" ?checked="${this.fits_bands.checked.z}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'y')}" ?checked="${this.fits_bands.checked.y}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox id="select-all-bands-toggle" @change="${e => this._selectAllFitsBands(e)}" ?checked="${this.fits_all_toggle}" ?disabled="${!this.fits}" style="font-weight: bold; padding-left: 2rem;" id="bc_all_toggle">Select All/None</paper-checkbox>&nbsp;
-        </div>
-        <h3>Color image format</h3>
-        <p>RGB color images require selection of <span id="criterion-three-bands">exactly three bands</span>.</p>
-        <div>
-          <paper-checkbox @change="${e => this._updateRgbTypes(e, 'stiff')}" ?checked="${this.rgb_types_stiff}">Color image (RGB: STIFF format)</paper-checkbox>
-        </div>
-        <div>
-          <paper-checkbox @change="${e => this._updateRgbTypes(e, 'lupton')}" ?checked="${this.rgb_types_lupton}">Color image (RGB: Lupton method)</paper-checkbox>
-        </div>
-
-        <div id="rgb_bands_selector" style="display: none;">
-          Bands: &nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'g')}" ?checked="${this.rgb_bands.checked.g}" ?disabled="${this.rgb_bands.disabled.g}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'r')}" ?checked="${this.rgb_bands.checked.r}" ?disabled="${this.rgb_bands.disabled.r}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'i')}" ?checked="${this.rgb_bands.checked.i}" ?disabled="${this.rgb_bands.disabled.i}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'z')}" ?checked="${this.rgb_bands.checked.z}" ?disabled="${this.rgb_bands.disabled.z}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
-          <paper-checkbox @change="${e => this._updateRgbSelection(e, 'y')}" ?checked="${this.rgb_bands.checked.y}" ?disabled="${this.rgb_bands.disabled.y}" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
-        </div>
-        <h3>Cutout size (arcminutes)</h3>
-        <div>
-          X &nbsp;<paper-slider @change="${e => this.xsize = e.target.value}" id="bc_xsizeSlider" pin min="0.1" max="12" max-markers="10" step="0.1" value="${this.xsize}" expand editable></paper-slider>
-          Y &nbsp;<paper-slider @change="${e => this.ysize = e.target.value}" id="bc_ysizeSlider" pin min="0.1" max="12" max-markers="10" step="0.1" value="${this.ysize}" expand editable></paper-slider>
-        </div>
-    </section>
-    <section>
-        <h2>Options</h2>
-        <div>
-          <p id="custom-job-option">Provide a custom job name:</p>
-          <paper-input @change="${(e) => {this.customJobName = e.target.value; console.log(e.target.value);}}" always-float-label id="bc_validname" name="name" label="Job Name" placeholder="my-custom-job.12" value="${this.customJobName}" style="max-width: 500px; padding-left:2rem;"></paper-input>
-          <p>Receive an email when the files are ready for download:</p>
-          <div id="email-options">
-            <!-- <p id="email-options-invalid" style="display: none; color: red;">Please enter a valid email address.</p> -->
-            <paper-checkbox
-              @change="${(e) => {this._updateEmailOption(e)}}"
-              style="font-size:16px; padding-left:2rem; padding-top:15px;"
-              id="send-email">Email when complete</paper-checkbox>
-            <paper-input
-              @change="${(e) => {this.email = e.target.value;}}"
-              always-float-label
-              disabled
-              id="custom-email"
-              name="name"
-              label="Email Address"
-              style="max-width: 500px; padding-left:2rem;"
-              placeholder="${this.email}"
-              value="${this.email}"></paper-input>
-          </div>
-        </div>
-    </section>
-    <section>
     <div>
-      <paper-button raised  class="indigo"  id="bc_submitJobButton" ?disabled="${this.submit_disabled}" @click="${e => this._submit(e)}">
-        Submit Job
-      </paper-button>
-      <paper-spinner id="submit-spinner" class="big"></paper-spinner>
+      <div id="submit-container">
+        <paper-button raised  class="indigo"  id="bc_submitJobButton" ?disabled="${this.submit_disabled}" @click="${e => this._submit(e)}">
+          Submit Job
+        </paper-button>
+        <paper-spinner id="submit-spinner" class="big"></paper-spinner>
+      </div>
+      <section>
+          <h2>Positions and data set</h2>
+          <div style="display: grid; grid-gap: 1rem; grid-template-columns: 20% 80%;">
 
-      <paper-toast class="toast-position toast-success" id="toast-job-success" text="Job has been submitted!" duration="7000"> </paper-toast>
-      <paper-toast class="toast-position toast-error" id="toast-job-failure" text="ERROR! There was an error. Please try again" duration="7000"> </paper-toast>
+            <div>
+              <label id="data-release-tag" style="font-weight: bold;">Data release tag:</label>
+              <div>
+                <paper-radio-group selected="${this.release}" aria-labelledby="data-release-tag">
+                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y6A1">Y6A1</paper-radio-button><br>
+                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y3A2">Y3A2</paper-radio-button><br>
+                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y1A1">Y1A1</paper-radio-button><br>
+                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="SVA1">SVA1</paper-radio-button><br>
+                </paper-radio-group>
+              </div>
+            </div>
+
+            <div>
+            <p style="margin-top: 0;">Enter positions using RA/DEC coordinates or coadd object ID numbers. Values can be entered manually or by uploading a CSV-formatted text file.</p>
+              <iron-autogrow-textarea style="font-family: monospace; width: 90%; margin-left: 2rem; margin-right: 2rem;" id="position-textarea" max-rows="10" rows=7 placeholder="RA,DEC\n21.5,3.48\n36.6,-15.68\n--- or ---\nCOADD_OBJECT_ID\n61407318\n61407582\n" value=""></iron-autogrow-textarea>
+              <paper-button raised class="indigo" id="bc_uploadFile">
+                <span style="overflow-x: auto; overflow-wrap: break-word;">Upload CSV file</span>
+                <input type="file" id="csv-upload" class="upload" @change="${e => this._fileChange(e)}" accept=".csv, .CSV" />
+              </paper-button>
+              <span id="csv-file-msg" style="margin-left: 2rem;"></span>
+            </div>
+
+          </div>
+      </section>
+
+      <section>
+          <h2>Output format and size</h2>
+          <p>Check all desired output files. FITS format requires selection of one or more bands. RGB color images require selection of exactly three bands.</p>
+          <div style="display: grid; grid-gap: 1rem; grid-template-columns: 50% 50%;">
+            <div>
+              <h3>FITS format</h3>
+              <p>FITS format requires selection of <span id="criterion-fits-band-selected">one or more bands</span>.</p>
+              <div>
+              <paper-checkbox @change="${e => this._updateFitsBands(e)}" ?checked="${this.fits}">FITS (FITS format)</paper-checkbox>&nbsp;&nbsp;&nbsp;&nbsp;
+              </div>
+              <div id="fits_bands_selector" style="display: none;">
+                Bands: &nbsp;&nbsp;
+                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'g')}" ?checked="${this.fits_bands.checked.g}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
+                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'r')}" ?checked="${this.fits_bands.checked.r}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
+                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'i')}" ?checked="${this.fits_bands.checked.i}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
+                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'z')}" ?checked="${this.fits_bands.checked.z}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
+                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'y')}" ?checked="${this.fits_bands.checked.y}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
+                <paper-checkbox id="select-all-bands-toggle" @change="${e => this._selectAllFitsBands(e)}" ?checked="${this.fits_all_toggle}" ?disabled="${!this.fits}" style="font-weight: bold; padding-left: 2rem;" id="bc_all_toggle">Select All/None</paper-checkbox>&nbsp;
+              </div>
+              <h3>Color image format</h3>
+              <p>RGB color images require selection of <span id="criterion-three-bands">exactly three bands</span>.</p>
+              <div>
+                <paper-checkbox @change="${e => this._updateRgbTypes(e, 'stiff')}" ?checked="${this.rgb_types_stiff}">Color image (RGB: STIFF format)</paper-checkbox>
+              </div>
+              <div>
+                <paper-checkbox @change="${e => this._updateRgbTypes(e, 'lupton')}" ?checked="${this.rgb_types_lupton}">Color image (RGB: Lupton method)</paper-checkbox>
+              </div>
+
+              <div id="rgb_bands_selector" style="display: none;">
+                Bands: &nbsp;&nbsp;
+                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'g')}" ?checked="${this.rgb_bands.checked.g}" ?disabled="${this.rgb_bands.disabled.g}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
+                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'r')}" ?checked="${this.rgb_bands.checked.r}" ?disabled="${this.rgb_bands.disabled.r}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
+                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'i')}" ?checked="${this.rgb_bands.checked.i}" ?disabled="${this.rgb_bands.disabled.i}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
+                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'z')}" ?checked="${this.rgb_bands.checked.z}" ?disabled="${this.rgb_bands.disabled.z}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
+                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'y')}" ?checked="${this.rgb_bands.checked.y}" ?disabled="${this.rgb_bands.disabled.y}" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
+              </div>
+            </div>
+            <div>
+              <h3>Cutout size (arcminutes)</h3>
+              <div style="display: grid; grid-gap: 1rem; grid-template-columns: 5% 95%; align-items: center;">
+                <div>
+                  <label id="bc_xsizeSlider" style="font-weight: bold;">X</label>
+                </div>
+                <div>
+                  <paper-slider @change="${e => this.xsize = e.target.value}" id="bc_xsizeSlider" pin min="0.1" max="12" max-markers="10" step="0.1" value="${this.xsize}" expand editable></paper-slider>
+                </div>
+              </div>
+              <div style="display: grid; grid-gap: 1rem; grid-template-columns: 5% 95%; align-items: center;">
+                <div>
+                  <label id="bc_ysizeSlider" style="font-weight: bold;">Y</label>
+                </div>
+                <div>
+                  <paper-slider @change="${e => this.ysize = e.target.value}" id="bc_ysizeSlider" pin min="0.1" max="12" max-markers="10" step="0.1" value="${this.ysize}" expand editable></paper-slider>
+                </div>
+              </div>
+            </div>
+          </div>
+      </section>
+      <section>
+          <h2>Options</h2>
+          <div>
+            <p id="custom-job-option">Provide a custom job name:</p>
+            <paper-input @change="${(e) => {this.customJobName = e.target.value; console.log(e.target.value);}}" always-float-label id="bc_validname" name="name" label="Job Name" placeholder="my-custom-job.12" value="${this.customJobName}" style="max-width: 500px; padding-left:2rem;"></paper-input>
+            <p>Receive an email when the files are ready for download:</p>
+            <div id="email-options">
+              <!-- <p id="email-options-invalid" style="display: none; color: red;">Please enter a valid email address.</p> -->
+              <paper-checkbox
+                @change="${(e) => {this._updateEmailOption(e)}}"
+                style="font-size:16px; padding-left:2rem; padding-top:15px;"
+                id="send-email">Email when complete</paper-checkbox>
+              <paper-input
+                @change="${(e) => {this.email = e.target.value;}}"
+                always-float-label
+                disabled
+                id="custom-email"
+                name="name"
+                label="Email Address"
+                style="max-width: 500px; padding-left:2rem;"
+                placeholder="${this.email}"
+                value="${this.email}"></paper-input>
+            </div>
+          </div>
+      </section>
+      <div>
+        <paper-toast class="toast-position toast-success" id="toast-job-success" text="Job has been submitted!" duration="7000"> </paper-toast>
+        <paper-toast class="toast-position toast-error" id="toast-job-failure" text="ERROR! There was an error. Please try again" duration="7000"> </paper-toast>
+      </div>
+
     </div>
-    </section>
     `;
   }
 
@@ -398,8 +450,6 @@ class DESCutout extends connect(store)(PageViewElement) {
       make_fits: this.fits,
       make_rgb_stiff: this.rgb_types_stiff,
       make_rgb_lupton: this.rgb_types_lupton,
-      colors_rgb: this._getSelectedBands(this.rgb_bands).join(','),
-      colors_fits: this._getSelectedBands(this.fits_bands).join(','),
       // TODO: Implement Lupton RGB format options
       // rgb_minimum: null,
       // rgb_stretch: null,
@@ -412,6 +462,12 @@ class DESCutout extends connect(store)(PageViewElement) {
     if (this.customJobName !== '') {
       body.job_name = this.customJobName;
     }
+    if (this.rgb_types_stiff || this.rgb_types_lupton) {
+      body.colors_rgb = this._getSelectedBands(this.rgb_bands).join(',');
+    }
+    if (this.make_fits) {
+      body.colors_fits = this._getSelectedBands(this.fits_bands).join(',');
+    }
     const param = {
       method: "PUT",
       headers: {
@@ -420,6 +476,7 @@ class DESCutout extends connect(store)(PageViewElement) {
       },
       body: JSON.stringify(body)
     };
+    console.log(param.body)
     var that = this;
     fetch(Url, param)
     .then(response => {
@@ -432,8 +489,8 @@ class DESCutout extends connect(store)(PageViewElement) {
       } else {
         that.shadowRoot.getElementById('toast-job-failure').text = 'Error submitting job';
         that.shadowRoot.getElementById('toast-job-failure').show();
+        console.log(JSON.stringify(data));
       }
-      console.log(JSON.stringify(data));
       callback();
     });
   }
@@ -459,8 +516,6 @@ class DESCutout extends connect(store)(PageViewElement) {
 
   }
   _validateForm() {
-    // this.submit_disabled = false;
-    // return(true);
     var validForm = true;
     validForm = this.positions !== "" && validForm;
     validForm = (this.fits || this.rgb_types_stiff || this.rgb_types_lupton) && validForm;
@@ -468,17 +523,22 @@ class DESCutout extends connect(store)(PageViewElement) {
       var criterion = this._bandsSelected(this.fits_bands) > 0
       validForm = criterion && validForm;
       this._toggleValidWarning('criterion-fits-band-selected', criterion);
+    } else {
+      this._toggleValidWarning('criterion-fits-band-selected', true);
     }
     if (this.rgb_types_stiff || this.rgb_types_lupton) {
       var criterion = this._bandsSelected(this.rgb_bands) === 3
       validForm = criterion && validForm;
       this._toggleValidWarning('criterion-three-bands', criterion);
-    }
-    if (this.tabIdx === 0) {
-      var textareaID = 'coadd-id-textarea';
     } else {
-      var textareaID = 'coords-textarea';
+      this._toggleValidWarning('criterion-three-bands', true);
     }
+    // if (this.tabIdx === 0) {
+    //   var textareaID = 'coadd-id-textarea';
+    // } else {
+    //   var textareaID = 'coords-textarea';
+    // }
+    var textareaID = 'position-textarea';
     var currentText = this.shadowRoot.getElementById(textareaID).value;
     if (this.positions !== currentText) {
       this._validateCsvFile(currentText);
@@ -625,24 +685,26 @@ class DESCutout extends connect(store)(PageViewElement) {
     })
     .then(data => {
       if (data.status === "ok") {
-        if (data.type === "coords") {
-          var textareaID = 'coords-textarea'
-          that.tabIdx = 1
-        } else {
-          var textareaID = 'coadd-id-textarea'
-          that.tabIdx = 0
-        }
+        // if (data.type === "coords") {
+        //   var textareaID = 'coords-textarea'
+        //   that.tabIdx = 1
+        // } else {
+        //   var textareaID = 'coadd-id-textarea'
+        //   that.tabIdx = 0
+        // }
+        var textareaID = 'position-textarea'
         that.positions = data.csv;
         that.shadowRoot.getElementById(textareaID).value = data.csv;
         that.shadowRoot.getElementById('csv-file-msg').innerHTML = 'Positions validated and processed.';
         that.shadowRoot.getElementById('csv-file-msg').style.color = 'green';
         that.shadowRoot.getElementById(textareaID).style['border-color'] = 'green';
       } else {
+        var textareaID = 'position-textarea'
         that.positions = 'INVALID';
         that.shadowRoot.getElementById('csv-file-msg').innerHTML = 'Please use valid CSV syntax and column headers.';
         that.shadowRoot.getElementById('csv-file-msg').style.color = 'red';
-        that.shadowRoot.getElementById('coadd-id-textarea').style['border-color'] = 'red';
-        that.shadowRoot.getElementById('coords-textarea').style['border-color'] = 'red';
+        that.shadowRoot.getElementById(textareaID).style['border-color'] = 'red';
+        that.shadowRoot.getElementById(textareaID).style['border-color'] = 'red';
       }
     })
   }
@@ -680,10 +742,13 @@ class DESCutout extends connect(store)(PageViewElement) {
 
   firstUpdated() {
     var that = this;
-    this.shadowRoot.getElementById('coadd-id-textarea').addEventListener('blur', function (event) {
-      that._validateForm();
-    });
-    this.shadowRoot.getElementById('coords-textarea').addEventListener('blur', function (event) {
+    // this.shadowRoot.getElementById('coadd-id-textarea').addEventListener('blur', function (event) {
+    //   that._validateForm();
+    // });
+    // this.shadowRoot.getElementById('coords-textarea').addEventListener('blur', function (event) {
+    //   that._validateForm();
+    // });
+    this.shadowRoot.getElementById('position-textarea').addEventListener('blur', function (event) {
       that._validateForm();
     });
   }

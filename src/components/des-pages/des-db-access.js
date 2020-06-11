@@ -150,7 +150,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     return html`
       <div class="query-left">
           <div id="queryBox">
-              <wc-codemirror mode="sql" src="src/components/des-pages/example-query.sql"></wc-codemirror>
+              <wc-codemirror mode="sql" src="images/example-query.sql"></wc-codemirror>
           </div>
       </div>
 
@@ -254,7 +254,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       </div>
     `;
   }
-  
+
   _updateCompressChecked(e){
     this.compressChecked = e.target.checked;
   }
@@ -271,8 +271,8 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     const outputfile = this.shadowRoot.getElementById('inputOutputFile').value
     if (outputfile.endsWith('.csv') || outputfile.endsWith('.h5') || outputfile.endsWith('.fits')){
       this.validOutputFile = {file: outputfile,valid: true}
-    } 
-    else { 
+    }
+    else {
       this.validOutputFile = {file: outputfile, valid: false}
     }
   }
@@ -284,7 +284,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
 
   _validateEmail(){
     const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    var validEmail = re.test(String(this.shadowRoot.getElementById('email').value).toLowerCase()); 
+    var validEmail = re.test(String(this.shadowRoot.getElementById('email').value).toLowerCase());
     if (validEmail){
       this.validEmail = true
     }
@@ -304,7 +304,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     }
     else { this.validCompression = false }
 
-   
+
     var validForm = (this.validEmail && this.validOutputFile.valid && this.validCompression)
     // Enable/disable submit button
     this.submit_disabled = !validForm;
@@ -315,7 +315,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     this.db = state.app.db;
     this.email = state.app.email;
   }
-  
+
   _quickSubmit(){
     console.log("_quickSubmit");
     const Url=config.backEndUrl + config.apiPath +  "/job/submit";
@@ -360,7 +360,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
 
     if (this.shadowRoot.getElementById('inputOutputFile').valid = true){
          }
-    
+
   }
 
   updated(changedProps) {
@@ -371,7 +371,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     else {
       this.shadowRoot.getElementById('subQuery').disabled = false
     }
-    
+
   }
 
 }

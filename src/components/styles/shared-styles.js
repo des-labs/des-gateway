@@ -5,7 +5,23 @@ export const SharedStyles = css`
     box-sizing: border-box;
   }
 
-
+  paper-button.indigo {
+    background-color: var(--paper-indigo-500);
+    color: white;
+    width: 150px;
+    text-transform: none;
+    --paper-button-raised-keyboard-focus: {
+    background-color: var(--paper-indigo-a250) !important;
+    color: white !important;
+    };
+  }
+  paper-button[disabled] {
+      background: #eaeaea;
+      color: #a8a8a8;
+      cursor: auto;
+      pointer-events: none;
+      box-shadow: 3px -3px 8px 8px rgba(184,184,184,0.7);
+  }
   paper-button.des-button {
       background-color: #3F51B5;
       color: white;
@@ -37,7 +53,7 @@ export const SharedStyles = css`
   }
 
   section > * {
-    max-width: 600px;
+    max-width: 1000px;
     margin-right: auto;
     margin-left: auto;
   }
@@ -70,7 +86,7 @@ export const SharedStyles = css`
     font-size: 30px;
     line-height: 64px;
   }
-  
+
   .errormessage{
           display: block;
           color : red;

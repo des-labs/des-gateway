@@ -153,7 +153,7 @@ class DESMain extends connect(store)(LitElement) {
   render() {
     return html`
       <!-- Header -->
-      <app-header fixed>
+      <app-header fixed style="z-index: 10;">
       <des-toolbar @clickMenu=${this._menuButtonClicked}></des-toolbar>
       </app-header>
 
@@ -236,9 +236,15 @@ class DESMain extends connect(store)(LitElement) {
   }
 
   firstUpdated() {
-    installMediaQueryWatcher(`(min-width: 460px)`, (matches) => {
+    installMediaQueryWatcher(`(min-width: 800px)`, (matches) => {
       matches ?  this._goWide() :  this._goNarrow()
     })
+    // Attempt to refresh the auth token automatically before it expires
+    let minutes = 60*1000;
+    window.setInterval(() => {
+      console.log('Refreshing auth token via getProfile()...');
+      store.dispatch(getProfile());
+    }, 5*minutes);
   }
 
   updated(changedProps) {
@@ -256,7 +262,7 @@ class DESMain extends connect(store)(LitElement) {
 
   _goWide(){
     store.dispatch(updateDrawerPersist(true));
-    //store.dispatch(updateDrawerState(true));
+    store.dispatch(updateDrawerState(true));
   }
 
   _goNarrow(){
