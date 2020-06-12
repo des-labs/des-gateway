@@ -216,10 +216,6 @@ class DESCutout extends connect(store)(PageViewElement) {
   static get properties() {
     return {
       _value: { type: Number },
-      // username: {type: String},
-      // email: {type: String},
-      // validEmail: {type: Boolean},
-      // customJobName: {type: String},
       db: {type: String},
       msg: {type: String},
       tabIdx: { type: Number },
@@ -240,10 +236,6 @@ class DESCutout extends connect(store)(PageViewElement) {
 
   constructor(){
     super();
-    // this.username = '';
-    // this.email = '';
-    // this.customJobName = '';
-    // this.validEmail = false;
     this.db = '';
     this.msg = "";
     this.positions = "";

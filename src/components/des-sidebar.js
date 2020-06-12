@@ -3,9 +3,12 @@ import {
   html,
   css
 } from 'lit-element';
+import { connect } from 'pwa-helpers/connect-mixin.js';
+import { store } from '../store.js';
+import {updateDrawerState} from '../actions/app.js';
 import '@polymer/app-layout/app-toolbar/app-toolbar.js';
 
-class DESSideBar extends LitElement {
+class DESSideBar extends connect(store)(LitElement) {
   static get properties() {
     return {
       username: {
@@ -16,6 +19,9 @@ class DESSideBar extends LitElement {
       },
       name: {
         type: String
+      },
+      _drawerOpened: {
+        type: Boolean
       }
     }
   }
@@ -56,6 +62,13 @@ class DESSideBar extends LitElement {
     ];
   }
 
+  stateChanged(state) {
+    this._drawerOpened = state.app.drawerOpened;
+  }
+
+  _ClickHandler(e) {
+    store.dispatch(updateDrawerState(window.innerWidth > 1001 || !this._drawerOpened));
+  }
 
   render() {
     return html `
@@ -64,7 +77,7 @@ class DESSideBar extends LitElement {
         <iron-image
         style="width:60px; height:60px;"
         sizing="cover"
-        src="images/DESDM_logo.png"></iron-image>
+        src="images/DESDM_logo.png" @click="${this._ClickHandler}"></iron-image>
       </app-toolbar>
       <div class="info-container">
         <div class="image"></div>
@@ -78,6 +91,7 @@ class DESSideBar extends LitElement {
 
   constructor() {
     super();
+    this._drawerOpened = false;
   }
 
 

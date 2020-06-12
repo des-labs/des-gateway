@@ -11,17 +11,18 @@ import '@polymer/paper-menu-button/paper-menu-button.js';
 import '@polymer/paper-dialog/paper-dialog.js';
 import './des-update-info.js';
 import './des-update-pwd.js';
+import './des-app-card.js';
 import { menuIcon } from './des-icons.js';
 import {config} from './des-config.js';
 import { store } from '../store.js';
 
-class DESToolBar extends  connect(store)(LitElement) {
+class DESToolBar extends connect(store)(LitElement) {
     static get properties() {
       return {
         _profile: { type: Boolean }
       }
     }
-  
+
     static get styles() {
       return [
         css`
@@ -32,6 +33,15 @@ class DESToolBar extends  connect(store)(LitElement) {
           font-weight: normal;
           font-style: normal;
           color: white;
+        }
+
+        .apps {
+          width: 100px;
+          left: 0px;
+          position: absolute;
+        }
+        .apps-menu-content {
+
         }
 
         .profileItem {
@@ -56,9 +66,9 @@ class DESToolBar extends  connect(store)(LitElement) {
         .profile-listbox {
           right: 80px;
           font-size: 0.8em;
-          
+
         }
-        
+
         .profile-icon{
           margin-left: 30px;
           --iron-icon-width: 44px;
@@ -69,7 +79,7 @@ class DESToolBar extends  connect(store)(LitElement) {
           display: none;
           margin-left: 256px;
         }
-        
+
 
         .menu-btn {
           background: none;
@@ -80,12 +90,12 @@ class DESToolBar extends  connect(store)(LitElement) {
           width: 44px;
         }
 
-        @media (min-width: 460px) {
+        @media (min-width: 1001px) {
 
           .menu-btn {
             display: none;
           }
-        
+
           [main-wide-title] {
             padding-right: 0px;
             display: block;
@@ -99,7 +109,7 @@ class DESToolBar extends  connect(store)(LitElement) {
         `
       ];
     }
-  
+
     _ClickHandler(e) {
       this.dispatchEvent(new CustomEvent('clickMenu'));
     }
@@ -144,14 +154,14 @@ class DESToolBar extends  connect(store)(LitElement) {
           <paper-menu-button class="profile">
             <iron-icon class="profile-icon" icon="account-circle" slot="dropdown-trigger"></iron-icon>
             <iron-icon style="margin-left:-5px;" icon="arrow-drop-down" slot="dropdown-trigger" alt="menu"></iron-icon>
-        <paper-listbox class="profile-listbox" slot="dropdown-content">
-          <paper-item class="profileItem"  @click="${this._ProfileDialog}"> Update Profile</paper-item>
-          <paper-item class="profileItem"  @click="${this._PasswordDialog}"> Change Password</paper-item>
-          <paper-item class="profileItem" @click="${this._ClickHandler}" >
-          <a href="${config.frontEndUrl + config.rootPath + '/logout'}">Log out</a>
-        </paper-item>
-        </paper-listbox>
-      </paper-menu-button>
+            <paper-listbox class="profile-listbox" slot="dropdown-content">
+              <paper-item class="profileItem"  @click="${this._ProfileDialog}"> Update Profile</paper-item>
+              <paper-item class="profileItem"  @click="${this._PasswordDialog}"> Change Password</paper-item>
+              <paper-item class="profileItem" @click="${this._ClickHandler}" >
+                <a href="${config.frontEndUrl + config.rootPath + '/logout'}">Log out</a>
+              </paper-item>
+            </paper-listbox>
+          </paper-menu-button>
 
           ` : html``}
 
@@ -159,15 +169,15 @@ class DESToolBar extends  connect(store)(LitElement) {
     </app-toolbar>
       `;
     }
-  
+
     constructor() {
       super();
       this._profile = false;
     }
-  
+
     stateChanged(state) {
       this._profile = state.app.session;
     }
   }
-  
+
   window.customElements.define('des-toolbar', DESToolBar);

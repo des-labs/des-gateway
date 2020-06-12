@@ -138,7 +138,7 @@ class DESMain extends connect(store)(LitElement) {
           text-align: center;
         }
 
-        @media (min-width: 460px) {
+        @media (min-width: 1001px) {
           .main-content {
             padding-top: 107px;
             margin-left: 256px;
@@ -153,12 +153,12 @@ class DESMain extends connect(store)(LitElement) {
   render() {
     return html`
       <!-- Header -->
-      <app-header fixed style="z-index: 10;">
+      <app-header fixed>
       <des-toolbar @clickMenu=${this._menuButtonClicked}></des-toolbar>
       </app-header>
 
       <!-- Drawer content -->
-      <app-drawer
+      <app-drawer style="z-index: 20;"
           .opened="${this._drawerOpened}"
           .persistent="${this._drawerPersisted}"
           @opened-changed="${this._drawerOpenedChanged}"
@@ -219,7 +219,6 @@ class DESMain extends connect(store)(LitElement) {
     super();
     this._session = false;
     store.dispatch(getProfile());
-    this._drawerOpened="false";
     setPassiveTouchGestures(true);
   }
 
@@ -236,13 +235,12 @@ class DESMain extends connect(store)(LitElement) {
   }
 
   firstUpdated() {
-    installMediaQueryWatcher(`(min-width: 800px)`, (matches) => {
+    installMediaQueryWatcher(`(min-width: 1001px)`, (matches) => {
       matches ?  this._goWide() :  this._goNarrow()
     })
     // Attempt to refresh the auth token automatically before it expires
     let minutes = 60*1000;
     window.setInterval(() => {
-      console.log('Refreshing auth token via getProfile()...');
       store.dispatch(getProfile());
     }, 5*minutes);
   }
@@ -266,12 +264,12 @@ class DESMain extends connect(store)(LitElement) {
   }
 
   _goNarrow(){
-    store.dispatch(updateDrawerPersist(false))
+    store.dispatch(updateDrawerPersist(false));
     store.dispatch(updateDrawerState(false));
   }
 
   _menuButtonClicked() {
-    store.dispatch(updateDrawerState(true));
+    store.dispatch(updateDrawerState(!this._drawerOpened));
   }
 
   _drawerOpenedChanged(e) {

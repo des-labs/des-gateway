@@ -6,16 +6,11 @@ export const UPDATE_DRAWER_STATE = 'UPDATE_DRAWER_STATE';
 export const UPDATE_DRAWER_PERSIST = 'UPDATE_DRAWER_PERSIST';
 export const LOGIN_USER = 'LOGIN_USER';
 export const LOGOUT_USER = 'LOGOUT_USER';
-// var root = config.rootPath === '/' || config.rootPath === '' ? '/' : config.rootPath.slice(1);
-// TODO: need to fix this usage of ridx
-// var ridx = config.rootPath === '/' || config.rootPath === '' ? 0 : 1;
 
 // TODO: double request to /profile
 const isauth = () => {
-  console.log('is auth?');
   const token = localStorage.getItem("token");
   if (token === null){
-    console.log('no: no token');
     return false;
   }
   const Url=config.backEndUrl + config.apiPath +  "/profile";
@@ -26,7 +21,6 @@ const isauth = () => {
   return fetch(Url, param).then(resp => resp.json())
                 .then(function(data){
                   if (data.status=='ok') {
-                    console.log('Updating token via isauth()...');
                     localStorage.setItem("token", data.new_token);
                     return true;
                   }
@@ -52,8 +46,6 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
   }
   dispatch(loadPage(page, ap));
   persist ? '' : dispatch(updateDrawerState(false));
-  // Close the drawer - in case the *path* change came from a link in the drawer.
-  //dispatch(updateDrawerState(false));
 };
 
 export const loadPage = (page,ap) => (dispatch) => {
@@ -97,8 +89,11 @@ export const loadPage = (page,ap) => (dispatch) => {
       page = 'des404';
       import('../components/des-pages/des-404.js');
   }
+  if (['login', 'des404'].indexOf(page) === -1) {
+    dispatch(updateDrawerState(window.innerWidth > 1001));
+    dispatch(updateDrawerPersist(window.innerWidth > 1001));
+  }
   history.pushState({}, '', location.origin + '/' + page)
-  // console.log('pushing state: ' + location.origin + '/' + page)
   dispatch(updatePage(page));
 };
 
@@ -125,7 +120,6 @@ export const updateDrawerPersist = (persisted) => {
 };
 
 export const loginUser = (userObj) => {
-  console.log('logging in...', userObj.username);
   return {
     type: LOGIN_USER,
     username: userObj.username,
@@ -140,18 +134,15 @@ export const loginUser = (userObj) => {
 };
 
 export const logoutUser = () => {
-  console.log('logging out...');
   return {
     type: LOGOUT_USER,
   };
 };
 
 export const getProfile = () => {
-  console.log('getting profile...');
   return dispatch => {
       const token = localStorage.getItem("token");
       if (token) {
-        console.log('Have token. Fetch /profile...');
         const Url=config.backEndUrl + config.apiPath +  "/profile";
         const formData = new FormData();
         formData.append('token', token);
@@ -163,15 +154,10 @@ export const getProfile = () => {
         };
         return fetch(Url, param).then(resp => resp.json())
           .then(data => {
-            console.log(data);
             if (data.status == 'ok') {
-              console.log('Profile fetched. loginUser...');
               dispatch(loginUser({"username":data.username, "lastname": data.lastname, "email": data.email,
               "name": data.name, "session": true, "db": data.db, "roles": data.roles}));
-              console.log('Updating token via getProfile()...');
               localStorage.setItem("token", data.new_token);
-              dispatch(updateDrawerPersist(true));
-              dispatch(updateDrawerState(true));
               return true;
             }
             else {
@@ -179,9 +165,6 @@ export const getProfile = () => {
               return false;
             }
           });
-      }
-      else {
-        console.log('no token');
       }
 
   }

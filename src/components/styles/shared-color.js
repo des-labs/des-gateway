@@ -26,7 +26,7 @@ export const SharedStyles = css`
     color: var(--app-dark-text-color);
   }
 
-  @media (min-width: 460px) {
+  @media (min-width: 1001px) {
     h2 {
       font-size: 36px;
     }

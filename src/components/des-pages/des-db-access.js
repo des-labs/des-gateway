@@ -20,11 +20,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       msg: {type: String},
       results: {type: String},
       submit_disabled: {type: Boolean},
-      // username: {type: String},
-      // validEmail: {type: Boolean},
-      // email: {type: String},
       validOutputFile: {type: Object},
-      // validCompression: {type: Boolean},
       refreshStatusIntervalId: {type: Number},
       compressOutputFile: {type: Boolean},
       quickQuery: {type: Boolean}
@@ -187,18 +183,12 @@ class DESDbAccess extends connect(store)(PageViewElement) {
           --paper-toast-color:  #DFF2BF;
           --paper-toast-background-color: #4F8A10;
         }
-        /* #submit-container {
-          position: fixed;
-          left: 250px;
-          bottom: 0%;
-          z-index: 1;
-        } */
         `,
     ];
   }
 
 
-  constructor(){
+  constructor() {
     super();
     // this.username = '';
     // this.email = '';
