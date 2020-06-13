@@ -13,7 +13,7 @@ const isauth = () => {
   if (token === null){
     return false;
   }
-  const Url=config.backEndUrl + config.apiPath +  "/profile";
+  const Url=config.backEndUrl + "profile";
   const formData = new FormData();
   formData.append('token', token);
   const data = new URLSearchParams(formData);
@@ -29,20 +29,45 @@ const isauth = () => {
 };
 
 export const navigate = (path,persist,ap,session) => (dispatch) => {
+  // Strip preceding and trailing slashes from root path
+  let iterstr = null;
+  let basePath = config.rootPath;
+  while(basePath !== iterstr) {
+    basePath = basePath.replace(/\/\//g, '/').replace(/\/+$/, '').replace(/^\/+/, '');
+    iterstr = basePath.replace(/\/\//g, '/').replace(/\/+$/, '').replace(/^\/+/, '');
+  }
+  iterstr = null;
+  while(path !== iterstr) {
+    path = path.replace(/\/\//g, '/').replace(/\/+$/, '').replace(/^\/+/, '');
+    iterstr = path.replace(/\/\//g, '/').replace(/\/+$/, '').replace(/^\/+/, '');
+  }
+  // Now path and basePath are of the form `blah/blah` where only one slash
+  // separates each word and there are no surrounding slashes
+
   // is the session active, if not verify auth
   const auth = session ? true : isauth();
   if (auth === false) {
     dispatch(loadPage('login', ap));
     return;
   }
-  var pathParts = path.replace(/\/+$/, '').split('/');
-  var page = 'home';
-
-  if (!((pathParts.length === 1 && pathParts[0] === '') || (pathParts.length > 1 && pathParts[1] === config.rootPath))) {
-    page = pathParts.splice(-1)[0];
-    if (page === 'login') {
+  // pathParts should have no zero-length strings because of the slash reduction above
+  var pathParts = path.split('/');
+  var basePathParts = basePath.split('/');
+  var page = null;
+  switch (true) {
+    case (basePathParts[0] === ''):
+      page = pathParts[0];
+      break;
+    case (basePathParts[0] === pathParts[0] && pathParts.length > 1):
+      page = pathParts[1];
+      break;
+    default:
       page = 'home';
-    }
+      break;
+  }
+
+  if (page === 'login' || page === '') {
+    page = 'home';
   }
   dispatch(loadPage(page, ap));
   persist ? '' : dispatch(updateDrawerState(false));
@@ -59,7 +84,7 @@ export const loadPage = (page,ap) => (dispatch) => {
     case 'logout':
         localStorage.clear();
         dispatch(logoutUser());
-        window.location.href = config.frontEndUrl + config.rootPath+'/login';
+        window.location.href = config.frontEndUrl + 'login';
       break;
     case 'home':
       import('../components/des-pages/des-home.js');
@@ -93,7 +118,7 @@ export const loadPage = (page,ap) => (dispatch) => {
     dispatch(updateDrawerState(window.innerWidth > 1001));
     dispatch(updateDrawerPersist(window.innerWidth > 1001));
   }
-  history.pushState({}, '', location.origin + '/' + page)
+  history.pushState({}, '', config.frontEndUrl + page);
   dispatch(updatePage(page));
 };
 
@@ -143,7 +168,7 @@ export const getProfile = () => {
   return dispatch => {
       const token = localStorage.getItem("token");
       if (token) {
-        const Url=config.backEndUrl + config.apiPath +  "/profile";
+        const Url=config.backEndUrl + "profile";
         const formData = new FormData();
         formData.append('token', token);
         const data = new URLSearchParams(formData);

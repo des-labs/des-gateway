@@ -67,36 +67,32 @@ class DESLogin extends connect(store)(PageViewElement) {
   render() {
     return html`
       <section>
-      <paper-card class="loginBox">
-      <div style="cursor:default;" class="box-watermark-logo"></div>
-        <h2>DESaccess Login</h2>
-        <div class="card-content">
-        <span>Use your Internal DES DB credentials. <br />
-        <span> Fill this <a href='https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/' target="_blank">form</a>
-             if you have trouble accessing the server</span> <br><br>
+        <paper-card class="loginBox">
+          <div style="cursor:default;" class="box-watermark-logo"></div>
+          <h2>DESaccess Login</h2>
+          <div class="card-content">
+            <span>Use your Internal DES DB credentials. <br /></span>
+            <span> Fill this <a href='https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/' target="_blank">form</a>
+                 if you have trouble accessing the server</span> <br><br>
 
 
-        <paper-input always-float-label label="Username"  @input="${e => this.username = e.target.value}"></paper-input>
-        <paper-password-input always-float-label label="Password"  type="password" @input="${e => this._passwd = e.target.value}">
-        </paper-password-input>
-        <br>
-
-
-        <div class="container">
-        <paper-button class="des-button" id="loginButton"raised @click="${this._prep0}">dessci</paper-button>
-        <paper-button class="des-button" id="loginButton"raised @click="${this._prep1}">desoper</paper-button>
-        <paper-spinner id=loginSpinner></paper-spinner>
-          </div>
-          <br>
-        <div class="errormessage"> <b>${this.msg}</b></div>
-        <br>
-        </div>
-            <div class="card-content"><a href="https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/" style="font-size: 11px; margin-left: 5px;" target="_blank"> Forgot Password? </a>
+            <paper-input always-float-label label="Username"  @input="${e => this.username = e.target.value}"></paper-input>
+            <paper-password-input always-float-label label="Password"  type="password" @input="${e => this._passwd = e.target.value}">
+            </paper-password-input>
+            <br>
+            <div class="container">
+              <paper-button class="des-button" id="loginButton"raised @click="${this._prep0}">dessci</paper-button>
+              <paper-button class="des-button" id="loginButton"raised @click="${this._prep1}">desoper</paper-button>
+              <paper-spinner id=loginSpinner></paper-spinner>
             </div>
-      </div>
-
-        </div>
-      </paper-card>
+            <br>
+            <div class="errormessage"> <b>${this.msg}</b></div>
+            <br>
+          </div>
+          <div class="card-content">
+            <a href="https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/" style="font-size: 11px; margin-left: 5px;" target="_blank"> Forgot Password? </a>
+          </div>
+        </paper-card>
       </section>
     `;
   }
@@ -116,7 +112,7 @@ _submit(){
   // do request
   this.shadowRoot.getElementById("loginButton").disabled=true;
   this.shadowRoot.getElementById("loginSpinner").active=true;
-  const Url=config.backEndUrl + config.apiPath +  "/login"
+  const Url=config.backEndUrl + "login"
   const formData = new FormData();
   formData.append('username', this.username);
   formData.append('password', this._passwd);
@@ -132,7 +128,8 @@ _submit(){
       localStorage.setItem("token", data.token);
       store.dispatch(loginUser({"name": data.name, "username": data.username,
       "lastname": data.lastname, "email":data.email, "session": true, "db": data.db, "roles": data.roles}));
-      store.dispatch(navigate(decodeURIComponent(window.location.pathname.replace(/\/+$/, '')) ,true, getAccessPages(data.roles), true));
+      console.log('path: ' + decodeURIComponent(window.location.pathname));
+      store.dispatch(navigate(decodeURIComponent(window.location.pathname),true, getAccessPages(data.roles), true));
     }
     else {
       localStorage.clear();

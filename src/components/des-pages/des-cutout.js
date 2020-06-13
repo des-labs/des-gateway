@@ -432,7 +432,7 @@ class DESCutout extends connect(store)(PageViewElement) {
   }
 
   _submitJob(callback) {
-    const Url=config.backEndUrl + config.apiPath +  "/job/submit"
+    const Url=config.backEndUrl + "job/submit"
     var body = {
       job: 'cutout',
       username: this.username,
@@ -665,7 +665,7 @@ class DESCutout extends connect(store)(PageViewElement) {
   }
 
   _validateCsvFile(csvText) {
-    const Url=config.backEndUrl + config.apiPath +  "/page/cutout/csv/validate"
+    const Url=config.backEndUrl + "page/cutout/csv/validate"
     const param = {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({

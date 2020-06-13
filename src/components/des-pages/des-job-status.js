@@ -169,7 +169,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   }
 
   _updateStatus() {
-    const Url=config.backEndUrl + config.apiPath +  "/job/status"
+    const Url=config.backEndUrl + "job/status"
     let body = {
       'job-id': 'all',
     };
@@ -292,7 +292,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     for (let i in jobIds) {
       let jobId = jobIds[i];
       console.log(`Deleting job "${jobId}"...`);
-      const Url=config.backEndUrl + config.apiPath +  "/job/delete"
+      const Url=config.backEndUrl + "job/delete"
       let body = {
         'job-id': jobId,
       };

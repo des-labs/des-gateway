@@ -158,7 +158,7 @@ class DESToolBar extends connect(store)(LitElement) {
               <paper-item class="profileItem"  @click="${this._ProfileDialog}"> Update Profile</paper-item>
               <paper-item class="profileItem"  @click="${this._PasswordDialog}"> Change Password</paper-item>
               <paper-item class="profileItem" @click="${this._ClickHandler}" >
-                <a href="${config.frontEndUrl + config.rootPath + '/logout'}">Log out</a>
+                <a href="${config.frontEndUrl + 'logout'}">Log out</a>
               </paper-item>
             </paper-listbox>
           </paper-menu-button>

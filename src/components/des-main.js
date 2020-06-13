@@ -166,14 +166,14 @@ class DESMain extends connect(store)(LitElement) {
        >
        <des-sidebar name=${this.name} email=${this.email}></des-sidebar>
         <nav class="drawer-list">
-          <a ?selected="${this._page === 'home'}" href="${config.frontEndUrl + config.rootPath + '/home'}">Home</a>
-          ${this.accessPages.includes('page1') ?  html`<a ?selected="${this._page === 'page1'}" href="${config.frontEndUrl + config.rootPath + '/page1'}">Page One</a>` : html ``}
-          ${this.accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.frontEndUrl + config.rootPath + '/page2'}">Page Two</a>` : html ``}
-          ${this.accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.frontEndUrl + config.rootPath + '/page3'}">Submit test job</a>` : html ``}
-          ${this.accessPages.includes('db-access') ?  html`<a ?selected="${this._page === 'db-access'}" href="${config.frontEndUrl + config.rootPath + '/db-access'}">DB access</a>` : html ``}
-          ${this.accessPages.includes('cutout') ?  html`<a ?selected="${this._page === 'cutout'}" href="${config.frontEndUrl + config.rootPath + '/cutout'}">Cutout</a>` : html ``}
-          ${this.accessPages.includes('status') ?  html`<a ?selected="${this._page === 'status'}" href="${config.frontEndUrl + config.rootPath + '/status'}">Job status</a>` : html ``}
-          ${this.accessPages.includes('ticket') ?  html`<a ?selected="${this._page === 'ticket'}" href="${config.frontEndUrl + config.rootPath + '/ticket'}">DES Ticket</a>` : html ``}
+          <a ?selected="${this._page === 'home'}" href="${config.frontEndUrl + 'home'}">Home</a>
+          ${this.accessPages.includes('page1') ?  html`<a ?selected="${this._page === 'page1'}" href="${config.frontEndUrl + 'page1'}">Page One</a>` : html ``}
+          ${this.accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.frontEndUrl + 'page2'}">Page Two</a>` : html ``}
+          ${this.accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.frontEndUrl + 'page3'}">Submit test job</a>` : html ``}
+          ${this.accessPages.includes('db-access') ?  html`<a ?selected="${this._page === 'db-access'}" href="${config.frontEndUrl + 'db-access'}">DB access</a>` : html ``}
+          ${this.accessPages.includes('cutout') ?  html`<a ?selected="${this._page === 'cutout'}" href="${config.frontEndUrl + 'cutout'}">Cutout</a>` : html ``}
+          ${this.accessPages.includes('status') ?  html`<a ?selected="${this._page === 'status'}" href="${config.frontEndUrl + 'status'}">Job status</a>` : html ``}
+          ${this.accessPages.includes('ticket') ?  html`<a ?selected="${this._page === 'ticket'}" href="${config.frontEndUrl + 'ticket'}">DES Ticket</a>` : html ``}
         </nav>
 
       </app-drawer>

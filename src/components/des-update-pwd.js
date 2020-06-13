@@ -23,7 +23,7 @@ class DESUpdatePwd extends  connect(store)(LitElement) {
 
       }
     }
-  
+
     static get styles() {
       return [
       SharedStyles,
@@ -37,13 +37,13 @@ class DESUpdatePwd extends  connect(store)(LitElement) {
         `
       ];
     }
-  
+
 
     _submit(){
         this.shadowRoot.getElementById("UpdateAcceptButton").disabled=true;
         this.shadowRoot.getElementById("loginSpinner").active=true;
         var token=localStorage.getItem("token");
-        const Url=config.backEndUrl + config.apiPath +  "/profile/changepwd"
+        const Url=config.backEndUrl + "profile/changepwd"
         const formData = new FormData();
         formData.append('username', this._username);
         formData.append('oldpwd', this._oldpwd);
@@ -59,20 +59,20 @@ class DESUpdatePwd extends  connect(store)(LitElement) {
     .then(response => {return response.json();})
     .then(data => {
         this.msg = data.message;
-        console.log(data); 
+        console.log(data);
         const status = data.status;
         this.shadowRoot.getElementById("UpdateAcceptButton").disabled=false;
         this.shadowRoot.getElementById("loginSpinner").active=false;
         console.log(this.msg);
         if (status == "ok") {
           this.msg = "Password Changed. Logging out in 3 seconds..."
-          setTimeout(function(){  window.location.href = config.frontEndUrl + config.rootPath + '/logout';}, 3000);
+          setTimeout(function(){  window.location.href = config.frontEndUrl + 'logout';}, 3000);
         }
-    
+
     })
     .catch((error) => {console.log(error);});
   }
-      
+
     render() {
       return html`
         <min-length-validator id="min-length-validator" min-length="6"></min-length-validator>
@@ -81,26 +81,26 @@ class DESUpdatePwd extends  connect(store)(LitElement) {
         <div class="card-content">
         <br>
         <paper-input always-float-label label="Username" disabled placeholder=${this._username}></paper-input>
-        <paper-password-input 
-          always-float-label 
-          type="password" 
-          label="CURRENT Password" 
-          @input="${e => this._oldpwd = e.target.value}" 
+        <paper-password-input
+          always-float-label
+          type="password"
+          label="CURRENT Password"
+          @input="${e => this._oldpwd = e.target.value}"
           required
-          auto-validate 
+          auto-validate
           error-message="Can't be empty"
           ></paper-password-input>
-        <paper-password-input 
-          always-float-label 
-          type="password" 
-          label="NEW Password" 
+        <paper-password-input
+          always-float-label
+          type="password"
+          label="NEW Password"
           @input="${e => this._newpwd = e.target.value}"
           auto-validate
            ></paper-password-input>
-        <paper-password-input 
+        <paper-password-input
         always-float-label
         type="password"
-        label="Re-enter NEW Password" 
+        label="Re-enter NEW Password"
         auto-validate
         validator="match-passwords-validator"
         error-message="Passwords need to match"
@@ -123,17 +123,17 @@ class DESUpdatePwd extends  connect(store)(LitElement) {
         </paper-card>
       `;
     }
-  
+
     constructor() {
       super();
       this._profile = false;
     }
-  
+
     stateChanged(state) {
       this._profile = state.app.session;
       this._username = state.app.username;
       this._db = state.app.db;
     }
   }
-  
+
   window.customElements.define('des-update-pwd', DESUpdatePwd);

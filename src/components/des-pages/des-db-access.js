@@ -367,7 +367,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   }
 
   _submitJob(callback){
-    const Url=config.backEndUrl + config.apiPath +  "/job/submit";
+    const Url=config.backEndUrl + "job/submit";
 
      /* Removing comments from query string */
      this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
@@ -427,7 +427,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   }
 
   _getJobStatus(jobId) {
-    const Url=config.backEndUrl + config.apiPath +  "/job/status"
+    const Url=config.backEndUrl + "job/status"
     let body = {
       'job-id': jobId,
     };

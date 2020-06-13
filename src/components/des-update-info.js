@@ -19,7 +19,7 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
 
       }
     }
-  
+
     static get styles() {
       return [
       SharedStyles,
@@ -34,13 +34,13 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
         `
       ];
     }
-  
+
 
     _submit(){
         this.shadowRoot.getElementById("UpdateAcceptButton").disabled=true;
         this.shadowRoot.getElementById("loginSpinner").active=true;
         var token=localStorage.getItem("token");
-        const Url=config.backEndUrl + config.apiPath +  "/profile/update"
+        const Url=config.backEndUrl + "profile/update"
         const formData = new FormData();
         formData.append('username', this._username);
         formData.append('firstname', this._name);
@@ -56,20 +56,20 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
     .then(response => {return response.json();})
     .then(data => {
       this.msg = data.message;
-      const status = data.status; 
+      const status = data.status;
         this.shadowRoot.getElementById("UpdateAcceptButton").disabled=false;
         this.shadowRoot.getElementById("loginSpinner").active=false;
         console.log(this.msg);
         if (status == 'ok') {
         this.msg = "Information Updated. Logging out in 3 seconds..."
-        setTimeout(function(){  window.location.href = config.frontEndUrl + config.rootPath + '/logout';}, 3000);
-        
+        setTimeout(function(){  window.location.href = config.frontEndUrl + 'logout';}, 3000);
+
         }
-    
+
     })
     .catch((error) => {console.log(error);});
   }
-      
+
     render() {
       return html`
         <paper-card class="des-card" heading="Update Personal Profile" elevation="0">
@@ -96,12 +96,12 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
         </paper-card>
       `;
     }
-  
+
     constructor() {
       super();
       this._profile = false;
     }
-  
+
     stateChanged(state) {
       this._profile = state.app.session;
       this._name = state.app.name;
@@ -110,5 +110,5 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
       this._email = state.app.email;
     }
   }
-  
+
   window.customElements.define('des-update-info', DESUpdateInfo);

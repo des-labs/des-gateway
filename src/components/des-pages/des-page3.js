@@ -54,7 +54,7 @@ class DESPage3 extends connect(store)(PageViewElement) {
 
   _submit(){
     var token=localStorage.getItem("token");
-    const Url=config.backEndUrl + config.apiPath +  "/job/submit"
+    const Url=config.backEndUrl + "job/submit"
     const formData = new FormData();
     formData.append('job', 'test');
     formData.append('username', this.username);
