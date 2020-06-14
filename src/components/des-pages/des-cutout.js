@@ -449,7 +449,7 @@ class DESCutout extends connect(store)(PageViewElement) {
   _updateEmailOption(event) {
     this.shadowRoot.getElementById('custom-email').disabled = !event.target.checked;
     this.shadowRoot.getElementById('custom-email').invalid = this.shadowRoot.getElementById('custom-email').invalid && !this.shadowRoot.getElementById('custom-email').disabled;
-    this.validEmail = this._validateEmail(this.email);
+    this.validEmail = this._validateEmailAddress(this.email);
     this._validateForm();
   }
 
@@ -580,7 +580,7 @@ class DESCutout extends connect(store)(PageViewElement) {
     var criterion = this.positions === currentText
     validForm = criterion && validForm;
 
-    this.validEmail = this._validateEmail(this.email);
+    this.validEmail = this._validateEmailAddress(this.email);
     var criterion = this.validEmail || !this.shadowRoot.getElementById('send-email').checked;
     validForm = criterion && validForm;
     this.shadowRoot.getElementById('custom-email').invalid = !criterion;
@@ -801,7 +801,7 @@ class DESCutout extends connect(store)(PageViewElement) {
             this.shadowRoot.getElementById('custom-job-invalid').classList.add('invalid-form-element');
           }
         case 'email':
-          this.validEmail = this._validateEmail(this.email);
+          this.validEmail = this._validateEmailAddress(this.email);
         default:
           // Assume that we want to revalidate the form when a property changes
           this._validateForm();

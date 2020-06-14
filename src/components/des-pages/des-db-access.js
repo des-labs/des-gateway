@@ -310,7 +310,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
                 <paper-button id="QuickQuery" class="indigo medium" raised @tap="${this._quickSubmit}">Quick</paper-button>
               </div> -->
               <div class="btn-wrap">
-                <a href = "/easyweb/db-examples" style="text-decoration: none;" tabindex="-1">
+                <a href = "/db-examples" style="text-decoration: none;" tabindex="-1">
                 <paper-button class="indigo medium" raised >See Examples</paper-button>
                 </a>
               </div>
@@ -342,7 +342,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   _updateEmailOption(event) {
     this.shadowRoot.getElementById('custom-email').disabled = !event.target.checked;
     this.shadowRoot.getElementById('custom-email').invalid = this.shadowRoot.getElementById('custom-email').invalid && !this.shadowRoot.getElementById('custom-email').disabled;
-    this.validEmail = this._validateEmail(this.email);
+    this.validEmail = this._validateEmailAddress(this.email);
     this._validateForm();
   }
 
@@ -363,8 +363,41 @@ class DESDbAccess extends connect(store)(PageViewElement) {
         this.compressOutputFile = false;
         break;
     }
-    this.shadowRoot.getElementById('output-filename').invalid = !valid;
+    // Disable invalid warnings if quick query is checked
+    this.shadowRoot.getElementById('output-filename').disabled = this.quickQuery;
+    this.shadowRoot.getElementById('output-filename').invalid = !(valid || this.quickQuery);
     this.validOutputFile = {file: outputfile,valid: valid};
+  }
+
+  _validateEmail(event){
+    this.validEmail = this._validateEmailAddress(this.email);
+    let criterion = this.validEmail || this.quickQuery;
+    this.shadowRoot.getElementById('custom-email').invalid = !criterion;
+    this.shadowRoot.getElementById('send-email').disabled = this.quickQuery;
+    this.shadowRoot.getElementById('custom-email').disabled = this.quickQuery || !this.shadowRoot.getElementById('send-email').checked;
+    if (criterion) {
+      this.shadowRoot.getElementById('custom-email-invalid').classList.remove('invalid-form-element');
+      this.shadowRoot.getElementById('custom-email-invalid').classList.add('valid-form-element');
+    } else {
+      this.shadowRoot.getElementById('custom-email-invalid').classList.remove('valid-form-element');
+      this.shadowRoot.getElementById('custom-email-invalid').classList.add('invalid-form-element');
+    }
+  }
+  _validateCustomJobName(event){
+
+    var originalName = this.customJobName;
+    var isValidJobName = this.customJobName === '' || (this.customJobName.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])*(\.[a-z0-9]([-a-z0-9]*[a-z0-9])*)*$/g) && this.customJobName.length < 129);
+    // Disable invalid warnings if quick query is checked
+    isValidJobName = isValidJobName || this.quickQuery;
+    this.shadowRoot.getElementById('custom-job-name').disabled = this.quickQuery;
+    this.shadowRoot.getElementById('custom-job-name').invalid = !isValidJobName;
+    if (isValidJobName) {
+      this.shadowRoot.getElementById('custom-job-invalid').classList.remove('invalid-form-element');
+      this.shadowRoot.getElementById('custom-job-invalid').classList.add('valid-form-element');
+    } else {
+      this.shadowRoot.getElementById('custom-job-invalid').classList.remove('valid-form-element');
+      this.shadowRoot.getElementById('custom-job-invalid').classList.add('invalid-form-element');
+    }
   }
 
   _validateSyntax(){
@@ -381,17 +414,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     validForm = validForm && criterion;
 
     // Validate email
-    this.validEmail = this._validateEmail(this.email);
-    criterion = this.validEmail || !this.shadowRoot.getElementById('send-email').checked;
-    validForm = criterion && validForm;
-    this.shadowRoot.getElementById('custom-email').invalid = !criterion;
-    if (criterion) {
-      this.shadowRoot.getElementById('custom-email-invalid').classList.remove('invalid-form-element');
-      this.shadowRoot.getElementById('custom-email-invalid').classList.add('valid-form-element');
-    } else {
-      this.shadowRoot.getElementById('custom-email-invalid').classList.remove('valid-form-element');
-      this.shadowRoot.getElementById('custom-email-invalid').classList.add('invalid-form-element');
-    }
+    criterion = this._validateEmail();
     validForm = validForm && criterion;
 
     // Validate output file
@@ -400,6 +423,9 @@ class DESDbAccess extends connect(store)(PageViewElement) {
 
     // Form is valid if performing a quick query
     validForm = validForm || this.quickQuery;
+
+    // Dim the other text for consistency if quick query
+    this.shadowRoot.getElementById('options-controls').style.color = this.quickQuery ? 'lightgray' : 'black';
 
     // Enable/disable submit button
     if (this.refreshStatusIntervalId === 0) {
@@ -534,27 +560,11 @@ class DESDbAccess extends connect(store)(PageViewElement) {
           this.shadowRoot.getElementById('submit-button-query').disabled = this.submit_disabled;
           break;
         case 'quickQuery':
-          this.shadowRoot.getElementById('output-filename').disabled = this.quickQuery;
-          // this.shadowRoot.getElementById('option-compress-files').disabled = this.quickQuery;
           this._validateOutputFile();
-          this.shadowRoot.getElementById('custom-job-name').disabled = this.quickQuery;
-          this.shadowRoot.getElementById('options-controls').style.color = this.quickQuery ? 'lightgray' : 'black';
-          // this.validEmail = this._validateEmail(this.email);
-          this.shadowRoot.getElementById('send-email').disabled = this.quickQuery;
-          this.shadowRoot.getElementById('custom-email').disabled = this.quickQuery || !this.shadowRoot.getElementById('send-email').checked;
         case 'email':
-          this.validEmail = this._validateEmail(this.email);
+          this.validEmail = this._validateEmailAddress(this.email);
         case 'customJobName':
-          var originalName = this.customJobName;
-          var isValidJobName = this.customJobName === '' || (this.customJobName.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])*(\.[a-z0-9]([-a-z0-9]*[a-z0-9])*)*$/g) && this.customJobName.length < 129);
-          this.shadowRoot.getElementById('custom-job-name').invalid = !isValidJobName;
-          if (isValidJobName) {
-            this.shadowRoot.getElementById('custom-job-invalid').classList.remove('invalid-form-element');
-            this.shadowRoot.getElementById('custom-job-invalid').classList.add('valid-form-element');
-          } else {
-            this.shadowRoot.getElementById('custom-job-invalid').classList.remove('valid-form-element');
-            this.shadowRoot.getElementById('custom-job-invalid').classList.add('invalid-form-element');
-          }
+          this._validateCustomJobName();
         default:
           // Assume that we want to revalidate the form when a property changes
           this._validateForm();

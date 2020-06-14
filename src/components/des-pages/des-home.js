@@ -2,8 +2,10 @@ import { html,css } from 'lit-element';
 import { PageViewElement } from './des-base-page.js';
 import { SharedStyles } from '../styles/shared-styles.js';
 import '../des-home-card.js';
+import { connect } from 'pwa-helpers/connect-mixin.js';
+import { store } from '../../store.js';
 
-class DESHome extends PageViewElement {
+class DESHome extends connect(store)(PageViewElement) {
   static get styles() {
     return [
       SharedStyles

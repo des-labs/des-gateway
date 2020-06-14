@@ -2,6 +2,7 @@ import {config, rbac_bindings} from '../components/des-config.js';
 import { store } from '../store.js';
 
 export const UPDATE_PAGE = 'UPDATE_PAGE';
+export const UPDATE_LAST_VALID_PAGE = 'UPDATE_LAST_VALID_PAGE';
 export const UPDATE_DRAWER_STATE = 'UPDATE_DRAWER_STATE';
 export const UPDATE_DRAWER_PERSIST = 'UPDATE_DRAWER_PERSIST';
 export const LOGIN_USER = 'LOGIN_USER';
@@ -115,9 +116,20 @@ export const loadPage = (page,ap) => (dispatch) => {
   if (['login', 'des404'].indexOf(page) === -1) {
     dispatch(updateDrawerState(window.innerWidth >= 1001));
     dispatch(updateDrawerPersist(window.innerWidth >= 1001));
+    dispatch(updateLastValidPage(page));
   }
-  history.pushState({}, '', config.frontEndUrl + page);
+  let newLocation = config.frontEndUrl + page;
+  if (newLocation !== window.location.href) {
+    history.pushState({}, '', newLocation);
+  }
   dispatch(updatePage(page));
+};
+
+const updateLastValidPage = (page) => {
+  return {
+    type: UPDATE_LAST_VALID_PAGE,
+    page
+  };
 };
 
 const updatePage = (page) => {
