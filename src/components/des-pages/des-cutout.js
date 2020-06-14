@@ -158,12 +158,12 @@ class DESCutout extends connect(store)(PageViewElement) {
             --paper-toast-color:  #DFF2BF;
             --paper-toast-background-color: #4F8A10;
           }
-          .invalid-form-element {
+          /* .invalid-form-element {
             color: red;
             border-color: red;
             border-width: 1px;
             border-style: dashed;
-          }
+          } */
 
           .grid-system {
               display: grid;
@@ -181,7 +181,7 @@ class DESCutout extends connect(store)(PageViewElement) {
             padding-top: 0;
             padding-bottom: 0;
           }
-          #submit-button {
+          #submit-button-cutout {
             background-color: var(--paper-indigo-500);
             color: white;
             width: 150px;
@@ -192,7 +192,7 @@ class DESCutout extends connect(store)(PageViewElement) {
             };
             box-shadow: 3px -3px 4px 3px rgba(63,81,181,0.7);
           }
-          #submit-button[disabled] {
+          #submit-button-cutout[disabled] {
               background: #eaeaea;
               color: #a8a8a8;
               cursor: auto;
@@ -202,11 +202,27 @@ class DESCutout extends connect(store)(PageViewElement) {
 
           #submit-container {
             position: fixed;
-            left: 250px;
             bottom: 0%;
             z-index: 1;
-            /* width: 100%; */
-            /* background-color: white; */
+            left: 0px;
+          }
+
+          @media (min-width: 1001px) {
+            #submit-container {
+              left: 250px;
+            }
+
+          }
+          .valid-form-element {
+            display: none;
+          }
+
+          .invalid-form-element {
+            display: block;
+            color: red;
+            font-size: 0.75rem;
+            padding-left:2rem;
+            max-width: 500px;
           }
         `,
 
@@ -230,12 +246,20 @@ class DESCutout extends connect(store)(PageViewElement) {
       rgb_types_lupton: {type: Boolean},
       fits_all_toggle: {type: Boolean},
       fits: {type: Boolean},
-      submit_disabled: {type: Boolean}
+      submit_disabled: {type: Boolean},
+      username: {type: String},
+      validEmail: {type: Boolean},
+      email: {type: String},
+      customJobName: {type: String}
     };
   }
 
   constructor(){
     super();
+    this.username = '';
+    this.email = '';
+    this.validEmail = false;
+    this.customJobName = '';
     this.db = '';
     this.msg = "";
     this.positions = "";
@@ -246,9 +270,9 @@ class DESCutout extends connect(store)(PageViewElement) {
     this.rgb_types_lupton = false;
     this.fits_all_toggle = false;
     this.submit_disabled = true;
-    this.xsize = 1.0
-    this.ysize = 1.0
-    this.release = "Y6A1"
+    this.xsize = 1.0;
+    this.ysize = 1.0;
+    this.release = "Y6A1";
     this.rgb_bands = {
       "checked": {
         "g": true,
@@ -280,7 +304,7 @@ class DESCutout extends connect(store)(PageViewElement) {
     return html`
     <div>
       <div id="submit-container">
-        <paper-button raised  class="indigo"  id="submit-button" ?disabled="${this.submit_disabled}" @click="${e => this._submit(e)}">
+        <paper-button raised  class="indigo"  id="submit-button-cutout" ?disabled="${this.submit_disabled}" @click="${e => this._submit(e)}">
           Submit Job
         </paper-button>
         <paper-spinner id="submit-spinner" class="big"></paper-spinner>
@@ -375,7 +399,8 @@ class DESCutout extends connect(store)(PageViewElement) {
       <section>
           <h2>Options</h2>
           <div>
-            <!-- <p id="custom-job-option">Provide a custom job name:</p> -->
+            <!-- <label id="custom-job-option" style="font-weight: bold;">Provide a custom job name:</label> -->
+            <!-- aria-labelledby="custom-job-option" -->
             <paper-input
               style="max-width: 500px; padding-left:2rem;"
               placeholder="" value="${this.customJobName}"
@@ -383,6 +408,12 @@ class DESCutout extends connect(store)(PageViewElement) {
               @change="${(e) => {this.customJobName = e.target.value}}"
               id="custom-job-name" name="custom-job-name"></paper-input>
             <!-- <paper-input @change="${(e) => {this.customJobName = e.target.value; console.log(e.target.value);}}" always-float-label id="bc_validname" name="name" label="Job Name" placeholder="my-custom-job.12" value="${this.customJobName}" style="max-width: 500px; padding-left:2rem;"></paper-input> -->
+
+            <p id="custom-job-invalid" class="valid-form-element">
+              Custom job name must consist of lower case alphanumeric characters,
+              '-' or '.', and must start and end with an alphanumeric character.
+              Maximum length is 128 characters.
+            </p>
             <p>Receive an email when the files are ready for download:</p>
             <div id="email-options">
               <!-- <p id="email-options-invalid" style="display: none; color: red;">Please enter a valid email address.</p> -->
@@ -400,6 +431,9 @@ class DESCutout extends connect(store)(PageViewElement) {
                 style="max-width: 500px; padding-left:2rem;"
                 placeholder="${this.email}"
                 value="${this.email}"></paper-input>
+                <p id="custom-email-invalid" class="valid-form-element">
+                  Enter a valid email address.
+                </p>
             </div>
           </div>
       </section>
@@ -412,6 +446,12 @@ class DESCutout extends connect(store)(PageViewElement) {
     `;
   }
 
+  _updateEmailOption(event) {
+    this.shadowRoot.getElementById('custom-email').disabled = !event.target.checked;
+    this.shadowRoot.getElementById('custom-email').invalid = this.shadowRoot.getElementById('custom-email').invalid && !this.shadowRoot.getElementById('custom-email').disabled;
+    this.validEmail = this._validateEmail(this.email);
+    this._validateForm();
+  }
 
   _toggleSpinner(active, callback) {
 
@@ -540,16 +580,20 @@ class DESCutout extends connect(store)(PageViewElement) {
     var criterion = this.positions === currentText
     validForm = criterion && validForm;
 
-    var criterion = this._validateEmail(this.email);
-    this.validEmail = criterion;
+    this.validEmail = this._validateEmail(this.email);
+    var criterion = this.validEmail || !this.shadowRoot.getElementById('send-email').checked;
     validForm = criterion && validForm;
-    if (this.validEmail) {
-      this.shadowRoot.getElementById('email-options').classList.remove('invalid-form-element');
+    this.shadowRoot.getElementById('custom-email').invalid = !criterion;
+    if (criterion) {
+      this.shadowRoot.getElementById('custom-email-invalid').classList.remove('invalid-form-element');
+      this.shadowRoot.getElementById('custom-email-invalid').classList.add('valid-form-element');
     } else {
-      var that = this;
-      this._toast(false, 'Please enter a valid email address.', () => {
-        that.shadowRoot.getElementById('email-options').classList.add('invalid-form-element');
-      });
+      this.shadowRoot.getElementById('custom-email-invalid').classList.remove('valid-form-element');
+      this.shadowRoot.getElementById('custom-email-invalid').classList.add('invalid-form-element');
+      // var that = this;
+      // this._toast(false, 'Please enter a valid email address.', () => {
+      //   that.shadowRoot.getElementById('email-options').classList.add('invalid-form-element');
+      // });
     }
 
     // Enable/disable submit button
@@ -727,12 +771,6 @@ class DESCutout extends connect(store)(PageViewElement) {
 
   firstUpdated() {
     var that = this;
-    // this.shadowRoot.getElementById('coadd-id-textarea').addEventListener('blur', function (event) {
-    //   that._validateForm();
-    // });
-    // this.shadowRoot.getElementById('coords-textarea').addEventListener('blur', function (event) {
-    //   that._validateForm();
-    // });
     this.shadowRoot.getElementById('position-textarea').addEventListener('blur', function (event) {
       that._validateForm();
     });
@@ -743,7 +781,7 @@ class DESCutout extends connect(store)(PageViewElement) {
       // console.log(`${propName} changed. oldValue: ${oldValue}`);
       switch (propName) {
         case 'submit_disabled':
-          this.shadowRoot.getElementById('submit-button').disabled = this.submit_disabled;
+          this.shadowRoot.getElementById('submit-button-cutout').disabled = this.submit_disabled;
           break;
         case 'fits':
           if (this.fits) {
@@ -754,10 +792,14 @@ class DESCutout extends connect(store)(PageViewElement) {
         case 'customJobName':
           var originalName = this.customJobName;
           var isValidJobName = this.customJobName === '' || (this.customJobName.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])*(\.[a-z0-9]([-a-z0-9]*[a-z0-9])*)*$/g) && this.customJobName.length < 129);
-          if (!isValidJobName) {
-            this._toast(false, "Custom job name must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character. Maximum length is 128 characters.", () => {});
+          this.shadowRoot.getElementById('custom-job-name').invalid = !isValidJobName;
+          if (isValidJobName) {
+            this.shadowRoot.getElementById('custom-job-invalid').classList.remove('invalid-form-element');
+            this.shadowRoot.getElementById('custom-job-invalid').classList.add('valid-form-element');
+          } else {
+            this.shadowRoot.getElementById('custom-job-invalid').classList.remove('valid-form-element');
+            this.shadowRoot.getElementById('custom-job-invalid').classList.add('invalid-form-element');
           }
-          this._toggleValidWarning('custom-job-option', isValidJobName);
         case 'email':
           this.validEmail = this._validateEmail(this.email);
         default:

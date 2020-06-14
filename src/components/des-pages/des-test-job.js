@@ -6,7 +6,7 @@ import {config} from '../des-config.js';
 import { store } from '../../store.js';
 
 
-class DESPage3 extends connect(store)(PageViewElement) {
+class DESTestJob extends connect(store)(PageViewElement) {
   static get properties() {
     return {
       _value: { type: Number },
@@ -77,4 +77,4 @@ class DESPage3 extends connect(store)(PageViewElement) {
 
 }
 
-window.customElements.define('des-page3', DESPage3);
+window.customElements.define('des-test-job', DESTestJob);

@@ -8,11 +8,7 @@ export class PageViewElement extends LitElement {
 
   static get properties() {
     return {
-      active: { type: Boolean },
-      username: {type: String},
-      validEmail: {type: Boolean},
-      email: {type: String},
-      customJobName: {type: String}
+      active: { type: Boolean }
     }
   }
 
@@ -21,16 +17,8 @@ export class PageViewElement extends LitElement {
     return re.test(String(emailStr).toLowerCase());
   }
 
-  _updateEmailOption(event) {
-    this.shadowRoot.getElementById('custom-email').disabled = !event.target.checked;
-    this.validEmail = this._validateEmail(this.email);
-  }
   constructor(){
     super();
-    this.username = '';
-    this.email = '';
-    this.validEmail = false;
-    this.customJobName = '';
   }
 
 }

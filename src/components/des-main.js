@@ -14,6 +14,7 @@ import { connect } from 'pwa-helpers/connect-mixin.js';
 import { installMediaQueryWatcher } from 'pwa-helpers/media-query.js';
 import { installRouter } from 'pwa-helpers/router.js';
 import { updateMetadata } from 'pwa-helpers/metadata.js';
+import '@vaadin/vaadin-icons/vaadin-icons.js';
 
 // This element is connected to the Redux store.
 import { store } from '../store.js';
@@ -150,11 +151,20 @@ class DESMain extends connect(store)(LitElement) {
     ];
   }
 
+  _renderMenuItem(linkText, pageName, iconName) {
+    return html`
+      <a ?selected="${this._page === pageName}" href="${config.frontEndUrl + pageName}">
+        <iron-icon icon="${iconName}" style="color: black; margin-right: 1rem;"></iron-icon>
+        ${linkText}
+      </a>
+      `
+  }
+
   render() {
     return html`
       <!-- Header -->
       <app-header fixed>
-      <des-toolbar @clickMenu=${this._menuButtonClicked}></des-toolbar>
+        <des-toolbar @clickMenu=${this._menuButtonClicked}></des-toolbar>
       </app-header>
 
       <!-- Drawer content -->
@@ -166,14 +176,12 @@ class DESMain extends connect(store)(LitElement) {
        >
        <des-sidebar name=${this.name} email=${this.email}></des-sidebar>
         <nav class="drawer-list">
-          <a ?selected="${this._page === 'home'}" href="${config.frontEndUrl + 'home'}">Home</a>
-          ${this.accessPages.includes('page1') ?  html`<a ?selected="${this._page === 'page1'}" href="${config.frontEndUrl + 'page1'}">Page One</a>` : html ``}
-          ${this.accessPages.includes('page2') ?  html`<a ?selected="${this._page === 'page2'}" href="${config.frontEndUrl + 'page2'}">Page Two</a>` : html ``}
-          ${this.accessPages.includes('page3') ?  html`<a ?selected="${this._page === 'page3'}" href="${config.frontEndUrl + 'page3'}">Submit test job</a>` : html ``}
-          ${this.accessPages.includes('db-access') ?  html`<a ?selected="${this._page === 'db-access'}" href="${config.frontEndUrl + 'db-access'}">DB access</a>` : html ``}
-          ${this.accessPages.includes('cutout') ?  html`<a ?selected="${this._page === 'cutout'}" href="${config.frontEndUrl + 'cutout'}">Cutout</a>` : html ``}
-          ${this.accessPages.includes('status') ?  html`<a ?selected="${this._page === 'status'}" href="${config.frontEndUrl + 'status'}">Job status</a>` : html ``}
-          ${this.accessPages.includes('ticket') ?  html`<a ?selected="${this._page === 'ticket'}" href="${config.frontEndUrl + 'ticket'}">DES Ticket</a>` : html ``}
+          <a ?selected="${this._page === 'home'}" href="${config.frontEndUrl + 'home'}"><iron-icon icon="vaadin:home" style="color: black; margin-right: 1rem;"></iron-icon>Home</a>
+          ${this.accessPages.includes('test-job')  ? this._renderMenuItem('Submit Test Job', 'test-job', 'vaadin:stopwatch') : html ``}
+          ${this.accessPages.includes('db-access') ? this._renderMenuItem('DB Access', 'db-access', 'vaadin:code') : html ``}
+          ${this.accessPages.includes('cutout')    ? this._renderMenuItem('Cutout Service', 'cutout', 'vaadin:scissors') : html ``}
+          ${this.accessPages.includes('status')    ? this._renderMenuItem('Job Status', 'status', 'vaadin:cogs') : html ``}
+          ${this.accessPages.includes('ticket')    ? this._renderMenuItem('DES Ticket', 'ticket', 'vaadin:clipboard-user') : html ``}
         </nav>
 
       </app-drawer>
@@ -182,15 +190,9 @@ class DESMain extends connect(store)(LitElement) {
       <main role="main" class="main-content">
          <des-login class="page" ?active="${this._page === 'login'}" ></des-login>
          <des-home class="page" ?active="${this._page === 'home'}"></des-home>
-        ${this.accessPages.includes('page1') ?
-           html`<des-page1 class="page" ?active="${this._page === 'page1'}"></des-page1>` :
-           html`<des-404 class="page" ?active="${this._page === 'page1'}"></des-404>`}
-        ${this.accessPages.includes('page2') ?
-           html`<des-page2 class="page" ?active="${this._page === 'page2'}"></des-page2>` :
-           html`<des-404 class="page" ?active="${this._page === 'page2'}"></des-404>` }
-        ${this.accessPages.includes('page3') ?
-           html`<des-page3 class="page" ?active="${this._page === 'page3'}"></des-page3>` :
-           html`<des-404 class="page" ?active="${this._page === 'page3'}"></des-404>`}
+        ${this.accessPages.includes('test-job') ?
+           html`<des-test-job class="page" ?active="${this._page === 'test-job'}"></des-test-job>` :
+           html`<des-404 class="page" ?active="${this._page === 'test-job'}"></des-404>`}
         ${this.accessPages.includes('db-access') ?
            html`<des-db-access class="page" ?active="${this._page === 'db-access'}"></des-db-access>` :
            html`<des-404 class="page" ?active="${this._page === 'db-access'}"></des-404>`}

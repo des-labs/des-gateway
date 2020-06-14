@@ -22,9 +22,9 @@ while(cnf.apiPath !== iterstr) {
 // Construct base URLs, ensuring exactly one trailing slash
 cnf.frontEndUrl = cnf.frontEndOrigin.replace(/\/+$/, '') + '/' + cnf.rootPath + '/';
 cnf.backEndUrl  = cnf.backEndOrigin.replace(/\/+$/, '') + '/' + cnf.apiPath + '/';
-// // Ensure exactly one trailing slash
-// cnf.frontEndUrl = cnf.frontEndUrl.replace(/\/+$/, '/')
-// cnf.backEndUrl = cnf.backEndUrl.replace(/\/+$/, '/')
+// Ensure exactly one trailing slash
+cnf.frontEndUrl = cnf.frontEndUrl.replace(/\/+$/, '/')
+cnf.backEndUrl = cnf.backEndUrl.replace(/\/+$/, '/')
 
 export const config = cnf;
 

@@ -15,7 +15,6 @@ import '@polymer/paper-toast/paper-toast.js';
 class DESDbAccess extends connect(store)(PageViewElement) {
   static get properties() {
     return {
-      _value: { type: Number },
       query: {type: String},
       msg: {type: String},
       results: {type: String},
@@ -23,7 +22,11 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       validOutputFile: {type: Object},
       refreshStatusIntervalId: {type: Number},
       compressOutputFile: {type: Boolean},
-      quickQuery: {type: Boolean}
+      quickQuery: {type: Boolean},
+      username: {type: String},
+      validEmail: {type: Boolean},
+      email: {type: String},
+      customJobName: {type: String}
     };
   }
 
@@ -154,7 +157,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
         .invalidFormFlag {
           color: red;
         }
-        #submit-button {
+        #submit-button-query {
           padding-top: 1rem;
           font-weight: bold;
           background-color: var(--paper-indigo-500);
@@ -168,7 +171,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
           };
           /* box-shadow: 3px -3px 4px 3px rgba(63,81,181,0.7); */
         }
-        #submit-button[disabled] {
+        #submit-button-query[disabled] {
             background: #eaeaea;
             color: #a8a8a8;
             cursor: auto;
@@ -182,6 +185,17 @@ class DESDbAccess extends connect(store)(PageViewElement) {
         .toast-success {
           --paper-toast-color:  #DFF2BF;
           --paper-toast-background-color: #4F8A10;
+        }
+        .valid-form-element {
+          display: none;
+        }
+
+        .invalid-form-element {
+          display: block;
+          color: red;
+          font-size: 0.75rem;
+          padding-left:2rem;
+          max-width: 500px;
         }
         `,
     ];
@@ -202,6 +216,10 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     this.quickQuery = false;
     this.refreshStatusIntervalId = 0;
     // this.validCompression = false;
+    this.username = '';
+    this.email = '';
+    this.customJobName = '';
+    this.validEmail = false;
   }
 
   render() {
@@ -227,7 +245,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
               id="option-compress-files" name="option-compress-files" disabled>Compress files (.csv and .h5 only)</paper-checkbox>
 
           </div>
-          <div>
+          <div id="options-controls">
             <h3>Options</h3>
             <paper-input
               always-float-label
@@ -236,6 +254,11 @@ class DESDbAccess extends connect(store)(PageViewElement) {
               label="Custom job name (example: my-custom-job.12)"
               @change="${(e) => {this.customJobName = e.target.value}}"
               id="custom-job-name" name="custom-job-name"></paper-input>
+            <p id="custom-job-invalid" class="valid-form-element">
+              Custom job name must consist of lower case alphanumeric characters,
+              '-' or '.', and must start and end with an alphanumeric character.
+              Maximum length is 128 characters.
+            </p>
           </div>
           <div id="email-options">
             <!-- <p id="email-options-invalid" style="display: none; color: red;">Please enter a valid email address.</p> -->
@@ -253,6 +276,9 @@ class DESDbAccess extends connect(store)(PageViewElement) {
               style="max-width: 500px;"
               placeholder="${this.email}"
               value="${this.email}"></paper-input>
+              <p id="custom-email-invalid" class="valid-form-element">
+                Enter a valid email address.
+              </p>
           </div>
 
           <div style="display: grid; justify-content: center;">
@@ -263,7 +289,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
               </div>
               -->
               <div id="submit-container">
-                <paper-button id="submit-button" class="indigo medium" raised ?disabled="${this.submit_disabled}" @click="${e => this._submit(e)}"
+                <paper-button id="submit-button-query" class="indigo medium" raised ?disabled="${this.submit_disabled}" @click="${e => this._submit(e)}"
                   style="height: 3rem;">Submit Job</paper-button>
                 <paper-spinner id="submit-spinner" class="big"></paper-spinner>
               </div>
@@ -293,7 +319,8 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       </div>
       </section>
       <section>
-        <div style="font-family: monospace;">
+        <div id="results-textarea-container" style="font-family: monospace; display: none;">
+          <h3>Quick query results:</h3>
           <textarea id="results-textarea" name="results-textarea" rows="20" style="width: 100%;"></textarea>
         </div>
       </section>
@@ -311,6 +338,13 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   //   this.editor.focus();
   //   this.editor.execCommand('goLineDown');
   // }
+
+  _updateEmailOption(event) {
+    this.shadowRoot.getElementById('custom-email').disabled = !event.target.checked;
+    this.shadowRoot.getElementById('custom-email').invalid = this.shadowRoot.getElementById('custom-email').invalid && !this.shadowRoot.getElementById('custom-email').disabled;
+    this.validEmail = this._validateEmail(this.email);
+    this._validateForm();
+  }
 
   _validateOutputFile(event){
     const outputfile = this.shadowRoot.getElementById('output-filename').value;
@@ -339,21 +373,34 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   }
 
   _validateForm() {
-    // const outputfile = this.validOutputFile.file
-    // let validCompression = false;
-    // if (this.compressOutputFile == false){
-    //   validCompression = true
-    // }
-    // else if (this.compressOutputFile && (outputfile.endsWith('.csv') || outputfile.endsWith('.h5'))){
-    //   validCompression = true
-    // }
+    let criterion = true;
+    let validForm = true;
 
-    // Validate email
-    this.shadowRoot.getElementById('custom-email').invalid = !this.validEmail;
     // Validate custom job name
     let validCustomJobName = !this.shadowRoot.getElementById('custom-job-name').invalid
+    validForm = validForm && criterion;
 
-    var validForm = (this.validEmail && this.validOutputFile.valid && validCustomJobName) || this.quickQuery;
+    // Validate email
+    this.validEmail = this._validateEmail(this.email);
+    criterion = this.validEmail || !this.shadowRoot.getElementById('send-email').checked;
+    validForm = criterion && validForm;
+    this.shadowRoot.getElementById('custom-email').invalid = !criterion;
+    if (criterion) {
+      this.shadowRoot.getElementById('custom-email-invalid').classList.remove('invalid-form-element');
+      this.shadowRoot.getElementById('custom-email-invalid').classList.add('valid-form-element');
+    } else {
+      this.shadowRoot.getElementById('custom-email-invalid').classList.remove('valid-form-element');
+      this.shadowRoot.getElementById('custom-email-invalid').classList.add('invalid-form-element');
+    }
+    validForm = validForm && criterion;
+
+    // Validate output file
+    criterion = this.validOutputFile.valid;
+    validForm = validForm && criterion;
+
+    // Form is valid if performing a quick query
+    validForm = validForm || this.quickQuery;
+
     // Enable/disable submit button
     if (this.refreshStatusIntervalId === 0) {
       this.submit_disabled = !validForm;
@@ -453,6 +500,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
           that.refreshStatusIntervalId = 0;
           this._toggleSpinner(false, () => {});
           this.shadowRoot.getElementById('results-textarea').value = that.results;
+          this.shadowRoot.getElementById('results-textarea-container').style.display = 'block';
 
         }
         //TODO: Display results
@@ -463,7 +511,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   }
   _toggleSpinner(active, callback) {
     this.submit_disabled = active;
-    this.shadowRoot.getElementById('submit-button').disabled = this.submit_disabled;
+    this.shadowRoot.getElementById('submit-button-query').disabled = this.submit_disabled;
     this.shadowRoot.getElementById('submit-spinner').active = active;
     callback();
   }
@@ -483,13 +531,14 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       // console.log(`${propName} changed. oldValue: ${oldValue}`);
       switch (propName) {
         case 'submit_disabled':
-          this.shadowRoot.getElementById('submit-button').disabled = this.submit_disabled;
+          this.shadowRoot.getElementById('submit-button-query').disabled = this.submit_disabled;
           break;
         case 'quickQuery':
           this.shadowRoot.getElementById('output-filename').disabled = this.quickQuery;
           // this.shadowRoot.getElementById('option-compress-files').disabled = this.quickQuery;
           this._validateOutputFile();
           this.shadowRoot.getElementById('custom-job-name').disabled = this.quickQuery;
+          this.shadowRoot.getElementById('options-controls').style.color = this.quickQuery ? 'lightgray' : 'black';
           // this.validEmail = this._validateEmail(this.email);
           this.shadowRoot.getElementById('send-email').disabled = this.quickQuery;
           this.shadowRoot.getElementById('custom-email').disabled = this.quickQuery || !this.shadowRoot.getElementById('send-email').checked;
@@ -499,6 +548,13 @@ class DESDbAccess extends connect(store)(PageViewElement) {
           var originalName = this.customJobName;
           var isValidJobName = this.customJobName === '' || (this.customJobName.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])*(\.[a-z0-9]([-a-z0-9]*[a-z0-9])*)*$/g) && this.customJobName.length < 129);
           this.shadowRoot.getElementById('custom-job-name').invalid = !isValidJobName;
+          if (isValidJobName) {
+            this.shadowRoot.getElementById('custom-job-invalid').classList.remove('invalid-form-element');
+            this.shadowRoot.getElementById('custom-job-invalid').classList.add('valid-form-element');
+          } else {
+            this.shadowRoot.getElementById('custom-job-invalid').classList.remove('valid-form-element');
+            this.shadowRoot.getElementById('custom-job-invalid').classList.add('invalid-form-element');
+          }
         default:
           // Assume that we want to revalidate the form when a property changes
           this._validateForm();

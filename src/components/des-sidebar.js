@@ -67,7 +67,7 @@ class DESSideBar extends connect(store)(LitElement) {
   }
 
   _ClickHandler(e) {
-    store.dispatch(updateDrawerState(window.innerWidth > 1001 || !this._drawerOpened));
+    store.dispatch(updateDrawerState(window.innerWidth >= 1001 || !this._drawerOpened));
   }
 
   render() {

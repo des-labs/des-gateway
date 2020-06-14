@@ -65,9 +65,13 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
       page = 'home';
       break;
   }
-
-  if (page === 'login' || page === '') {
-    page = 'home';
+  switch (page) {
+    case '':
+    case 'login':
+      page = 'home';
+      break;
+    default:
+      break;
   }
   dispatch(loadPage(page, ap));
   persist ? '' : dispatch(updateDrawerState(false));
@@ -89,14 +93,8 @@ export const loadPage = (page,ap) => (dispatch) => {
     case 'home':
       import('../components/des-pages/des-home.js');
       break;
-    case 'page1':
-      ap.includes('page1') ?  import('../components/des-pages/des-page1.js') :  import('../components/des-pages/des-404.js') ;
-      break;
-    case 'page2':
-      ap.includes('page2') ?  import('../components/des-pages/des-page2.js') : import('../components/des-pages/des-404.js')  ;
-      break;
-    case 'page3':
-      ap.includes('page3') ?   import('../components/des-pages/des-page3.js') : import('../components/des-pages/des-404.js') ;
+    case 'test-job':
+      ap.includes('test-job') ?   import('../components/des-pages/des-test-job.js') : import('../components/des-pages/des-404.js') ;
       break;
     case 'db-access':
       ap.includes('db-access') ?   import('../components/des-pages/des-db-access.js') : import('../components/des-pages/des-404.js') ;
@@ -115,8 +113,8 @@ export const loadPage = (page,ap) => (dispatch) => {
       import('../components/des-pages/des-404.js');
   }
   if (['login', 'des404'].indexOf(page) === -1) {
-    dispatch(updateDrawerState(window.innerWidth > 1001));
-    dispatch(updateDrawerPersist(window.innerWidth > 1001));
+    dispatch(updateDrawerState(window.innerWidth >= 1001));
+    dispatch(updateDrawerPersist(window.innerWidth >= 1001));
   }
   history.pushState({}, '', config.frontEndUrl + page);
   dispatch(updatePage(page));
