@@ -74,17 +74,38 @@ class DESLogin extends connect(store)(PageViewElement) {
             <span>Use your Internal DES DB credentials. <br /></span>
             <span> Fill this <a href='https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/' target="_blank">form</a>
                  if you have trouble accessing the server</span> <br><br>
+            <form id="login-form" name="login-form" action="login" method="post">
 
+            <custom-style>
+              <style is="custom-style">
+                input.my-input {
+                  @apply --paper-input-container-shared-input-style;
+                }
+              </style>
+            </custom-style>
+            <paper-input-container always-float-label>
+              <label slot="label">Username</label>
+              <iron-input slot="input">
+                <input class="my-input" type="text" autocomplete="username" name="username" @input="${e => this.username = e.target.value}"></input>
+              </iron-input>
+            </paper-input-container>
+            <paper-input-container always-float-label>
+              <label slot="label">Password</label>
+              <iron-input slot="input">
+                <input class="my-input" type="password" autocomplete="current-password" name="password" @input="${e => this._passwd = e.target.value}"></input>
+              </iron-input>
+            </paper-input-container>
 
-            <paper-input always-float-label label="Username"  @input="${e => this.username = e.target.value}"></paper-input>
-            <paper-password-input always-float-label label="Password"  type="password" @input="${e => this._passwd = e.target.value}">
-            </paper-password-input>
-            <br>
-            <div class="container">
-              <paper-button class="des-button" id="loginButton"raised @click="${this._prep0}">dessci</paper-button>
-              <paper-button class="des-button" id="loginButton"raised @click="${this._prep1}">desoper</paper-button>
-              <paper-spinner id=loginSpinner></paper-spinner>
-            </div>
+              <!-- <paper-input always-float-label required="" label="Username" type="text" autocomplete="username" name="username" @input="${e => this.username = e.target.value}"></paper-input> -->
+              <!-- <paper-input always-float-label required="" label="Password" autocomplete="current-password" type="password" name="password" @input="${e => this._passwd = e.target.value}"></paper-input> -->
+              <br>
+              <div class="container">
+                <paper-button class="des-button" id="loginButton"raised @click="${this._prep0}" type="submit">dessci</paper-button>
+                <paper-button class="des-button" id="loginButton"raised @click="${this._prep1}" type="submit">desoper</paper-button>
+                <input type="submit" value="Dummy submit button" style="display: none;"></input>
+                <paper-spinner id=loginSpinner></paper-spinner>
+              </div>
+            </form>
             <br>
             <div class="errormessage"> <b>${this.msg}</b></div>
             <br>

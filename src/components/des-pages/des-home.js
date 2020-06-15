@@ -12,8 +12,14 @@ class DESHome extends connect(store)(PageViewElement) {
     ];
   }
 
+  static get properties() {
+    return {
+      accessPages: {type: Array},
+    };
+  }
   constructor(){
     super();
+    this.accessPages = [];
   }
 
   render() {
