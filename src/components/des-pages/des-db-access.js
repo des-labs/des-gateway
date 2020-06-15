@@ -1,4 +1,5 @@
 import { html,css } from 'lit-element';
+import { render } from 'lit-html';
 import { PageViewElement } from './des-base-page.js';
 import { connect } from 'pwa-helpers/connect-mixin.js';
 import { SharedStyles } from '../styles/shared-styles.js';
@@ -11,6 +12,7 @@ import '@polymer/paper-input/paper-input.js';
 import '@polymer/paper-spinner/paper-spinner.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-toast/paper-toast.js';
+import '@vaadin/vaadin-dialog/vaadin-dialog.js'
 
 class DESDbAccess extends connect(store)(PageViewElement) {
   static get properties() {
@@ -300,19 +302,14 @@ class DESDbAccess extends connect(store)(PageViewElement) {
         <div class="query-input-container">
           <p>Insert your query in the box below. Data results for "Quick" Jobs (30 sec.) will be displayed at the bottom.</p>
           <div id="queryBox" class="query-input-box">
-              <wc-codemirror id="wc-codemirror-element" mode="sql" src="images/example-query.sql" lineNumbers="false"></wc-codemirror>
+              <wc-codemirror id="wc-codemirror-element" mode="sql" src="images/example-query-0.sql"></wc-codemirror>
           </div>
           <div class="query-input-controls">
               <div class="btn-wrap">
                 <paper-button class="indigo medium" raised @tap="${this._checkSyntax}">Check</paper-button>
               </div>
-              <!-- <div class="btn-wrap">
-                <paper-button id="QuickQuery" class="indigo medium" raised @tap="${this._quickSubmit}">Quick</paper-button>
-              </div> -->
               <div class="btn-wrap">
-                <a href = "/db-examples" style="text-decoration: none;" tabindex="-1">
-                <paper-button class="indigo medium" raised >See Examples</paper-button>
-                </a>
+                <paper-button id="query-examples-button" class="indigo medium" raised >See Examples</paper-button>
               </div>
           </div>
         </div>
@@ -328,6 +325,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
         <paper-toast class="toast-position toast-success" id="toast-job-success" text="Job has been submitted!" duration="7000"> </paper-toast>
         <paper-toast class="toast-position toast-error" id="toast-job-failure" text="ERROR! There was an error. Please try again" duration="7000"> </paper-toast>
       </div>
+      <vaadin-dialog id="query-examples-dialog" aria-label="simple"></vaadin-dialog>
     `;
   }
   // _clearQueryBox(){
@@ -552,6 +550,47 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       });
     }
   }
+
+  _queryExampleRenderer(root, dialog) {
+    let container = root.firstElementChild;
+    if (container) {
+      // The wc-codemirror element creates duplicate boxes with repeated dialog
+      // openings. Removing the DOM element each time the dialog is opened bypasses
+      // this issue.
+      root.removeChild(root.childNodes[0]);
+    }
+    container = root.appendChild(document.createElement('div'));
+    render(
+      html`
+      <div style="overflow: auto; height: 50rem;">
+        <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo">Close</paper-button>
+        <h3>Sample Basic information</h3>
+        <div id="query-example-0" class="query-input-box" style="border: 1px solid #CCCCCC;">
+          <wc-codemirror id="query-example-editor-0" mode="sql" src="images/example-query-0.sql"></wc-codemirror>
+        </div>
+        <h3>Limit Basic information by region and number of rows</h3>
+        <div id="query-example-1" class="query-input-box" style="border: 1px solid #CCCCCC;">
+          <wc-codemirror id="query-example-editor-1" mode="sql" src="images/example-query-1.sql"></wc-codemirror>
+        </div>
+        <h3>Select stars from M2 Globular Cluster</h3>
+        <div id="query-example-2" class="query-input-box" style="border: 1px solid #CCCCCC;">
+          <wc-codemirror id="query-example-editor-2" mode="sql" src="images/example-query-2.sql"></wc-codemirror>
+        </div>
+      </div>
+      `,
+      container
+    );
+  }
+
+  firstUpdated() {
+
+    const dialog = this.shadowRoot.getElementById('query-examples-dialog');
+    dialog.renderer = this._queryExampleRenderer;
+    this.shadowRoot.getElementById('query-examples-button').addEventListener('click', function() {
+      dialog.opened = true;
+    });
+  }
+
   updated(changedProps) {
     changedProps.forEach((oldValue, propName) => {
       // console.log(`${propName} changed. oldValue: ${oldValue}`);

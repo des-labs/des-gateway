@@ -39,6 +39,7 @@
     "@polymer/paper-tabs": "^3.0.1",
     "@polymer/paper-toast": "^3.0.1",
     "@polymer/polymer": "^3.1.0",
+    "@vaadin/vaadin-dialog": "^2.4.0",
     "@vaadin/vaadin-grid": "^5.6.3",
     "@vaadin/vaadin-icons": "^4.3.1",
     "@vaadin/vaadin-menu-bar": "^1.0.5",
