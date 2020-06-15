@@ -434,7 +434,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   stateChanged(state) {
     this.username = state.app.username;
     this.db = state.app.db;
-    this.email = state.app.email;
+    this.email = this.email === '' ? state.app.email : this.email;
   }
 
   _submitJob(callback){
@@ -583,7 +583,6 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   }
 
   firstUpdated() {
-
     const dialog = this.shadowRoot.getElementById('query-examples-dialog');
     dialog.renderer = this._queryExampleRenderer;
     this.shadowRoot.getElementById('query-examples-button').addEventListener('click', function() {

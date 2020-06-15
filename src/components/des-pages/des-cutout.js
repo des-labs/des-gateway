@@ -766,7 +766,7 @@ class DESCutout extends connect(store)(PageViewElement) {
   stateChanged(state) {
     this.username = state.app.username;
     this.db = state.app.db;
-    this.email = state.app.email;
+    this.email = this.email === '' ? state.app.email : this.email;
   }
 
   firstUpdated() {
