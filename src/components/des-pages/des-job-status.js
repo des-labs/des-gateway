@@ -11,6 +11,7 @@ import '@vaadin/vaadin-grid/vaadin-grid-filter-column.js';
 import '@vaadin/vaadin-grid/vaadin-grid-sort-column.js';
 import '@vaadin/vaadin-grid/vaadin-grid-selection-column.js';
 import '@vaadin/vaadin-icons/vaadin-icons.js';
+import '@polymer/paper-button/paper-button.js';
 
 
 class DESJobStatus extends connect(store)(PageViewElement) {
@@ -19,6 +20,28 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     return [
       SharedStyles,
       css`
+        .monospace-column {
+          font-family: monospace;
+          font-size: 0.8rem;
+        }
+        paper-button {
+          width: 150px;
+          text-transform: none;
+          --paper-button-raised-keyboard-focus: {
+            background-color: var(--paper-indigo-a250) !important;
+            color: white !important;
+          };
+        }
+        paper-button.indigo {
+          background-color: var(--paper-indigo-500);
+          color: black;
+          width: 150px;
+          text-transform: none;
+          --paper-button-raised-keyboard-focus: {
+            background-color: var(--paper-indigo-a250) !important;
+            color: white !important;
+          };
+        }
         `,
 
     ];
@@ -27,6 +50,8 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   static get properties() {
     return {
       username: {type: String},
+      jobIdFromUrl: {type: String},
+      jobToDelete: {type: String},
       refreshStatusIntervalId: {type: Number},
       _selectedItems: {type: Array}
     };
@@ -35,10 +60,14 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   constructor(){
     super();
     this.username = '';
+    this.jobIdFromUrl = '';
+    this.jobToDelete = '';
     this.refreshStatusIntervalId = 0;
     this._selectedItems = [];
     this.rendererAction = this._rendererAction.bind(this); // need this to invoke class methods in renderers
     this.rendererStatus = this._rendererStatus.bind(this); // need this to invoke class methods in renderers
+    this._headerRendererJobId = this._headerRendererJobId.bind(this); // need this to invoke class methods in renderers
+    this._deleteConfirmDialogRenderer = this._deleteConfirmDialogRenderer.bind(this); // need this to invoke class methods in renderers
   }
 
   render() {
@@ -48,23 +77,70 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         <h2>Job status</h2>
       <vaadin-grid .multiSort="${true}">
         <vaadin-grid-selection-column auto-select></vaadin-grid-selection-column>
-        <vaadin-grid-sort-column flex-grow="0" path="job.status" header="Status" .renderer="${this.rendererStatus}"></vaadin-grid-sort-column>
-        <vaadin-grid-filter-column path="job.name" header="Job name" .renderer="${this._rendererJobId}"></vaadin-grid-filter-column>
-        <vaadin-grid-column path="job.id" header="Job ID" .renderer="${this._rendererJobId}"></vaadin-grid-column>
-        <vaadin-grid-sort-column flex-grow="0" path="job.type" header="Job type"></vaadin-grid-sort-column>
-        <vaadin-grid-column text-align="end" flex-grow="0" .renderer="${this.rendererAction}" .headerRenderer="${this._headerRendererAction}"></vaadin-grid-column>
+        <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererStatus}" .headerRenderer="${this._headerRendererStatus}"></vaadin-grid-column>
+        <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererAction}" .headerRenderer="${this._headerRendererAction}"></vaadin-grid-column>
+        <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererJobType}" .headerRenderer="${this._headerRendererJobType}"></vaadin-grid-column>
+        <vaadin-grid-column width="25%" path="job.id" header="Job ID" .renderer="${this._rendererJobId}" .headerRenderer="${this._headerRendererJobId}"></vaadin-grid-column>
+        <vaadin-grid-filter-column width="40%" path="job.name" header="Job name" .renderer="${this._rendererJobId}"></vaadin-grid-filter-column>
       </vaadin-grid>
       <div id="last-updated" style="text-align: right; font-family: monospace;"></div>
 
     </section>
-
+    <vaadin-dialog id="deleteConfirmDialog" no-close-on-esc no-close-on-outside-click></vaadin-dialog>
     `;
+  }
+
+  _headerRendererJobId(root) {
+    render(
+      html`
+        <vaadin-grid-filter path="job.id" id="job-id-filter">
+          <vaadin-text-field id="job-id-filter-text-field" slot="filter" focus-target label="JobId" style="max-width: 100%" theme="small" value="${this.jobIdFromUrl}"></vaadin-text-field>
+        </vaadin-grid-filter>
+        <iron-icon icon="vaadin:close-circle-o" style="color: gray;"></iron-icon>
+      `,
+      root
+    );
+    // root.getElementById('job-id-filter-text-field').addEventListener('value-changed', function(e) {
+    root.querySelector('vaadin-text-field').addEventListener('value-changed', function(e) {
+      root.querySelector('vaadin-grid-filter').value = e.detail.value;
+      if (e.detail.value === '') {
+        root.querySelector('iron-icon').style.display = 'none';
+      } else {
+        root.querySelector('iron-icon').style.display = 'inline-block';
+      }
+    });
+    root.querySelector('iron-icon').addEventListener('click', function(e) {
+      root.querySelector('vaadin-grid-filter').value = '';
+      root.querySelector('vaadin-text-field').value = '';
+    });
   }
 
   _headerRendererAction(root) {
     render(
       html`
         <iron-icon icon="vaadin:cogs"></iron-icon>
+      `,
+      root
+    );
+  }
+
+  _headerRendererStatus(root) {
+    render(
+      html`
+      <vaadin-grid-sorter path="job.status">
+        <iron-icon icon="vaadin:dashboard"></iron-icon>
+      </vaadin-grid-sorter>
+      `,
+      root
+    );
+  }
+
+  _headerRendererJobType(root) {
+    render(
+      html`
+      <vaadin-grid-sorter path="job.type">
+        <iron-icon icon="vaadin:cubes"></iron-icon>
+      </vaadin-grid-sorter>
       `,
       root
     );
@@ -77,7 +153,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     }
     render(
       html`
-        <span style="font-family: monospace;">${monospaceText}</span>
+        <span class="monospace-column">${monospaceText}</span>
       `,
       root
     );
@@ -111,7 +187,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       if (selected.length === 0) {
         render(
           html`
-            <a href="#" onclick="return false;"><iron-icon @click="${(e) => {this._deleteJob(rowData.item.job.id)}}" icon="vaadin:trash" style="color: darkgray;"></iron-icon></a>
+            <a href="#" onclick="return false;"><iron-icon @click="${(e) => {this._deleteJobConfirm(rowData.item.job.id)}}" icon="vaadin:trash" style="color: darkgray;"></iron-icon></a>
           `,
           container
         );
@@ -119,7 +195,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         if (selected.map((e) => {return e.job.id}).indexOf(rowData.item.job.id) > -1) {
           render(
             html`
-              <a href="#" onclick="return false;"><iron-icon @click="${(e) => {this._deleteJob(rowData.item.job.id)}}" icon="vaadin:trash" style="color: red;"></iron-icon></a>
+              <a href="#" onclick="return false;"><iron-icon @click="${(e) => {this._deleteJobConfirm(rowData.item.job.id)}}" icon="vaadin:trash" style="color: red;"></iron-icon></a>
             `,
             container
           );
@@ -153,6 +229,38 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       case 'unknown':
         var color = 'red';
         var icon = 'vaadin:close-circle-o';
+        break;
+      default:
+        var color = 'purple';
+        var icon = 'vaadin:question-circle-o';
+        break;
+    }
+    render(
+      html`
+        <iron-icon icon="${icon}" style="color: ${color};"></iron-icon>
+      `,
+      container
+    );
+
+  }
+
+  rendererJobType(root, column, rowData) {
+    let container = root.firstElementChild;
+    if (!container) {
+      container = root.appendChild(document.createElement('div'));
+    }
+    switch (rowData.item.job.type) {
+      case 'test':
+        var color = 'black';
+        var icon = 'vaadin:stopwatch';
+        break;
+      case 'query':
+        var color = 'black';
+        var icon = 'vaadin:code';
+        break;
+      case 'cutout':
+        var color = 'black';
+        var icon = 'vaadin:scissors';
         break;
       default:
         var color = 'purple';
@@ -246,6 +354,9 @@ class DESJobStatus extends connect(store)(PageViewElement) {
             grid.selectItem(grid.items[i]);
           }
         }
+
+        // this._highlightJob(this.jobIdFromUrl);
+        grid.recalculateColumnWidths();
         // let tempSelection = this._selectedItems;
         // grid.selectedItems = this._selectedItems;
         // console.log(`selectedItems: ${JSON.stringify(tempSelection)}`);
@@ -274,7 +385,12 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   }
 
   _cancelJob(jobId) {
-    this._deleteJob(jobId);
+    this._deleteJobConfirm(jobId);
+  }
+
+  _deleteJobConfirm(jobId) {
+    this.jobToDelete = jobId;
+    this.shadowRoot.getElementById('deleteConfirmDialog').opened = true;
   }
 
   _deleteJob(jobId) {
@@ -320,8 +436,42 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     }
   }
 
+  _deleteConfirmDialogRenderer(root, dialog) {
+    let container = root.firstElementChild;
+    if (container) {
+      root.removeChild(root.childNodes[0]);
+    }
+    container = root.appendChild(document.createElement('div'));
+    render(
+      html`
+      <div>
+        <p>Are you sure?</p>
+        <paper-button @click="${(e) => {dialog.opened = false; this._deleteJob(this.jobToDelete);}}" class="">Delete</paper-button>
+        <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo">Cancel</paper-button>
+      </div>
+      `,
+      container
+    );
+  }
+
+  // _highlightJob(jobIdFromUrl) {
+  //   if (jobIdFromUrl !== '') {
+  //     let grid = this.shadowRoot.querySelector('vaadin-grid');
+  //     let gridItems = grid.items;
+  //     if (gridItems.length > 0) {
+  //       let row = gridItems.map((e) => {return e.job.id}).indexOf(jobIdFromUrl);
+  //       if (row > 0) {
+  //         // grid.selectItem(gridItems[row]);
+  //         // console.log('current job id filter: ' + this.shadowRoot.getElementById('job-id-column').value);
+  //         // this.shadowRoot.getElementById('job-id-column').value = jobIdFromUrl;
+  //       }
+  //     }
+  //   }
+  // }
+
   stateChanged(state) {
     this.username = state.app.username;
+    this.jobIdFromUrl = state.app.jobId;
     this._page = state.app.page;
     if (this.refreshStatusIntervalId === 0) {
       this.refreshStatusIntervalId = window.setInterval(() => {
@@ -353,6 +503,9 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     //   that._selectedItems = that.shadowRoot.querySelector('vaadin-grid').selectedItems;
     //   // console.log(`selectedItems: ${JSON.stringify(that._selectedItems)}`);
     // });
+
+    const dialog = this.shadowRoot.getElementById('deleteConfirmDialog');
+    dialog.renderer = this._deleteConfirmDialogRenderer;
     this._updateStatus();
   }
 
@@ -365,6 +518,10 @@ class DESJobStatus extends connect(store)(PageViewElement) {
             this._updateStatus()
           }
           break;
+        // case 'jobIdFromUrl':
+        //   console.log('jobIdFromUrl updated: ' + this.jobIdFromUrl);
+        //   this._highlightJob(this.jobIdFromUrl);
+        // break;
         case '_selectedItems':
           break;
         default:

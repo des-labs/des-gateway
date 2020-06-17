@@ -408,11 +408,11 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     let validForm = true;
 
     // Validate custom job name
-    let validCustomJobName = !this.shadowRoot.getElementById('custom-job-name').invalid
+    let validCustomJobName = !this.shadowRoot.getElementById('custom-job-name').invalid;
     validForm = validForm && criterion;
 
     // Validate email
-    criterion = this._validateEmail();
+    criterion = this.validEmail || !this.shadowRoot.getElementById('send-email').checked;
     validForm = validForm && criterion;
 
     // Validate output file

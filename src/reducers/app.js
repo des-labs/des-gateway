@@ -10,6 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 import {
   UPDATE_PAGE,
+  UPDATE_JOB_ID,
   UPDATE_LAST_VALID_PAGE,
   UPDATE_DRAWER_STATE,
   UPDATE_DRAWER_PERSIST,
@@ -25,6 +26,7 @@ const INITIAL_STATE = {
   name: '',
   db: '',
   lastname: '',
+  jobId: '',
   roles: [],
   accessPages: [],
   session: false,
@@ -62,6 +64,11 @@ const app = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         page: action.page
+      };
+    case UPDATE_JOB_ID:
+      return {
+        ...state,
+        jobId: action.jobId
       };
     case UPDATE_LAST_VALID_PAGE:
       return {

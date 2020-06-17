@@ -1,4 +1,5 @@
 import { LitElement, html, css } from 'lit-element';
+import { render } from 'lit-html';
 import { connect } from 'pwa-helpers/connect-mixin.js';
 import '@polymer/app-layout/app-toolbar/app-toolbar.js';
 import '@polymer/iron-icon/iron-icon.js';
@@ -9,6 +10,7 @@ import '@polymer/paper-item/paper-item.js';
 import '@polymer/paper-listbox/paper-listbox.js';
 import '@polymer/paper-menu-button/paper-menu-button.js';
 import '@polymer/paper-dialog/paper-dialog.js';
+import '@vaadin/vaadin-dialog/vaadin-dialog.js'
 import './des-update-info.js';
 import './des-update-pwd.js';
 import './des-app-card.js';
@@ -134,16 +136,33 @@ class DESToolBar extends connect(store)(LitElement) {
     }
 
 
+    _updateProfileRenderer(root, dialog) {
+      let container = root.firstElementChild;
+      if (container) {
+        root.removeChild(root.childNodes[0]);
+      }
+      container = root.appendChild(document.createElement('div'));
+      render(
+        html`
+          <des-update-info></des-update-info>
+        `,
+        container
+      )
+      console.log(this.shadowRoot.getElementById('UpdateCloseButton'));
+      this.shadowRoot.getElementById('UpdateCloseButton').addEventListener('click', function() {
+        this.shadowRoot.getElementById('UpdateProfileDialog').opened = false;
+      });
+    }
 
     render() {
       return html`
-      <paper-dialog  id="UpdateProfileDialog" with-backdrop  @iron-overlay-opened="${this.patchOverlay}" >
-      <des-update-info></des-update-info>
-      </paper-dialog>
 
-      <paper-dialog  id="ChangePasswordDialog" with-backdrop  @iron-overlay-opened="${this.patchOverlay}" >
-      <des-update-pwd></des-update-pwd>
-      </paper-dialog>
+        <paper-dialog  id="ChangePasswordDialog" with-backdrop  @iron-overlay-opened="${this.patchOverlay}" >
+        <des-update-pwd></des-update-pwd>
+        </paper-dialog>
+
+
+        <vaadin-dialog @dialogClickCancel="${(e) => {console.log('hi there'); this.shadowRoot.getElementById('UpdateProfileDialog').opened = false;}}" id="UpdateProfileDialog" aria-label="simple"></vaadin-dialog>
 
         <app-toolbar class="toolbar-top" sticky>
           <button class="menu-btn" title="Menu" @click="${this._ClickHandler}">${menuIcon}</button>
@@ -151,22 +170,20 @@ class DESToolBar extends connect(store)(LitElement) {
           <div main-narrow-title>DES desaccess</div>
 
           ${this._profile ? html`
-          <paper-menu-button class="profile">
-            <iron-icon class="profile-icon" icon="account-circle" slot="dropdown-trigger"></iron-icon>
-            <iron-icon style="margin-left:-5px;" icon="arrow-drop-down" slot="dropdown-trigger" alt="menu"></iron-icon>
-            <paper-listbox class="profile-listbox" slot="dropdown-content">
-              <paper-item class="profileItem"  @click="${this._ProfileDialog}"> Update Profile</paper-item>
-              <paper-item class="profileItem"  @click="${this._PasswordDialog}"> Change Password</paper-item>
-              <paper-item class="profileItem" @click="${ (e) => {window.location.href = config.frontEndUrl + 'logout';}}" >
-                Log out
-              </paper-item>
-            </paper-listbox>
-          </paper-menu-button>
+            <paper-menu-button class="profile">
+              <iron-icon class="profile-icon" icon="account-circle" slot="dropdown-trigger"></iron-icon>
+              <iron-icon style="margin-left:-5px;" icon="arrow-drop-down" slot="dropdown-trigger" alt="menu"></iron-icon>
+              <paper-listbox class="profile-listbox" slot="dropdown-content">
+                <paper-item class="profileItem"  @click="${(e) => {this.shadowRoot.getElementById('UpdateProfileDialog').opened = true;}}"> Update Profile</paper-item>
+                <paper-item class="profileItem"  @click="${this._PasswordDialog}"> Change Password</paper-item>
+                <paper-item class="profileItem" @click="${ (e) => {window.location.href = config.frontEndUrl + 'logout';}}" >
+                  Log out
+                </paper-item>
+              </paper-listbox>
+            </paper-menu-button>
 
           ` : html``}
-
-
-    </app-toolbar>
+        </app-toolbar>
       `;
     }
 
@@ -177,6 +194,18 @@ class DESToolBar extends connect(store)(LitElement) {
 
     stateChanged(state) {
       this._profile = state.app.session;
+    }
+
+    firstUpdated() {
+
+      const dialog = this.shadowRoot.getElementById('UpdateProfileDialog');
+      dialog.renderer = this._updateProfileRenderer;
+      // this.shadowRoot.getElementById('UpdateProfileDialog').addEventListener('click', function() {
+      //   dialog.opened = true;
+      // });
+      // this.shadowRoot.getElementById('UpdateProfileDialog').addEventListener('dialogClickCancel', function() {
+      //   dialog.opened = false;
+      // });
     }
   }
 

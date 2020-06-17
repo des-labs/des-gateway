@@ -70,45 +70,49 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
     .catch((error) => {console.log(error);});
   }
 
-    render() {
-      return html`
-        <paper-card class="des-card" heading="Update Personal Profile" elevation="0">
-        <div class="card-content">
-        <span>Please enter your information</span>
-        <br>
-        <paper-input always-float-label label="Username" disabled placeholder=${this._username}></paper-input>
-        <paper-input always-float-label label="First Name" value=${this._name} @input="${e => this._name = e.target.value}"></paper-input>
-        <paper-input always-float-label label="Last Name" value=${this._lastname} @input="${e => this._lastname = e.target.value}"></paper-input>
-        <paper-input always-float-label label="Email" value=${this._email} @input="${e => this._email = e.target.value}"></paper-input>
-        <br>
-        <br>
-        <br>
-        <div>
-        <div class="card-actions">
-        <paper-button id="UpdateAcceptButton" class="des-button" raised @click="${this._submit}">Submit</paper-button>
-        <paper-button class="des-button" raised dialog-dismiss>Cancel</paper-button>
-        <paper-spinner id=loginSpinner></paper-spinner>
-        <br>
-        <br>
-        <div class="errormessage"> <b>${this.msg}</b></div>
-        <br>
-          </div>
-        </paper-card>
-      `;
-    }
+  _ClickHandler(e) {
+    console.log('dispatching custom event...');
+    this.dispatchEvent(new CustomEvent('dialogClickCancel'));
+  }
+  render() {
+    return html`
+      <paper-card class="des-card" heading="Update Personal Profile" elevation="0">
+      <div class="card-content">
+      <span>Please enter your information</span>
+      <br>
+      <paper-input always-float-label label="Username" disabled placeholder=${this._username}></paper-input>
+      <paper-input always-float-label label="First Name" value=${this._name} @input="${e => this._name = e.target.value}"></paper-input>
+      <paper-input always-float-label label="Last Name" value=${this._lastname} @input="${e => this._lastname = e.target.value}"></paper-input>
+      <paper-input always-float-label label="Email" value=${this._email} @input="${e => this._email = e.target.value}"></paper-input>
+      <br>
+      <br>
+      <br>
+      <div>
+      <div class="card-actions">
+      <paper-button id="UpdateAcceptButton" class="des-button" raised @click="${this._submit}">Submit</paper-button>
+      <paper-button id="UpdateCloseButton" class="des-button" raised dialog-dismiss @click="${this._ClickHandler}">Cancel</paper-button>
+      <paper-spinner id=loginSpinner></paper-spinner>
+      <br>
+      <br>
+      <div class="errormessage"> <b>${this.msg}</b></div>
+      <br>
+        </div>
+      </paper-card>
+    `;
+  }
 
-    constructor() {
-      super();
-      this._profile = false;
-    }
+  constructor() {
+    super();
+    this._profile = false;
+  }
 
-    stateChanged(state) {
-      this._profile = state.app.session;
-      this._name = state.app.name;
-      this._lastname = state.app.lastname;
-      this._username = state.app.username;
-      this._email = state.app.email;
-    }
+  stateChanged(state) {
+    this._profile = state.app.session;
+    this._name = state.app.name;
+    this._lastname = state.app.lastname;
+    this._username = state.app.username;
+    this._email = state.app.email;
+  }
   }
 
   window.customElements.define('des-update-info', DESUpdateInfo);
