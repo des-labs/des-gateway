@@ -600,7 +600,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
         case 'quickQuery':
           this._validateOutputFile();
         case 'email':
-          this.validEmail = this._validateEmailAddress(this.email);
+          this._validateEmail();
         case 'customJobName':
           this._validateCustomJobName();
         default:

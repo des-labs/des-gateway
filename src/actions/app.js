@@ -2,6 +2,7 @@ import {config, rbac_bindings} from '../components/des-config.js';
 import { store } from '../store.js';
 
 export const UPDATE_PAGE = 'UPDATE_PAGE';
+export const UPDATE_JOB_ID = 'UPDATE_JOB_ID';
 export const UPDATE_LAST_VALID_PAGE = 'UPDATE_LAST_VALID_PAGE';
 export const UPDATE_DRAWER_STATE = 'UPDATE_DRAWER_STATE';
 export const UPDATE_DRAWER_PERSIST = 'UPDATE_DRAWER_PERSIST';
@@ -55,16 +56,24 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
   var pathParts = path.split('/');
   var basePathParts = basePath.split('/');
   var page = null;
+  let pageIdx = 0;
   switch (true) {
     case (basePathParts[0] === ''):
       page = pathParts[0];
       break;
     case (basePathParts[0] === pathParts[0] && pathParts.length > 1):
       page = pathParts[1];
+      pageIdx = 1;
       break;
     default:
       page = 'home';
       break;
+  }
+  // Highlight specific job in status if provided in URL {{location.origin}}/status/dkdh9s84ty3thj3wehg3
+  if (page === 'status' && pathParts.length > pageIdx + 1) {
+    let jobId = pathParts[pageIdx + 1]
+    console.log('jobId: ' + jobId);
+    dispatch(setJobId(jobId));
   }
   switch (page) {
     case '':
@@ -74,11 +83,14 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
     default:
       break;
   }
-  dispatch(loadPage(page, ap));
+  dispatch(loadPage(page, ap, pathParts.slice(pageIdx)));
   persist ? '' : dispatch(updateDrawerState(false));
 };
 
-export const loadPage = (page,ap) => (dispatch) => {
+export const loadPage = (page,ap,pathParts = []) => (dispatch) => {
+  if (pathParts.length === 0) {
+    pathParts = [page];
+  }
   switch(page) {
     case 'login':
       import('../components/des-pages/des-login.js').then((module) => {
@@ -118,7 +130,7 @@ export const loadPage = (page,ap) => (dispatch) => {
     dispatch(updateDrawerPersist(window.innerWidth >= 1001));
     dispatch(updateLastValidPage(page));
   }
-  let newLocation = config.frontEndUrl + page;
+  let newLocation = config.frontEndUrl + pathParts.join('/');
   if (newLocation !== window.location.href) {
     history.pushState({}, '', newLocation);
   }
@@ -139,6 +151,12 @@ const updatePage = (page) => {
   };
 };
 
+export const setJobId = (jobId) => {
+  return {
+    type: UPDATE_JOB_ID,
+    jobId
+  };
+};
 
 export const updateDrawerState = (opened) => {
   return {
