@@ -74,7 +74,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     return html`
 
     <section>
-        <h2>Job status</h2>
       <vaadin-grid .multiSort="${true}">
         <vaadin-grid-selection-column auto-select></vaadin-grid-selection-column>
         <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererStatus}" .headerRenderer="${this._headerRendererStatus}"></vaadin-grid-column>
@@ -96,7 +95,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         <vaadin-grid-filter path="job.id" id="job-id-filter">
           <vaadin-text-field id="job-id-filter-text-field" slot="filter" focus-target label="JobId" style="max-width: 100%" theme="small" value="${this.jobIdFromUrl}"></vaadin-text-field>
         </vaadin-grid-filter>
-        <iron-icon icon="vaadin:close-circle-o" style="color: gray;"></iron-icon>
+        <a title="Clear filter"><iron-icon icon="vaadin:close-circle-o" style="color: gray;"></iron-icon></a>
       `,
       root
     );
@@ -118,7 +117,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   _headerRendererAction(root) {
     render(
       html`
-        <iron-icon icon="vaadin:cogs"></iron-icon>
+        <a title="Actions"><iron-icon icon="vaadin:cogs"></iron-icon></a>
       `,
       root
     );
@@ -128,7 +127,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     render(
       html`
       <vaadin-grid-sorter path="job.status">
-        <iron-icon icon="vaadin:dashboard"></iron-icon>
+        <a title="Job Status"><iron-icon icon="vaadin:dashboard"></iron-icon></a>
       </vaadin-grid-sorter>
       `,
       root
@@ -139,7 +138,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     render(
       html`
       <vaadin-grid-sorter path="job.type">
-        <iron-icon icon="vaadin:cubes"></iron-icon>
+        <a title="Job Type"><iron-icon icon="vaadin:cubes"></iron-icon></a>
       </vaadin-grid-sorter>
       `,
       root
@@ -171,6 +170,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     }
     let that = this;
     // Assign the listener callback to a variable
+    // TODO: Add a "cancel job" button that stops the process but does not delete the generated files.
     // if (rowData.item.job.status === "started" || rowData.item.job.status === "init") {
     if (false) {
       render(
@@ -187,7 +187,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       if (selected.length === 0) {
         render(
           html`
-            <a href="#" onclick="return false;"><iron-icon @click="${(e) => {this._deleteJobConfirm(rowData.item.job.id)}}" icon="vaadin:trash" style="color: darkgray;"></iron-icon></a>
+            <a title="Delete Job ${rowData.item.job.id.substring(0,8)}..." onclick="return false;"><iron-icon @click="${(e) => {this._deleteJobConfirm(rowData.item.job.id)}}" icon="vaadin:trash" style="color: darkgray;"></iron-icon></a>
           `,
           container
         );
@@ -195,7 +195,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         if (selected.map((e) => {return e.job.id}).indexOf(rowData.item.job.id) > -1) {
           render(
             html`
-              <a href="#" onclick="return false;"><iron-icon @click="${(e) => {this._deleteJobConfirm(rowData.item.job.id)}}" icon="vaadin:trash" style="color: red;"></iron-icon></a>
+              <a title="Delete (${selected.length}) Selected Jobs" onclick="return false;"><iron-icon @click="${(e) => {this._deleteJobConfirm(rowData.item.job.id)}}" icon="vaadin:trash" style="color: red;"></iron-icon></a>
             `,
             container
           );
@@ -219,25 +219,29 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       case 'success':
         var color = 'green';
         var icon = 'vaadin:check-circle-o';
+        var tooltip = 'Complete';
         break;
       case 'init':
       case 'started':
         var color = 'orange';
         var icon = 'vaadin:hourglass';
+        var tooltip = 'In Progess';
         break;
       case 'failure':
       case 'unknown':
         var color = 'red';
         var icon = 'vaadin:close-circle-o';
+        var tooltip = 'Failed';
         break;
       default:
         var color = 'purple';
         var icon = 'vaadin:question-circle-o';
+        var tooltip = 'Error';
         break;
     }
     render(
       html`
-        <iron-icon icon="${icon}" style="color: ${color};"></iron-icon>
+        <a title="${tooltip}"><iron-icon icon="${icon}" style="color: ${color};"></iron-icon></a>
       `,
       container
     );
@@ -253,23 +257,27 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       case 'test':
         var color = 'black';
         var icon = 'vaadin:stopwatch';
+        var type = 'Test';
         break;
       case 'query':
         var color = 'black';
         var icon = 'vaadin:code';
+        var type = 'DB Query';
         break;
       case 'cutout':
         var color = 'black';
         var icon = 'vaadin:scissors';
+        var type = 'Cutout';
         break;
       default:
         var color = 'purple';
         var icon = 'vaadin:question-circle-o';
+        var type = 'Other';
         break;
     }
     render(
       html`
-        <iron-icon icon="${icon}" style="color: ${color};"></iron-icon>
+        <a title="Type: ${type}"><iron-icon icon="${icon}" style="color: ${color};"></iron-icon></a>
       `,
       container
     );
@@ -447,7 +455,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       <div>
         <p>Are you sure?</p>
         <paper-button @click="${(e) => {dialog.opened = false; this._deleteJob(this.jobToDelete);}}" class="">Delete</paper-button>
-        <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo">Cancel</paper-button>
+        <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo" style="color: #3f51b5;">Cancel</paper-button>
       </div>
       `,
       container
