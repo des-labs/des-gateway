@@ -68,6 +68,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     this.rendererStatus = this._rendererStatus.bind(this); // need this to invoke class methods in renderers
     this._headerRendererJobId = this._headerRendererJobId.bind(this); // need this to invoke class methods in renderers
     this._deleteConfirmDialogRenderer = this._deleteConfirmDialogRenderer.bind(this); // need this to invoke class methods in renderers
+    this._rendererJobId = this._rendererJobId.bind(this); // need this to invoke class methods in renderers
   }
 
   render() {
@@ -85,6 +86,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       <div id="last-updated" style="text-align: right; font-family: monospace;"></div>
 
     </section>
+    <vaadin-dialog id="job-info-container"></vaadin-dialog>
     <vaadin-dialog id="deleteConfirmDialog" no-close-on-esc no-close-on-outside-click></vaadin-dialog>
     `;
   }
@@ -145,6 +147,89 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     );
   }
 
+  _showJobInfo(jobId) {
+    const jobInfoPanel = this.shadowRoot.getElementById('job-info-container');
+    const grid = this.shadowRoot.querySelector('vaadin-grid');
+    for (var i in grid.items) {
+      if (grid.items[i].job.id === jobId) {
+        console.log("job: " + JSON.stringify(grid.items[i].job));
+        var job = grid.items[i].job;
+        break;
+      }
+    }
+    jobInfoPanel.renderer = (root, dialog) => {
+      let container = root.firstElementChild;
+      if (!container) {
+        container = root.appendChild(document.createElement('div'));
+      }
+      render(
+        html`
+          <style>
+            p {
+              line-height: 0.8rem;
+              color: black;
+            }
+            .monospace-column {
+              font-family: monospace;
+              font-size: 0.8rem;
+            }
+            .job-results-container {
+              display: grid;
+              grid-gap: 1rem;
+              padding: 1rem;
+              grid-template-columns: 20% 80%;
+            }
+          </style>
+          <div style="overflow: auto;">
+            <h3>Job Results</h3>
+            <div class="job-results-container">
+              <div>Name</div><div><span class="monospace-column">${job.name}</span></div>
+              <div>ID</div><div><span class="monospace-column">${job.id}  </span></div>
+              <div>Status</div><div>${job.status}</div>
+              <div>Type</div><div>${job.type}</div>
+              <div>Duration</div><div>${this._displayDuration(job.time_start, job.time_complete)} (${job.time_start} &mdash; ${job.time_complete})</div>
+            </div>
+          </div>
+        `,
+        container
+      );
+    }
+    jobInfoPanel.opened = true;
+  }
+
+  _displayDuration(timeStart, timeComplete) {
+    let durationInSeconds = Math.round((Date.parse(timeComplete) - Date.parse(timeStart))/1000);
+    let seconds = 0;
+    let minutes = 0;
+    let hours = 0;
+    let days = 0;
+    let secondsInAMinute = 60;
+    let secondsInAnHour = 60*secondsInAMinute;
+    let secondsInADay = 24*secondsInAnHour;
+    let remainingSeconds = durationInSeconds;
+    let outString = '';
+    let delimiter = ', '
+    switch (true) {
+      case (remainingSeconds >= secondsInADay):
+        days = Math.floor(remainingSeconds/secondsInADay);
+        remainingSeconds = remainingSeconds - secondsInADay*days;
+        outString += `${days} days${delimiter}`
+      case (remainingSeconds >= secondsInAnHour):
+        hours = Math.floor(remainingSeconds/secondsInAnHour);
+        remainingSeconds = remainingSeconds - secondsInAnHour*hours;
+        outString += `${hours} hrs${delimiter}`
+      case (remainingSeconds >= secondsInAMinute):
+        minutes = Math.floor(remainingSeconds/secondsInAMinute);
+        outString += `${minutes} min${delimiter}`
+      default:
+        seconds = remainingSeconds - secondsInAMinute*minutes;
+        if (seconds > 0) {
+          outString += `${seconds} sec `
+        }
+    }
+    return outString
+  }
+
   _rendererJobId(root, column, rowData) {
     let monospaceText = rowData.item.job.id;
     if (column.header == "Job name") {
@@ -152,7 +237,10 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     }
     render(
       html`
-        <span class="monospace-column">${monospaceText}</span>
+        <a href="#" onclick="return false;" @click="${(e) => {this._showJobInfo(rowData.item.job.id);}}"
+        title="View details of job ${rowData.item.job.id.substring(0,8)}...">
+          <span class="monospace-column">${monospaceText}</span>
+        </a>
       `,
       root
     );
@@ -339,8 +427,8 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       job.name = item.job_name;
       job.status = item.job_status;
       job.type = item.job_type;
-      job.time_start = item.time_start;
-      job.time_complete = item.time_complete;
+      job.time_start = item.job_time_start;
+      job.time_complete = item.job_time_complete;
       gridItems.push({job: job});
       ctr++;
       if (ctr === array.length) {
