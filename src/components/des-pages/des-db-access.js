@@ -289,7 +289,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
               </div>
               -->
               <div id="submit-container">
-                <paper-button id="submit-button-query" class="indigo medium" raised ?disabled="${this.submit_disabled}" @click="${e => this._submit(e)}"
+                <paper-button id="submit-button-query" class="indigo medium" raised ?disabled="${this.submit_disabled}" @click="${(e) => this._submit(e)}"
                   style="height: 3rem;">Submit Job</paper-button>
                 <paper-spinner id="submit-spinner" class="big"></paper-spinner>
               </div>
@@ -304,10 +304,10 @@ class DESDbAccess extends connect(store)(PageViewElement) {
           </div>
           <div class="query-input-controls">
               <div class="btn-wrap">
-                <paper-button class="indigo medium" raised @tap="${this._checkSyntax}">Check</paper-button>
+                <paper-button id="check-syntax-button" class="indigo medium" raised>Check syntax</paper-button>
               </div>
               <div class="btn-wrap">
-                <paper-button id="query-examples-button" class="indigo medium" raised >See Examples</paper-button>
+                <paper-button id="query-examples-button" class="indigo medium" raised>See Examples</paper-button>
               </div>
           </div>
         </div>
@@ -442,7 +442,56 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     this.email = this.email === '' ? state.app.email : this.email;
   }
 
-  _submitJob(callback){
+  _checkSyntax(event) {
+    const Url=config.backEndUrl + "page/db-access/check";
+    console.log(Url);
+    /* Removing comments from query string */
+    this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
+    var query_lines = this.editor.doc.getValue().split('\n');
+    this.query = '';
+    var i;
+    for (i = 0; i < query_lines.length; i++) {
+      if (query_lines[i].startsWith('--') == false && query_lines[i] !== "") {
+        this.query += ' ' + query_lines[i];
+      }
+    }
+    var body = {
+      job: 'query',
+      username: this.username,
+      query: this.query,
+      check: true
+    };
+    const param = {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem("token")
+      },
+      body: JSON.stringify(body)
+    };
+    fetch(Url, param)
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      if (data.status === "ok") {
+        console.log(JSON.stringify(data));
+        if (data.valid) {
+          this.shadowRoot.getElementById('toast-job-success').text = 'Query syntax is valid';
+          this.shadowRoot.getElementById('toast-job-success').show();
+        } else {
+          this.shadowRoot.getElementById('toast-job-failure').text = 'Query syntax is invalid';
+          this.shadowRoot.getElementById('toast-job-failure').show();
+        }
+      } else {
+        this.shadowRoot.getElementById('toast-job-failure').text = 'Error checking query syntax';
+        this.shadowRoot.getElementById('toast-job-failure').show();
+        console.log(JSON.stringify(data));
+      }
+    });
+  }
+
+  _submitJob(callback) {
     const Url=config.backEndUrl + "job/submit";
 
     /* Removing comments from query string */
@@ -451,9 +500,9 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     this.query = '';
     var i;
     for (i = 0; i < query_lines.length; i++) {
-     if (query_lines[i].startsWith('--') == false && query_lines[i] !== "") {
-      this.query += ' ' + query_lines[i];
-     }
+      if (query_lines[i].startsWith('--') == false && query_lines[i] !== "") {
+        this.query += ' ' + query_lines[i];
+      }
     }
     var body = {
       job: 'query',
@@ -649,6 +698,9 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     dialog.renderer = this._queryExampleRenderer;
     this.shadowRoot.getElementById('query-examples-button').addEventListener('click', function() {
       dialog.opened = true;
+    });
+    this.shadowRoot.getElementById('check-syntax-button').addEventListener('click', () => {
+      this._checkSyntax();
     });
   }
 
