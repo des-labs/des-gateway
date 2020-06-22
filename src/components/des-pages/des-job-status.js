@@ -67,6 +67,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     this.rendererAction = this._rendererAction.bind(this); // need this to invoke class methods in renderers
     this.rendererStatus = this._rendererStatus.bind(this); // need this to invoke class methods in renderers
     this._headerRendererJobId = this._headerRendererJobId.bind(this); // need this to invoke class methods in renderers
+    this._headerRendererJobName = this._headerRendererJobName.bind(this); // need this to invoke class methods in renderers
     this._deleteConfirmDialogRenderer = this._deleteConfirmDialogRenderer.bind(this); // need this to invoke class methods in renderers
     this._rendererJobId = this._rendererJobId.bind(this); // need this to invoke class methods in renderers
   }
@@ -80,8 +81,8 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererStatus}" .headerRenderer="${this._headerRendererStatus}"></vaadin-grid-column>
         <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererAction}" .headerRenderer="${this._headerRendererAction}"></vaadin-grid-column>
         <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererJobType}" .headerRenderer="${this._headerRendererJobType}"></vaadin-grid-column>
-        <vaadin-grid-column width="25%" path="job.id" header="Job ID" .renderer="${this._rendererJobId}" .headerRenderer="${this._headerRendererJobId}"></vaadin-grid-column>
-        <vaadin-grid-filter-column width="40%" path="job.name" header="Job name" .renderer="${this._rendererJobId}"></vaadin-grid-filter-column>
+        <vaadin-grid-column width="25%" path="job.id"   .renderer="${this._rendererJobId}"   .headerRenderer="${this._headerRendererJobId}">  </vaadin-grid-column>
+        <vaadin-grid-column width="40%" path="job.name" .renderer="${this._rendererJobName}" .headerRenderer="${this._headerRendererJobName}"></vaadin-grid-column>
       </vaadin-grid>
       <div id="last-updated" style="text-align: right; font-family: monospace;"></div>
 
@@ -94,14 +95,37 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   _headerRendererJobId(root) {
     render(
       html`
-        <vaadin-grid-filter path="job.id" id="job-id-filter">
-          <vaadin-text-field id="job-id-filter-text-field" slot="filter" focus-target label="JobId" style="max-width: 100%" theme="small" value="${this.jobIdFromUrl}"></vaadin-text-field>
+        <vaadin-grid-filter path="job.id">
+          <vaadin-text-field slot="filter" focus-target label="Job ID" style="max-width: 100%" theme="small" value="${this.jobIdFromUrl}"></vaadin-text-field>
         </vaadin-grid-filter>
         <a title="Clear filter"><iron-icon icon="vaadin:close-circle-o" style="color: gray;"></iron-icon></a>
       `,
       root
     );
-    // root.getElementById('job-id-filter-text-field').addEventListener('value-changed', function(e) {
+    root.querySelector('vaadin-text-field').addEventListener('value-changed', function(e) {
+      root.querySelector('vaadin-grid-filter').value = e.detail.value;
+      if (e.detail.value === '') {
+        root.querySelector('iron-icon').style.display = 'none';
+      } else {
+        root.querySelector('iron-icon').style.display = 'inline-block';
+      }
+    });
+    root.querySelector('iron-icon').addEventListener('click', function(e) {
+      root.querySelector('vaadin-grid-filter').value = '';
+      root.querySelector('vaadin-text-field').value = '';
+    });
+  }
+
+  _headerRendererJobName(root) {
+    render(
+      html`
+        <vaadin-grid-filter path="job.name">
+          <vaadin-text-field slot="filter" focus-target label="Job Name" style="max-width: 100%" theme="small" value=""></vaadin-text-field>
+        </vaadin-grid-filter>
+        <a title="Clear filter"><iron-icon icon="vaadin:close-circle-o" style="color: gray;"></iron-icon></a>
+      `,
+      root
+    );
     root.querySelector('vaadin-text-field').addEventListener('value-changed', function(e) {
       root.querySelector('vaadin-grid-filter').value = e.detail.value;
       if (e.detail.value === '') {
@@ -232,9 +256,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
 
   _rendererJobId(root, column, rowData) {
     let monospaceText = rowData.item.job.id;
-    if (column.header == "Job name") {
-      monospaceText = rowData.item.job.name;
-    }
     render(
       html`
         <a href="#" onclick="return false;" @click="${(e) => {this._showJobInfo(rowData.item.job.id);}}"
@@ -245,12 +266,21 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       root
     );
   }
-  // _deleteJobClickHandler(event, jobId) {
-  //   this._deleteJob(jobId);
-  // }
-  // _cancelJobClickHandler(event, jobId) {
-  //   this._cancelJob(jobId);
-  // }
+
+
+  _rendererJobName(root, column, rowData) {
+    let monospaceText = rowData.item.job.name;
+    render(
+      html`
+        <a href="#" onclick="return false;" @click="${(e) => {this._showJobInfo(rowData.item.job.id);}}"
+        title="View details of job ${rowData.item.job.id.substring(0,8)}...">
+          <span class="monospace-column">${monospaceText}</span>
+        </a>
+      `,
+      root
+    );
+  }
+
   _rendererAction(root, column, rowData) {
     let container = root.firstElementChild;
     if (!container) {
