@@ -70,6 +70,15 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     this._headerRendererJobName = this._headerRendererJobName.bind(this); // need this to invoke class methods in renderers
     this._deleteConfirmDialogRenderer = this._deleteConfirmDialogRenderer.bind(this); // need this to invoke class methods in renderers
     this._rendererJobId = this._rendererJobId.bind(this); // need this to invoke class methods in renderers
+    this._rendererJobName = this._rendererJobName.bind(this); // need this to invoke class methods in renderers
+
+    // Define the datetime functions used by the update time indicator
+    Date.prototype.today = function () {
+        return this.getFullYear() + "/" + (((this.getMonth()+1) < 10)?"0":"") + (this.getMonth()+1) + "/" + ((this.getDate() < 10)?"0":"") + this.getDate();
+    }
+    Date.prototype.timeNow = function () {
+         return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
+    }
   }
 
   render() {
@@ -580,21 +589,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     );
   }
 
-  // _highlightJob(jobIdFromUrl) {
-  //   if (jobIdFromUrl !== '') {
-  //     let grid = this.shadowRoot.querySelector('vaadin-grid');
-  //     let gridItems = grid.items;
-  //     if (gridItems.length > 0) {
-  //       let row = gridItems.map((e) => {return e.job.id}).indexOf(jobIdFromUrl);
-  //       if (row > 0) {
-  //         // grid.selectItem(gridItems[row]);
-  //         // console.log('current job id filter: ' + this.shadowRoot.getElementById('job-id-column').value);
-  //         // this.shadowRoot.getElementById('job-id-column').value = jobIdFromUrl;
-  //       }
-  //     }
-  //   }
-  // }
-
   stateChanged(state) {
     this.username = state.app.username;
     this.jobIdFromUrl = state.app.jobId;
@@ -609,29 +603,10 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   }
 
   firstUpdated() {
-    // For todays date;
-    Date.prototype.today = function () {
-        return this.getFullYear() + "/" + (((this.getMonth()+1) < 10)?"0":"") + (this.getMonth()+1) + "/" + ((this.getDate() < 10)?"0":"") + this.getDate();
-    }
-
-    // For the time now
-    Date.prototype.timeNow = function () {
-         return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
-    }
-    // var that = this;
-    // this.shadowRoot.querySelector('vaadin-grid').addEventListener('selected-items-changed', function(event) {
-    //   console.log(JSON.stringify(event));
-    //   that._selectedItems = that.shadowRoot.querySelector('vaadin-grid').selectedItems;
-    //   // console.log(`selectedItems: ${JSON.stringify(that._selectedItems)}`);
-    // });
-    // this.shadowRoot.querySelector('vaadin-grid').addEventListener('deselected-items-changed', function(event) {
-    //   console.log(JSON.stringify(event));
-    //   that._selectedItems = that.shadowRoot.querySelector('vaadin-grid').selectedItems;
-    //   // console.log(`selectedItems: ${JSON.stringify(that._selectedItems)}`);
-    // });
-
+    // Delete job confirmation dialog renderer
     const dialog = this.shadowRoot.getElementById('deleteConfirmDialog');
     dialog.renderer = this._deleteConfirmDialogRenderer;
+    // Trigger an immediate job status update upon page load
     this._updateStatus();
   }
 
