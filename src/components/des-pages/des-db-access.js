@@ -13,6 +13,8 @@ import '@polymer/paper-spinner/paper-spinner.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-toast/paper-toast.js';
 import '@vaadin/vaadin-dialog/vaadin-dialog.js'
+import '@vaadin/vaadin-grid';
+import '@vaadin/vaadin-grid/vaadin-grid-sort-column.js';
 
 class DESDbAccess extends connect(store)(PageViewElement) {
   static get properties() {
@@ -311,17 +313,24 @@ class DESDbAccess extends connect(store)(PageViewElement) {
         </div>
       </div>
       </section>
-      <section>
-        <div id="results-textarea-container" style="font-family: monospace; display: none;">
-          <h3>Quick query results:</h3>
-          <textarea id="results-textarea" name="results-textarea" rows="20" style="width: 100%;"></textarea>
-        </div>
+      <section id="results-textarea-container" style="display: none;">
       </section>
       <div>
         <paper-toast class="toast-position toast-success" id="toast-job-success" text="Job has been submitted!" duration="7000"> </paper-toast>
         <paper-toast class="toast-position toast-error" id="toast-job-failure" text="ERROR! There was an error. Please try again" duration="7000"> </paper-toast>
       </div>
       <vaadin-dialog id="query-examples-dialog" aria-label="simple"></vaadin-dialog>
+      <dom-module id="my-grid-styles" theme-for="vaadin-grid">
+        <template>
+          <style>
+            .monospace-column {
+              font-family: monospace;
+              font-size: 0.8rem;
+            }
+          </style>
+        </template>
+      </dom-module>
+
     `;
   }
   // _clearQueryBox(){
@@ -468,22 +477,21 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       },
       body: JSON.stringify(body)
     };
-    var that = this;
     fetch(Url, param)
     .then(response => {
       return response.json()
     })
     .then(data => {
       if (data.status === "ok") {
-        that.shadowRoot.getElementById('toast-job-success').text = 'Job submitted';
-        that.shadowRoot.getElementById('toast-job-success').show();
-        if (that.quickQuery) {
+        this.shadowRoot.getElementById('toast-job-success').text = 'Job submitted';
+        this.shadowRoot.getElementById('toast-job-success').show();
+        if (this.quickQuery) {
           // TODO: Set up polling of status until results are fetched.
-          that._pollQuickQueryResult(data.jobid);
+          this._pollQuickQueryResult(data.jobid);
         }
       } else {
-        that.shadowRoot.getElementById('toast-job-failure').text = 'Error submitting job';
-        that.shadowRoot.getElementById('toast-job-failure').show();
+        this.shadowRoot.getElementById('toast-job-failure').text = 'Error submitting job';
+        this.shadowRoot.getElementById('toast-job-failure').show();
         console.log(JSON.stringify(data));
       }
       callback();
@@ -494,8 +502,17 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   _pollQuickQueryResult(jobId) {
 
     if (this.refreshStatusIntervalId === 0) {
+      let pollStartTime = Date.now();
       this.refreshStatusIntervalId = window.setInterval(() => {
-        this._getJobStatus(jobId);
+        if (Date.now() - pollStartTime < 40*1000) {
+          this._getJobStatus(jobId);
+        } else {
+          window.clearInterval(this.refreshStatusIntervalId);
+          this.refreshStatusIntervalId = 0;
+          this._toggleSpinner(false, () => {});
+          this.shadowRoot.getElementById('toast-job-failure').text = 'Quick query timeout.';
+          this.shadowRoot.getElementById('toast-job-failure').show();
+        }
       }, 3000);
     }
   }
@@ -513,7 +530,6 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       },
       body: JSON.stringify(body)
     };
-    var that = this;
     fetch(Url, param)
     .then(response => {
       return response.json()
@@ -521,19 +537,19 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     .then(data => {
       if (data.status === "ok") {
         if (data.jobs[0].job_status == 'success' || data.jobs[0].job_status == 'failure') {
-          window.clearInterval(that.refreshStatusIntervalId);
-          that.refreshStatusIntervalId = 0;
+          window.clearInterval(this.refreshStatusIntervalId);
+          this.refreshStatusIntervalId = 0;
           this._toggleSpinner(false, () => {});
           if (data.jobs[0].job_status == 'success') {
             let results = JSON.parse(data.jobs[0].data);
-            that.results = JSON.stringify(results);
-            this.shadowRoot.getElementById('results-textarea').value = that.results;
-            this.shadowRoot.getElementById('results-textarea-container').style.display = 'block';
+            this.results = JSON.stringify(results);
+            this._displayQuickQueryResults(results);
           } else {
-            that.results = '';
-            this.shadowRoot.getElementById('results-textarea').value = that.results;
-            that.shadowRoot.getElementById('toast-job-failure').text = 'Quick query failed.';
-            that.shadowRoot.getElementById('toast-job-failure').show();
+            this.results = '';
+            this.shadowRoot.getElementById('results-textarea-container').innerHTML = '';
+            this.shadowRoot.getElementById('results-textarea-container').style.display = 'none';
+            this.shadowRoot.getElementById('toast-job-failure').text = 'Quick query failed.';
+            this.shadowRoot.getElementById('toast-job-failure').show();
           }
         }
         //TODO: Display results
@@ -542,6 +558,44 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       }
     });
   }
+
+  _displayQuickQueryResults(results){
+    // Generate an array of vaadin-grid column elements based on the keys of the first object in the array
+    let columnElements = [];
+    for (var key in results[0]) {
+      columnElements.push(html`
+        <vaadin-grid-sort-column path="${key}" header="${key}" class="monospace-column"></vaadin-grid-sort-column>
+      `);
+    }
+    // Inject a vaadin-grid element into the results container
+    let resultsContainer = this.shadowRoot.getElementById('results-textarea-container');
+    let container = resultsContainer.firstElementChild;
+    if (!container) {
+      container = resultsContainer.appendChild(document.createElement('div'));
+    }
+    render(
+      html`
+        <h3>Quick query results:</h3>
+        <vaadin-grid .multiSort="${true}">
+          ${columnElements}
+        </vaadin-grid>
+      `,
+      container
+    );
+    let grid = this.shadowRoot.querySelector('vaadin-grid');
+    // Populate the grid data with the input `results` array
+    // Apply class names for styling
+    grid.cellClassNameGenerator = function(column, rowData) {
+      let classes = '';
+      classes += ' monospace-column';
+      return classes;
+    };
+    grid.items = results;
+    grid.recalculateColumnWidths();
+    grid.generateCellClassNames();
+    this.shadowRoot.getElementById('results-textarea-container').style.display = 'block';
+  }
+
   _toggleSpinner(active, callback) {
     this.submit_disabled = active;
     this.shadowRoot.getElementById('submit-button-query').disabled = this.submit_disabled;
@@ -551,7 +605,6 @@ class DESDbAccess extends connect(store)(PageViewElement) {
 
   _submit(event) {
     if (!this.submit_disabled) {
-      var that = this;
       this._toggleSpinner(true, () => {
         this._submitJob(() => {
           this._toggleSpinner(this.quickQuery, () => {});

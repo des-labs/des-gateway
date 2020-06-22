@@ -232,7 +232,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
 
   _displayDuration(timeStart, timeComplete) {
     let durationInSeconds = Math.round((Date.parse(timeComplete) - Date.parse(timeStart))/1000);
-    let seconds = 0;
+    let seconds = -1;
     let minutes = 0;
     let hours = 0;
     let days = 0;
@@ -256,7 +256,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         outString += `${minutes} min${delimiter}`
       default:
         seconds = remainingSeconds - secondsInAMinute*minutes;
-        if (seconds > 0) {
+        if (seconds >= 0) {
           outString += `${seconds} sec `
         }
     }
