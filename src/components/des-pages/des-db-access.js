@@ -206,9 +206,6 @@ class DESDbAccess extends connect(store)(PageViewElement) {
 
   constructor() {
     super();
-    // this.username = '';
-    // this.email = '';
-    // this.validEmail = false;
     this.query = '';
     this.results = '';
     this.msg = "";
@@ -217,7 +214,6 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     this.compressOutputFile = false;
     this.quickQuery = false;
     this.refreshStatusIntervalId = 0;
-    // this.validCompression = false;
     this.username = '';
     this.email = '';
     this.customJobName = '';
@@ -457,13 +453,19 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     if (this.quickQuery) {
       body.quick = "true";
     }
+    if (this.shadowRoot.getElementById('send-email').checked) {
+      body.email = this.email;
+    }
+    if (this.customJobName !== '') {
+      body.job_name = this.customJobName;
+    }
     const param = {
       method: "PUT",
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + localStorage.getItem("token")
       },
-    body: JSON.stringify(body)
+      body: JSON.stringify(body)
     };
     var that = this;
     fetch(Url, param)

@@ -510,7 +510,6 @@ class DESCutout extends connect(store)(PageViewElement) {
       },
       body: JSON.stringify(body)
     };
-    console.log(param.body)
     var that = this;
     fetch(Url, param)
     .then(response => {
