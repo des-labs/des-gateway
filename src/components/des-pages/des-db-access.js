@@ -436,15 +436,16 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   _submitJob(callback){
     const Url=config.backEndUrl + "job/submit";
 
-     /* Removing comments from query string */
-     this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
-     var query_lines = this.editor.doc.getValue().split('\n');
-     var i;
-     for (i = 0; i < query_lines.length; i++) {
-       if (query_lines[i].startsWith('--') == false && query_lines[i] !== "") {
-         this.query = query_lines[i]
-       }
+    /* Removing comments from query string */
+    this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
+    var query_lines = this.editor.doc.getValue().split('\n');
+    this.query = '';
+    var i;
+    for (i = 0; i < query_lines.length; i++) {
+     if (query_lines[i].startsWith('--') == false && query_lines[i] !== "") {
+      this.query += ' ' + query_lines[i];
      }
+    }
     var body = {
       job: 'query',
       username: this.username,
@@ -520,14 +521,20 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     .then(data => {
       if (data.status === "ok") {
         if (data.jobs[0].job_status == 'success' || data.jobs[0].job_status == 'failure') {
-          let results = JSON.parse(data.jobs[0].data);
-          that.results = JSON.stringify(results);
           window.clearInterval(that.refreshStatusIntervalId);
           that.refreshStatusIntervalId = 0;
           this._toggleSpinner(false, () => {});
-          this.shadowRoot.getElementById('results-textarea').value = that.results;
-          this.shadowRoot.getElementById('results-textarea-container').style.display = 'block';
-
+          if (data.jobs[0].job_status == 'success') {
+            let results = JSON.parse(data.jobs[0].data);
+            that.results = JSON.stringify(results);
+            this.shadowRoot.getElementById('results-textarea').value = that.results;
+            this.shadowRoot.getElementById('results-textarea-container').style.display = 'block';
+          } else {
+            that.results = '';
+            this.shadowRoot.getElementById('results-textarea').value = that.results;
+            that.shadowRoot.getElementById('toast-job-failure').text = 'Quick query failed.';
+            that.shadowRoot.getElementById('toast-job-failure').show();
+          }
         }
         //TODO: Display results
       } else {
