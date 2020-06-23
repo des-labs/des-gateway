@@ -195,14 +195,19 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     let taskSpecificInfo = null;
     switch (job.type) {
       case 'query':
+        if (job.query_files !== null) {
+          var numFiles = job.query_files.length;
+        } else {
+          var numFiles = 0;
+        }
         taskSpecificInfo = html`
-          <div>Query:</div><div><span class="monospace-column">${job.query}</span></div>
-          <div>Files:</div><div style="overflow: auto; height: 300px;"><span class="monospace-column">
+          <div>Query</div><div><span class="monospace-column">${job.query}</span></div>
+          <div>Files (${numFiles})</div><div style="overflow: auto; height: 300px;"><span class="monospace-column">
           ${job.query_files === null ?
             html``:
             html`
               <ul style="list-style-type: square; margin: 0; padding: 0;">
-                ${job.query_files.map(i => html`<li>${i}</li>`)}
+                ${job.query_files.map(i => html`<li><a href="${config.frontEndUrl}files/${this.username}/query/${job.id}/${i}">${i}</a></li>`)}
               </ul>
             `
           }
@@ -210,17 +215,22 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         `;
         break;
       case 'cutout':
-        taskSpecificInfo = html`
-        <div>Files:</div><div style="overflow: auto; height: 300px;"><span class="monospace-column">
-        ${job.cutout_files === null ?
-          html``:
-          html`
-            <ul style="list-style-type: square; margin: 0; padding: 0;">
-              ${job.cutout_files.map(i => html`<li>${i}</li>`)}
-            </ul>
-          `
+        if (job.cutout_files !== null) {
+          var numFiles = job.cutout_files.length;
+        } else {
+          var numFiles = 0;
         }
-        </span></div>
+        taskSpecificInfo = html`
+          <div>Files (${numFiles})</div><div style="overflow: auto; height: 300px;"><span class="monospace-column">
+          ${job.cutout_files === null ?
+            html``:
+            html`
+              <ul style="list-style-type: square; margin: 0; padding: 0;">
+                ${job.cutout_files.map(i => html`<li><a href="${config.frontEndUrl}files/${this.username}/cutout/${i}">${i.split('/').splice(1).join('/')}</a></li>`)}
+              </ul>
+            `
+          }
+          </span></div>
         `;
         break;
       default:
