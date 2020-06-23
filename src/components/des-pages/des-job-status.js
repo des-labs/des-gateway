@@ -53,6 +53,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       jobIdFromUrl: {type: String},
       jobToDelete: {type: String},
       refreshStatusIntervalId: {type: Number},
+      initialJobInfoPopup: {type: Boolean},
       _selectedItems: {type: Array}
     };
   }
@@ -61,6 +62,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     super();
     this.username = '';
     this.jobIdFromUrl = '';
+    this.initialJobInfoPopup = true;
     this.jobToDelete = '';
     this.refreshStatusIntervalId = 0;
     this._selectedItems = [];
@@ -195,6 +197,30 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       case 'query':
         taskSpecificInfo = html`
           <div>Query:</div><div><span class="monospace-column">${job.query}</span></div>
+          <div>Files:</div><div style="overflow: auto; height: 300px;"><span class="monospace-column">
+          ${job.query_files === null ?
+            html``:
+            html`
+              <ul style="list-style-type: square; margin: 0; padding: 0;">
+                ${job.query_files.map(i => html`<li>${i}</li>`)}
+              </ul>
+            `
+          }
+          </span></div>
+        `;
+        break;
+      case 'cutout':
+        taskSpecificInfo = html`
+        <div>Files:</div><div style="overflow: auto; height: 300px;"><span class="monospace-column">
+        ${job.cutout_files === null ?
+          html``:
+          html`
+            <ul style="list-style-type: square; margin: 0; padding: 0;">
+              ${job.cutout_files.map(i => html`<li>${i}</li>`)}
+            </ul>
+          `
+        }
+        </span></div>
         `;
         break;
       default:
@@ -224,7 +250,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               grid-template-columns: 20% 80%;
             }
           </style>
-          <div style="overflow: auto;">
+          <div style="overflow: auto; width: 1000px; maxHeight: 1000px;">
             <h3>Job Results</h3>
             <div class="job-results-container">
               <div>Name</div><div><span class="monospace-column">${job.name}</span></div>
@@ -501,6 +527,10 @@ class DESJobStatus extends connect(store)(PageViewElement) {
           }
         }
         grid.recalculateColumnWidths();
+        if (this.jobIdFromUrl !== '' && this.initialJobInfoPopup) {
+          this.initialJobInfoPopup = false;
+          this._showJobInfo(this.jobIdFromUrl);
+        }
       }
     })
   }
@@ -605,10 +635,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
             this._updateStatus()
           }
           break;
-        // case 'jobIdFromUrl':
-        //   console.log('jobIdFromUrl updated: ' + this.jobIdFromUrl);
-        //   this._highlightJob(this.jobIdFromUrl);
-        // break;
         case '_selectedItems':
           break;
         default:

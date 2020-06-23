@@ -21,13 +21,13 @@ const isauth = () => {
   const data = new URLSearchParams(formData);
   const param = { body:data, method: "POST"};
   return fetch(Url, param).then(resp => resp.json())
-                .then(function(data){
-                  if (data.status=='ok') {
-                    localStorage.setItem("token", data.new_token);
-                    return true;
-                  }
-                  else {return false;}
-                })
+    .then(function(data){
+      if (data.status=='ok') {
+        localStorage.setItem("token", data.new_token);
+        return true;
+      }
+      else {return false;}
+    })
 };
 
 export const navigate = (path,persist,ap,session) => (dispatch) => {
@@ -46,15 +46,16 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
   // Now path and basePath are of the form `blah/blah` where only one slash
   // separates each word and there are no surrounding slashes
 
-  // is the session active, if not verify auth
-  const auth = session ? true : isauth();
-  if (auth === false) {
-    dispatch(loadPage('login', ap));
-    return;
-  }
   // pathParts should have no zero-length strings because of the slash reduction above
   var pathParts = path.split('/');
   var basePathParts = basePath.split('/');
+  // is the session active, if not verify auth
+  const auth = session ? true : isauth();
+  if (auth === false) {
+    // dispatch(storeTargetPath(path));
+    dispatch(loadPage('login', ap, pathParts));
+    return;
+  }
   var page = null;
   let pageIdx = 0;
   switch (true) {

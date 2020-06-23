@@ -38,7 +38,7 @@ class DESHome extends connect(store)(PageViewElement) {
           ` : html``}
           ${this.accessPages.includes('status') ? html`
             <a style = "text-transform: none; color:black;" href="status" tabindex="-1">
-              <des-home-card heading="MY JOBS" image="images/home-jobs.png" alt="My Jobs" desc="List of submitted jobs" name="status" ></des-home-card>
+              <des-home-card heading="JOB STATUS" image="images/home-jobs.png" alt="Job Status" desc="List of submitted jobs" name="status" ></des-home-card>
             </a>
           ` : html``}
           ${this.accessPages.includes('ticket') ? html`
