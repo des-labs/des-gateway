@@ -135,6 +135,10 @@ class DESToolBar extends connect(store)(LitElement) {
 
     }
 
+    _closeUpdateProfileDialog(event) {
+      this.shadowRoot.getElementById('UpdateProfileDialog').opened = false;
+      this.shadowRoot.getElementById('ChangePasswordDialog').opened = false;
+    }
 
     _updateProfileRenderer(root, dialog) {
       let container = root.firstElementChild;
@@ -144,25 +148,31 @@ class DESToolBar extends connect(store)(LitElement) {
       container = root.appendChild(document.createElement('div'));
       render(
         html`
-          <des-update-info></des-update-info>
+          <des-update-info @dialogClickCancel="${(e) => {this._closeUpdateProfileDialog(e)}}"></des-update-info>
         `,
         container
       )
-      console.log(this.shadowRoot.getElementById('UpdateCloseButton'));
-      this.shadowRoot.getElementById('UpdateCloseButton').addEventListener('click', function() {
-        this.shadowRoot.getElementById('UpdateProfileDialog').opened = false;
-      });
+    }
+
+    _changePasswordRenderer(root, dialog) {
+      let container = root.firstElementChild;
+      if (container) {
+        root.removeChild(root.childNodes[0]);
+      }
+      container = root.appendChild(document.createElement('div'));
+      render(
+        html`
+          <des-update-pwd @dialogClickCancel="${(e) => {this._closeUpdateProfileDialog(e)}}"></des-update-pwd>
+        `,
+        container
+      )
     }
 
     render() {
       return html`
 
-        <paper-dialog  id="ChangePasswordDialog" with-backdrop  @iron-overlay-opened="${this.patchOverlay}" >
-        <des-update-pwd></des-update-pwd>
-        </paper-dialog>
-
-
-        <vaadin-dialog @dialogClickCancel="${(e) => {console.log('hi there'); this.shadowRoot.getElementById('UpdateProfileDialog').opened = false;}}" id="UpdateProfileDialog" aria-label="simple"></vaadin-dialog>
+        <vaadin-dialog id="UpdateProfileDialog" aria-label="simple"></vaadin-dialog>
+        <vaadin-dialog id="ChangePasswordDialog" aria-label="simple"></vaadin-dialog>
 
         <app-toolbar class="toolbar-top" sticky>
           <button class="menu-btn" title="Menu" @click="${this._ClickHandler}">${menuIcon}</button>
@@ -174,8 +184,8 @@ class DESToolBar extends connect(store)(LitElement) {
               <iron-icon class="profile-icon" icon="account-circle" slot="dropdown-trigger"></iron-icon>
               <iron-icon style="margin-left:-5px;" icon="arrow-drop-down" slot="dropdown-trigger" alt="menu"></iron-icon>
               <paper-listbox class="profile-listbox" slot="dropdown-content">
-                <paper-item class="profileItem"  @click="${(e) => {this.shadowRoot.getElementById('UpdateProfileDialog').opened = true;}}"> Update Profile</paper-item>
-                <paper-item class="profileItem"  @click="${this._PasswordDialog}"> Change Password</paper-item>
+                <paper-item class="profileItem" @click="${(e) => {this.shadowRoot.getElementById('UpdateProfileDialog').opened = true;}}">Update Profile</paper-item>
+                <paper-item class="profileItem" @click="${(e) => {this.shadowRoot.getElementById('ChangePasswordDialog').opened = true;}}">Change Password</paper-item>
                 <paper-item class="profileItem" @click="${ (e) => {window.location.href = config.frontEndUrl + 'logout';}}" >
                   Log out
                 </paper-item>
@@ -190,6 +200,8 @@ class DESToolBar extends connect(store)(LitElement) {
     constructor() {
       super();
       this._profile = false;
+      this._updateProfileRenderer = this._updateProfileRenderer.bind(this); // need this to invoke class methods in renderers
+      this._changePasswordRenderer = this._changePasswordRenderer.bind(this); // need this to invoke class methods in renderers
     }
 
     stateChanged(state) {
@@ -197,15 +209,8 @@ class DESToolBar extends connect(store)(LitElement) {
     }
 
     firstUpdated() {
-
-      const dialog = this.shadowRoot.getElementById('UpdateProfileDialog');
-      dialog.renderer = this._updateProfileRenderer;
-      // this.shadowRoot.getElementById('UpdateProfileDialog').addEventListener('click', function() {
-      //   dialog.opened = true;
-      // });
-      // this.shadowRoot.getElementById('UpdateProfileDialog').addEventListener('dialogClickCancel', function() {
-      //   dialog.opened = false;
-      // });
+      this.shadowRoot.getElementById('UpdateProfileDialog').renderer = this._updateProfileRenderer;
+      this.shadowRoot.getElementById('ChangePasswordDialog').renderer = this._changePasswordRenderer;
     }
   }
 

@@ -8,51 +8,51 @@ import '@polymer/paper-card/paper-card.js';
 import {config} from './des-config.js';
 
 class DESUpdateInfo extends  connect(store)(LitElement) {
-    static get properties() {
-      return {
-        _profile: { type: Boolean },
-        _name: { type: String },
-        _username: { type: String },
-        _lastname: { type: String },
-        msg: { type: String },
-        _email: { type: String },
+  static get properties() {
+    return {
+      _profile: { type: Boolean },
+      _name: { type: String },
+      _username: { type: String },
+      _lastname: { type: String },
+      msg: { type: String },
+      _email: { type: String },
 
+    }
+  }
+
+  static get styles() {
+    return [
+    SharedStyles,
+      css`
+
+      paper-card.des-card {
+        margin-top: 8px;
+        width: 100%;
+        --paper-card-header-color: red;
+        padding: 40px;
       }
-    }
-
-    static get styles() {
-      return [
-      SharedStyles,
-        css`
-
-        paper-card.des-card {
-          margin-top: 8px;
-          width: 100%;
-          --paper-card-header-color: red;
-          padding: 40px;
-        }
-        `
-      ];
-    }
+      `
+    ];
+  }
 
 
-    _submit(){
-        this.shadowRoot.getElementById("UpdateAcceptButton").disabled=true;
-        this.shadowRoot.getElementById("loginSpinner").active=true;
-        var token=localStorage.getItem("token");
-        const Url=config.backEndUrl + "profile/update"
-        const formData = new FormData();
-        formData.append('username', this._username);
-        formData.append('firstname', this._name);
-        formData.append('lastname', this._lastname);
-        formData.append('email', this._email);
-      const data = new URLSearchParams(formData);
-      const param = {
-        body: data,
-        method: "POST",
-        headers: {'Authorization': 'Bearer ' + token}
-      };
-      fetch(Url, param)
+  _submit(){
+    this.shadowRoot.getElementById("UpdateAcceptButton").disabled=true;
+    this.shadowRoot.getElementById("loginSpinner").active=true;
+    var token=localStorage.getItem("token");
+    const Url=config.backEndUrl + "profile/update"
+    const formData = new FormData();
+    formData.append('username', this._username);
+    formData.append('firstname', this._name);
+    formData.append('lastname', this._lastname);
+    formData.append('email', this._email);
+    const data = new URLSearchParams(formData);
+    const param = {
+      body: data,
+      method: "POST",
+      headers: {'Authorization': 'Bearer ' + token}
+    };
+    fetch(Url, param)
     .then(response => {return response.json();})
     .then(data => {
       this.msg = data.message;
@@ -61,19 +61,17 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
         this.shadowRoot.getElementById("loginSpinner").active=false;
         console.log(this.msg);
         if (status == 'ok') {
-        this.msg = "Information Updated. Logging out in 3 seconds..."
-        setTimeout(function(){  window.location.href = config.frontEndUrl + 'logout';}, 3000);
-
+          this.msg = "Information Updated. Logging out in 3 seconds..."
+          setTimeout(function(){  window.location.href = config.frontEndUrl + 'logout';}, 3000);
         }
-
     })
     .catch((error) => {console.log(error);});
   }
 
   _ClickHandler(e) {
-    console.log('dispatching custom event...');
     this.dispatchEvent(new CustomEvent('dialogClickCancel'));
   }
+
   render() {
     return html`
       <paper-card class="des-card" heading="Update Personal Profile" elevation="0">
@@ -90,7 +88,7 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
       <div>
       <div class="card-actions">
       <paper-button id="UpdateAcceptButton" class="des-button" raised @click="${this._submit}">Submit</paper-button>
-      <paper-button id="UpdateCloseButton" class="des-button" raised dialog-dismiss @click="${this._ClickHandler}">Cancel</paper-button>
+      <paper-button id="UpdateCloseButton" class="des-button" raised dialog-dismiss @click="${(e) => {this._ClickHandler(e)}}">Cancel</paper-button>
       <paper-spinner id=loginSpinner></paper-spinner>
       <br>
       <br>
@@ -113,6 +111,6 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
     this._username = state.app.username;
     this._email = state.app.email;
   }
-  }
+}
 
-  window.customElements.define('des-update-info', DESUpdateInfo);
+window.customElements.define('des-update-info', DESUpdateInfo);
