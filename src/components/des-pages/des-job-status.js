@@ -185,10 +185,21 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     const grid = this.shadowRoot.querySelector('vaadin-grid');
     for (var i in grid.items) {
       if (grid.items[i].job.id === jobId) {
-        console.log("job: " + JSON.stringify(grid.items[i].job));
+        // console.log("job: " + JSON.stringify(grid.items[i].job));
         var job = grid.items[i].job;
         break;
       }
+    }
+    let taskSpecificInfo = null;
+    switch (job.type) {
+      case 'query':
+        taskSpecificInfo = html`
+          <div>Query:</div><div><span class="monospace-column">${job.query}</span></div>
+        `;
+        break;
+      default:
+        taskSpecificInfo = html``;
+        break;
     }
     jobInfoPanel.renderer = (root, dialog) => {
       let container = root.firstElementChild;
@@ -221,6 +232,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               <div>Status</div><div>${job.status}</div>
               <div>Type</div><div>${job.type}</div>
               <div>Duration</div><div>${this._displayDuration(job.time_start, job.time_complete)} (${job.time_start} &mdash; ${job.time_complete})</div>
+              ${taskSpecificInfo}
             </div>
           </div>
         `,
@@ -307,9 +319,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         container
       );
     } else {
-      // var doClick = (event) => this._deleteJob(rowData.item.job.id);
-      // container.removeEventListener('click', doClick);
-      // container.addEventListener('click', doClick);
       let selected = this.shadowRoot.querySelector('vaadin-grid').selectedItems;
       if (selected.length === 0) {
         render(
@@ -431,11 +440,11 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     })
     .then(data => {
       if (data.status === "ok") {
-        // console.log(JSON.stringify(data));
+        // console.log(JSON.stringify(data, null, 2));
         that._updateGridData(data.jobs);
         that._updateLastUpdatedDisplay();
       } else {
-        console.log(JSON.stringify(data));
+        console.log(JSON.stringify(data, null, 2));
       }
     });
   }
@@ -468,15 +477,17 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       job.type = item.job_type;
       job.time_start = item.job_time_start;
       job.time_complete = item.job_time_complete;
-      gridItems.push({job: job});
+      job.data = typeof(item.data) === 'string' ? JSON.parse(item.data) : null;
+      job.query = item.query;
+      job.query_files = typeof(item.query_files) === 'string' ? JSON.parse(item.query_files) : null;
+      job.cutout_files = typeof(item.cutout_files) === 'string' ? JSON.parse(item.cutout_files) : null;
+      if (job.type !== 'query' || job.data === null) {
+        gridItems.push({job: job});
+      }
       ctr++;
       if (ctr === array.length) {
         grid.items = gridItems;
-        // console.log(`grid.items: ${JSON.stringify(grid.items)}`);
-        // let tempSelection = grid.selectedItems;
-        // console.log(`selectedItems (${grid.selectedItems.length}): ${JSON.stringify(grid.selectedItems)}`);
-        // grid.selectedItems = [];
-        // console.log(`selectedItems (${tempSelection.length}): ${JSON.stringify(tempSelection)}`);
+        console.log(JSON.stringify(gridItems, null, 2));
         let dedupSelItems = [];
         for (var i in grid.selectedItems) {
           if (dedupSelItems.map((e) => {return e.job.id}).indexOf(grid.selectedItems[i].job.id) < 0) {
@@ -489,32 +500,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
             grid.selectItem(grid.items[i]);
           }
         }
-
-        // this._highlightJob(this.jobIdFromUrl);
         grid.recalculateColumnWidths();
-        // let tempSelection = this._selectedItems;
-        // grid.selectedItems = this._selectedItems;
-        // console.log(`selectedItems: ${JSON.stringify(tempSelection)}`);
-        // for (var itemIdx in grid.items) {
-          // console.log(`grid items index: ${itemIdx}: ${JSON.stringify(grid.items[itemIdx])}, selectedItems index match: ${this._selectedItems.indexOf(grid.items[itemIdx])}`);
-          // if (tempSelection.indexOf(grid.items[itemIdx]) > -1) {
-          // console.log(`${tempSelection.map((e) => {return e.job.id}).indexOf(grid.items[itemIdx].job.id)}`);
-          // for (var selItemsIdx in tempSelection) {
-          //   if (tempSelection[selItemsIdx].job.id == grid.items[itemIdx].job.id) {
-          //     console.log(`grid item ${JSON.stringify(grid.items[itemIdx].job.id)} is selected`)
-          //     // grid.selectItem(grid.items[itemIdx]);
-          //     grid.selectedItems.push(grid.items[itemIdx]);
-          //   }
-          // }
-          // if (tempSelection.map((e) => {return e.job.id}).indexOf(grid.items[itemIdx].job.id) > -1) {
-          //   grid.selectItem(grid.items[itemIdx]);
-          // }
-          // else {
-          //   grid.deselectItem(grid.items[itemIdx]);
-          // }
-        // }
-        // tempSelection = grid.selectedItems;
-        // this._selectedItems = tempSelection;
       }
     })
   }

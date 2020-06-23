@@ -613,7 +613,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     let columnElements = [];
     for (var key in results[0]) {
       columnElements.push(html`
-        <vaadin-grid-sort-column path="${key}" header="${key}" class="monospace-column"></vaadin-grid-sort-column>
+        <vaadin-grid-sort-column path="${key}" header="${key}"></vaadin-grid-sort-column>
       `);
     }
     // Inject a vaadin-grid element into the results container
