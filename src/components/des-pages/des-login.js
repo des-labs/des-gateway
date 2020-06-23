@@ -149,7 +149,6 @@ _submit(){
       localStorage.setItem("token", data.token);
       store.dispatch(loginUser({"name": data.name, "username": data.username,
       "lastname": data.lastname, "email":data.email, "session": true, "db": data.db, "roles": data.roles}));
-      console.log('path: ' + decodeURIComponent(window.location.pathname));
       store.dispatch(navigate(decodeURIComponent(window.location.pathname),true, getAccessPages(data.roles), true));
     }
     else {

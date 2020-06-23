@@ -88,10 +88,14 @@ export const SharedStyles = css`
   }
 
   .errormessage{
-          display: block;
-          color : red;
-          font-size: 0.9em;
-          text-align: center;
-          word-wrap: break-word;
-        }
+    display: block;
+    color : red;
+    font-size: 0.9em;
+    word-wrap: break-word;    
+    margin-top: 2rem;
+    text-align: left;
+  }
+  .dialog-warning-text {
+    color: red; font-size: 0.8rem; margin-top: 2rem; text-align: center;
+  }
 `;

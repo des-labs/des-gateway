@@ -31,7 +31,7 @@ class DESUpdatePwd extends  connect(store)(LitElement) {
       paper-card.des-card {
         margin-top: 8px;
         width: 100%;
-        --paper-card-header-color: red;
+        /* --paper-card-header-color: red; */
         padding: 40px;
       }
       `
@@ -43,7 +43,7 @@ class DESUpdatePwd extends  connect(store)(LitElement) {
     this.shadowRoot.getElementById("UpdateAcceptButton").disabled=true;
     this.shadowRoot.getElementById("loginSpinner").active=true;
     var token=localStorage.getItem("token");
-    const Url=config.backEndUrl + "profile/changepwd"
+    const Url=config.backEndUrl + "profile/update/password"
     const formData = new FormData();
     formData.append('username', this._username);
     formData.append('oldpwd', this._oldpwd);
@@ -81,48 +81,40 @@ class DESUpdatePwd extends  connect(store)(LitElement) {
       <min-length-validator id="min-length-validator" min-length="6"></min-length-validator>
       <match-passwords-validator id="match-passwords-validator" password=${this._newpwd}></match-passwords-validator>
       <paper-card class="des-card" heading="Change Password  for [${this._db}]"  elevation="0">
-      <div class="card-content">
-      <br>
-      <paper-input always-float-label label="Username" disabled placeholder=${this._username}></paper-input>
-      <paper-password-input
-        always-float-label
-        type="password"
-        label="CURRENT Password"
-        @input="${e => this._oldpwd = e.target.value}"
-        required
-        auto-validate
-        error-message="Can't be empty"
-        ></paper-password-input>
-      <paper-password-input
-        always-float-label
-        type="password"
-        label="NEW Password"
-        @input="${e => this._newpwd = e.target.value}"
-        auto-validate
-         ></paper-password-input>
-      <paper-password-input
-      always-float-label
-      type="password"
-      label="Re-enter NEW Password"
-      auto-validate
-      validator="match-passwords-validator"
-      error-message="Passwords need to match"
-      ></paper-password-input>
-      <br>
-      <br>
-      <br>
-      <div>
-      <div class="card-actions">
-      <paper-button id="UpdateAcceptButton" class="des-button" raised @click="${this._submit}">Submit</paper-button>
-      <paper-button class="des-button" raised dialog-dismiss @click="${(e) => {this._ClickHandler(e)}}">Cancel</paper-button>
-      <paper-spinner id=loginSpinner></paper-spinner>
-      <br>
-      <br>
-      <br>
+        <div class="card-content">
+          <paper-input always-float-label label="Username" disabled placeholder=${this._username}></paper-input>
+          <paper-password-input
+            always-float-label
+            type="password"
+            label="CURRENT Password"
+            @input="${e => this._oldpwd = e.target.value}"
+            required
+            auto-validate
+            error-message="Can't be empty"
+            ></paper-password-input>
+          <paper-password-input
+            always-float-label
+            type="password"
+            label="NEW Password"
+            @input="${e => this._newpwd = e.target.value}"
+            auto-validate
+             ></paper-password-input>
+          <paper-password-input
+            always-float-label
+            type="password"
+            label="Re-enter NEW Password"
+            auto-validate
+            validator="match-passwords-validator"
+            error-message="Passwords need to match"
+            ></paper-password-input>
+          <div class="dialog-warning-text">Warning: You will be automatically logged out upon successful password update.</div>
+          <div class="card-actions" style="margin-top: 2rem;">
+            <paper-button id="UpdateAcceptButton" class="des-button" raised @click="${this._submit}">Submit</paper-button>
+            <paper-button class="des-button" raised dialog-dismiss @click="${(e) => {this._ClickHandler(e)}}">Cancel</paper-button>
+            <paper-spinner id=loginSpinner></paper-spinner>
+          </div>
+          <div class="errormessage"> <b>${this.msg}</b></div>
         </div>
-        <br>
-
-      <div class="errormessage"> <b>${this.msg}</b></div>
       </paper-card>
     `;
   }

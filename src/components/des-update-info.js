@@ -28,7 +28,7 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
       paper-card.des-card {
         margin-top: 8px;
         width: 100%;
-        --paper-card-header-color: red;
+        /* --paper-card-header-color: black; */
         padding: 40px;
       }
       `
@@ -40,7 +40,7 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
     this.shadowRoot.getElementById("UpdateAcceptButton").disabled=true;
     this.shadowRoot.getElementById("loginSpinner").active=true;
     var token=localStorage.getItem("token");
-    const Url=config.backEndUrl + "profile/update"
+    const Url=config.backEndUrl + "profile/update/info"
     const formData = new FormData();
     formData.append('username', this._username);
     formData.append('firstname', this._name);
@@ -57,15 +57,15 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
     .then(data => {
       this.msg = data.message;
       const status = data.status;
-        this.shadowRoot.getElementById("UpdateAcceptButton").disabled=false;
-        this.shadowRoot.getElementById("loginSpinner").active=false;
-        console.log(this.msg);
-        if (status == 'ok') {
-          this.msg = "Information Updated. Logging out in 3 seconds..."
-          setTimeout(function(){  window.location.href = config.frontEndUrl + 'logout';}, 3000);
-        }
+      this.shadowRoot.getElementById("UpdateAcceptButton").disabled=false;
+      this.shadowRoot.getElementById("loginSpinner").active=false;
+      console.log(this.msg);
+      if (status == 'ok') {
+        this.msg = "Information Updated. Logging out in 3 seconds..."
+        setTimeout(function(){  window.location.href = config.frontEndUrl + 'logout';}, 3000);
+      }
     })
-    .catch((error) => {console.log(error);});
+    .catch((error) => {console.log(JSON.stringify(error));});
   }
 
   _ClickHandler(e) {
@@ -75,25 +75,18 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
   render() {
     return html`
       <paper-card class="des-card" heading="Update Personal Profile" elevation="0">
-      <div class="card-content">
-      <span>Please enter your information</span>
-      <br>
-      <paper-input always-float-label label="Username" disabled placeholder=${this._username}></paper-input>
-      <paper-input always-float-label label="First Name" value=${this._name} @input="${e => this._name = e.target.value}"></paper-input>
-      <paper-input always-float-label label="Last Name" value=${this._lastname} @input="${e => this._lastname = e.target.value}"></paper-input>
-      <paper-input always-float-label label="Email" value=${this._email} @input="${e => this._email = e.target.value}"></paper-input>
-      <br>
-      <br>
-      <br>
-      <div>
-      <div class="card-actions">
-      <paper-button id="UpdateAcceptButton" class="des-button" raised @click="${this._submit}">Submit</paper-button>
-      <paper-button id="UpdateCloseButton" class="des-button" raised dialog-dismiss @click="${(e) => {this._ClickHandler(e)}}">Cancel</paper-button>
-      <paper-spinner id=loginSpinner></paper-spinner>
-      <br>
-      <br>
-      <div class="errormessage"> <b>${this.msg}</b></div>
-      <br>
+        <div class="card-content">
+          <paper-input always-float-label label="Username" disabled placeholder=${this._username}></paper-input>
+          <paper-input always-float-label label="First Name" value=${this._name} @input="${e => this._name = e.target.value}"></paper-input>
+          <paper-input always-float-label label="Last Name" value=${this._lastname} @input="${e => this._lastname = e.target.value}"></paper-input>
+          <paper-input always-float-label label="Email" value=${this._email} @input="${e => this._email = e.target.value}"></paper-input>
+          <div class="dialog-warning-text">Warning: You will be automatically logged out upon successful profile update.</div>
+          <div class="card-actions" style="margin-top: 2rem;">
+            <paper-button id="UpdateAcceptButton" class="des-button" raised @click="${this._submit}">Submit</paper-button>
+            <paper-button id="UpdateCloseButton" class="des-button" raised dialog-dismiss @click="${(e) => {this._ClickHandler(e)}}">Cancel</paper-button>
+            <paper-spinner id=loginSpinner></paper-spinner>
+            <div class="errormessage"> <b>${this.msg}</b></div>
+          </div>
         </div>
       </paper-card>
     `;

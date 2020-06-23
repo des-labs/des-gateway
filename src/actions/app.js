@@ -72,13 +72,13 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
   // Highlight specific job in status if provided in URL {{location.origin}}/status/dkdh9s84ty3thj3wehg3
   if (page === 'status' && pathParts.length > pageIdx + 1) {
     let jobId = pathParts[pageIdx + 1]
-    console.log('jobId: ' + jobId);
     dispatch(setJobId(jobId));
   }
   switch (page) {
     case '':
     case 'login':
       page = 'home';
+      pathParts[pageIdx] = page;
       break;
     default:
       break;
