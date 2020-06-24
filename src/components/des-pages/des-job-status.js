@@ -78,6 +78,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     this._deleteConfirmDialogRenderer = this._deleteConfirmDialogRenderer.bind(this); // need this to invoke class methods in renderers
     this._rendererJobId = this._rendererJobId.bind(this); // need this to invoke class methods in renderers
     this._rendererJobName = this._rendererJobName.bind(this); // need this to invoke class methods in renderers
+    this._jobRenameDialog = this._jobRenameDialog.bind(this); // need this to invoke class methods in renderers
 
     // Define the datetime functions used by the update time indicator
     Date.prototype.today = function () {
@@ -104,6 +105,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
 
     </section>
     <vaadin-dialog id="job-info-container"></vaadin-dialog>
+    <vaadin-dialog id="job-rename-dialog"></vaadin-dialog>
     <vaadin-dialog id="deleteConfirmDialog" no-close-on-esc no-close-on-outside-click></vaadin-dialog>
     `;
   }
@@ -193,6 +195,63 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     store.dispatch(updateQuery(query));
     store.dispatch(loadPage('db-access', this.accessPages));
     dialog.opened = false;
+  }
+
+  _jobRenameDialog(jobInfo, message='') {
+    const jobDialogPanel = this.shadowRoot.getElementById('job-rename-dialog');
+    jobDialogPanel.renderer = (root, dialog) => {
+      let container = root.firstElementChild;
+      if (!container) {
+        container = root.appendChild(document.createElement('div'));
+      }
+      let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+      viewportHeight = viewportHeight === 0 ? 300 : viewportHeight;
+      render(
+        html`
+        <style>
+          paper-button {
+            width: 100px;
+            text-transform: none;
+            --paper-button-raised-keyboard-focus: {
+              background-color: var(--paper-indigo-a250) !important;
+              color: white !important;
+            };
+          }
+          paper-button.indigo {
+            background-color: var(--paper-indigo-500);
+            color: white;
+            width: 100px;
+            text-transform: none;
+            --paper-button-raised-keyboard-focus: {
+              background-color: var(--paper-indigo-a250) !important;
+              color: white !important;
+            };
+          }
+          paper-button.des-button {
+              background-color: white;
+              color: black;
+              width: 100px;
+              text-transform: none;
+              --paper-button-raised-keyboard-focus: {
+                background-color: white !important;
+                color: black !important;
+              };
+          }
+        </style>
+          <div style="">
+            <a title="Close" href="#" onclick="return false;">
+              <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
+            </a>
+            <p style="display: ${message === '' ? 'none' : 'block'}; color: red;">${message}</p>
+            <paper-input id="new-job-name-input" ?invalid="${message !== ''}" always-float-label label="New job name" placeholder=${jobInfo.name}></paper-input>
+            <paper-button @click="${(e) => {dialog.opened = false; this._renameJob(jobInfo, document.getElementById('new-job-name-input').value);}}" class="des-button" raised>Rename</paper-button>
+            <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo" raised>Cancel</paper-button>
+          </div>
+        `,
+        container
+      );
+    }
+    jobDialogPanel.opened = true;
   }
 
   _showJobInfo(jobId) {
@@ -355,6 +414,16 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     let monospaceText = rowData.item.job.name;
     render(
       html`
+        <style>
+        .edit-icon {
+          --iron-icon-width: 1rem;
+          --iron-icon-height: 1rem;
+        }
+        </style>
+        <a href="#" onclick="return false;" @click="${(e) => {this._jobRenameDialog(rowData.item.job);}}"
+        title="Rename job">
+          <span  style="font-size: 0.8rem; color: black;"><iron-icon class="edit-icon" icon="vaadin:pencil"></iron-icon></span>
+        </a>&nbsp;
         <a href="#" onclick="return false;" @click="${(e) => {this._showJobInfo(rowData.item.job.id);}}"
         title="View details of job ${rowData.item.job.id.substring(0,8)}...">
           <span class="monospace-column">${monospaceText}</span>
@@ -362,6 +431,40 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       `,
       root
     );
+  }
+
+  _renameJob(jobInfo, newJobName) {
+    console.log(jobInfo);
+    var isValidJobName = newJobName === '' || (newJobName.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])*(\.[a-z0-9]([-a-z0-9]*[a-z0-9])*)*$/g) && newJobName.length < 129);
+    if (!isValidJobName) {
+      this._jobRenameDialog(jobInfo, 'Invalid job name');
+      return;
+    }
+    const Url=config.backEndUrl + "job/rename"
+    let body = {
+      'job-id': jobInfo.id,
+      'job-name': newJobName
+    };
+    const param = {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem("token")
+      },
+      body: JSON.stringify(body)
+    };
+    var that = this;
+    fetch(Url, param)
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      if (data.status === "ok") {
+        // console.log(JSON.stringify(data, null, 2));
+      } else {
+        console.log(JSON.stringify(data, null, 2));
+      }
+    });
   }
 
   _rendererAction(root, column, rowData) {
