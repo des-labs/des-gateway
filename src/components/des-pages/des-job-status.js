@@ -631,10 +631,41 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     container = root.appendChild(document.createElement('div'));
     render(
       html`
+      <style>
+        paper-button {
+          width: 100px;
+          text-transform: none;
+          --paper-button-raised-keyboard-focus: {
+            background-color: var(--paper-indigo-a250) !important;
+            color: white !important;
+          };
+        }
+        paper-button.indigo {
+          background-color: var(--paper-indigo-500);
+          color: white;
+          width: 100px;
+          text-transform: none;
+          --paper-button-raised-keyboard-focus: {
+            background-color: var(--paper-indigo-a250) !important;
+            color: white !important;
+          };
+        }
+        paper-button.des-button {
+            background-color: white;
+            color: black;
+            width: 100px;
+            text-transform: none;
+            --paper-button-raised-keyboard-focus: {
+              background-color: white !important;
+              color: black !important;
+            };
+        }
+
+      </style>
       <div>
-        <p>Are you sure?</p>
-        <paper-button @click="${(e) => {dialog.opened = false; this._deleteJob(this.jobToDelete);}}" class="">Delete</paper-button>
-        <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo" style="color: #3f51b5;">Cancel</paper-button>
+        <p style="text-align: center;font-size: 1.2rem;">Are you sure?</p>
+        <paper-button @click="${(e) => {dialog.opened = false; this._deleteJob(this.jobToDelete);}}" class="des-button" raised>Delete</paper-button>
+        <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo" raised>Cancel</paper-button>
       </div>
       `,
       container
