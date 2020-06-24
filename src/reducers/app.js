@@ -14,6 +14,7 @@ import {
   UPDATE_LAST_VALID_PAGE,
   UPDATE_DRAWER_STATE,
   UPDATE_DRAWER_PERSIST,
+  UPDATE_QUERY,
   LOGIN_USER,
   LOGOUT_USER
 } from '../actions/app.js';
@@ -27,6 +28,7 @@ const INITIAL_STATE = {
   db: '',
   lastname: '',
   jobId: '',
+  query: '',
   roles: [],
   accessPages: [],
   session: false,
@@ -84,6 +86,11 @@ const app = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         drawerPersisted: action.persisted
+      };
+    case UPDATE_QUERY:
+      return {
+        ...state,
+        query: action.query
       };
     default:
       return state;

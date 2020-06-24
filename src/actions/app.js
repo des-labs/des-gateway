@@ -8,6 +8,7 @@ export const UPDATE_DRAWER_STATE = 'UPDATE_DRAWER_STATE';
 export const UPDATE_DRAWER_PERSIST = 'UPDATE_DRAWER_PERSIST';
 export const LOGIN_USER = 'LOGIN_USER';
 export const LOGOUT_USER = 'LOGOUT_USER';
+export const UPDATE_QUERY = 'UPDATE_QUERY';
 
 // TODO: double request to /profile
 const isauth = () => {
@@ -149,6 +150,13 @@ const updatePage = (page) => {
   return {
     type: UPDATE_PAGE,
     page
+  };
+};
+
+export const updateQuery = (query) => {
+  return {
+    type: UPDATE_QUERY,
+    query
   };
 };
 

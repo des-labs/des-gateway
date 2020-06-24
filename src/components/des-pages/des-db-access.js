@@ -15,6 +15,7 @@ import '@polymer/paper-toast/paper-toast.js';
 import '@vaadin/vaadin-dialog/vaadin-dialog.js'
 import '@vaadin/vaadin-grid';
 import '@vaadin/vaadin-grid/vaadin-grid-sort-column.js';
+import { updateQuery } from '../../actions/app.js';
 
 class DESDbAccess extends connect(store)(PageViewElement) {
   static get properties() {
@@ -201,6 +202,10 @@ class DESDbAccess extends connect(store)(PageViewElement) {
           padding-left:2rem;
           max-width: 500px;
         }
+        .CodeMirror {
+          font-size: 0.8rem;
+          height: 24rem;
+        }
         `,
     ];
   }
@@ -220,6 +225,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     this.email = '';
     this.customJobName = '';
     this.validEmail = false;
+    this._queryExampleRenderer = this._queryExampleRenderer.bind(this); // need this to invoke class methods in renderers
   }
 
   render() {
@@ -300,7 +306,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
         <div class="query-input-container">
           <p>Insert your query in the box below. Data results for "Quick" Jobs (30 sec.) will be displayed at the bottom.</p>
           <div id="queryBox" class="query-input-box">
-              <wc-codemirror id="wc-codemirror-element" mode="sql" src="images/example-query-0.sql"></wc-codemirror>
+              <wc-codemirror id="query-input-editor" mode="sql" src="images/example-query-0.sql"></wc-codemirror>
           </div>
           <div class="query-input-controls">
               <div class="btn-wrap">
@@ -402,11 +408,11 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       this.shadowRoot.getElementById('custom-job-invalid').classList.add('invalid-form-element');
     }
   }
-
-  _validateSyntax(){
-    this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
-    this.query = this.editor.getValue();
-  }
+  //
+  // _validateSyntax(){
+  //   this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
+  //   this.query = this.editor.getValue();
+  // }
 
   _validateForm() {
     let criterion = true;
@@ -436,29 +442,22 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     }
   }
 
-  stateChanged(state) {
-    this.username = state.app.username;
-    this.db = state.app.db;
-    this.email = this.email === '' ? state.app.email : this.email;
-  }
-
   _checkSyntax(event) {
     const Url=config.backEndUrl + "page/db-access/check";
-    console.log(Url);
     /* Removing comments from query string */
     this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
     var query_lines = this.editor.doc.getValue().split('\n');
-    this.query = '';
+    let query = '';
     var i;
     for (i = 0; i < query_lines.length; i++) {
       if (query_lines[i].startsWith('--') == false && query_lines[i] !== "") {
-        this.query += ' ' + query_lines[i];
+        query += ' ' + query_lines[i];
       }
     }
     var body = {
       job: 'query',
       username: this.username,
-      query: this.query,
+      query: query,
       check: true
     };
     const param = {
@@ -475,7 +474,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     })
     .then(data => {
       if (data.status === "ok") {
-        console.log(JSON.stringify(data));
+        // console.log(JSON.stringify(data));
         if (data.valid) {
           this.shadowRoot.getElementById('toast-job-success').text = 'Query syntax is valid';
           this.shadowRoot.getElementById('toast-job-success').show();
@@ -497,17 +496,17 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     /* Removing comments from query string */
     this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
     var query_lines = this.editor.doc.getValue().split('\n');
-    this.query = '';
+    let query = '';
     var i;
     for (i = 0; i < query_lines.length; i++) {
       if (query_lines[i].startsWith('--') == false && query_lines[i] !== "") {
-        this.query += ' ' + query_lines[i];
+        query += ' ' + query_lines[i];
       }
     }
     var body = {
       job: 'query',
       username: this.username,
-      query: this.query,
+      query: query,
     };
     if (this.quickQuery) {
       body.quick = "true";
@@ -671,19 +670,38 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       root.removeChild(root.childNodes[0]);
     }
     container = root.appendChild(document.createElement('div'));
+    let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    viewportHeight = viewportHeight === 0 ? 1000 : viewportHeight;
     render(
       html`
-      <div style="overflow: auto; height: 50rem;">
-        <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo">Close</paper-button>
-        <h3>Sample Basic information</h3>
+      <style>
+        .CodeMirror {
+          height: 24rem;
+          font-size: 0.8rem;
+        }
+      </style>
+      <div style="overflow-x: auto; overflow-y: auto; height: ${0.9*viewportHeight}px; width: 1000px;">
+        <a title="Close" href="#" onclick="return false;">
+          <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 4rem; color: darkgray;"></iron-icon>
+        </a>
+        <h3>Sample Basic information
+        <a title="Copy query to editor" href="#" onclick="return false;">
+          <iron-icon id="copy-example-0" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+        </a></h3>
         <div id="query-example-0" class="query-input-box" style="border: 1px solid #CCCCCC;">
           <wc-codemirror id="query-example-editor-0" mode="sql" src="images/example-query-0.sql"></wc-codemirror>
         </div>
-        <h3>Limit Basic information by region and number of rows</h3>
+        <h3>Limit Basic information by region and number of rows
+        <a title="Copy query to editor" href="#" onclick="return false;">
+          <iron-icon id="copy-example-1" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+        </a></h3>
         <div id="query-example-1" class="query-input-box" style="border: 1px solid #CCCCCC;">
           <wc-codemirror id="query-example-editor-1" mode="sql" src="images/example-query-1.sql"></wc-codemirror>
         </div>
-        <h3>Select stars from M2 Globular Cluster</h3>
+        <h3>Select stars from M2 Globular Cluster
+        <a title="Copy query to editor" href="#" onclick="return false;">
+          <iron-icon id="copy-example-2" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+        </a></h3>
         <div id="query-example-2" class="query-input-box" style="border: 1px solid #CCCCCC;">
           <wc-codemirror id="query-example-editor-2" mode="sql" src="images/example-query-2.sql"></wc-codemirror>
         </div>
@@ -691,6 +709,111 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       `,
       container
     );
+
+    var ivlIds = [0,0,0];
+    for (let editorId in [0, 1, 2]) {
+      // console.log(`Trying to set format (${editorId})...`);
+      ivlIds[editorId] = window.setInterval(() => {
+        // console.log(`    intervalId: ${ivlIds[editorId]}`);
+        var editorElement = document.getElementById(`query-example-editor-${editorId}`).querySelector('.CodeMirror');
+        if (editorElement !== null) {
+          // console.log(editorElement);
+          this.editor = editorElement.CodeMirror;
+          this.editor.doc.cm.setOption('lineNumbers', false);
+          editorElement.style['height'] = 'auto';
+          document.getElementById(`copy-example-${editorId}`).addEventListener('click', (e) => {
+            this._copyQueryToDbAccessPage(e);
+            dialog.opened = false;
+          });
+          window.clearInterval(ivlIds[editorId]);
+        }
+      }, 200);
+    }
+  }
+
+  _copyQueryToDbAccessPage(event) {
+    // query = query.replace(/(  )+/g, '\n');
+    // console.log(`queryidx: ${queryIdx}`);
+    // console.log(event.target.id);
+    switch (event.target.id) {
+      case "copy-example-0":
+        var query = `--
+-- Example Query --
+-- This query selects 0.001% of the data and returns only five rows
+SELECT RA, DEC, MAG_AUTO_G, TILENAME
+FROM Y3_GOLD_2_2 sample(0.001)
+FETCH FIRST 5 ROWS ONLY
+`
+        break;
+      case "copy-example-1":
+        var query = `--
+-- Example Query --
+-- This query selects the first 1000 rows from a RA/DEC region
+SELECT ALPHAWIN_J2000 RAP,DELTAWIN_J2000 DECP, MAG_AUTO_G, TILENAME
+FROM Y3_GOLD_2_2
+WHERE
+RA BETWEEN 40.0 and 41.0 and
+DEC BETWEEN -41 and -40 and
+ROWNUM < 1001
+`
+        break;
+      case "copy-example-2":
+        var query = `--
+-- Example Query --
+-- This query selects stars around the center of glubular cluster M2
+SELECT
+  COADD_OBJECT_ID,RA,DEC,
+  MAG_AUTO_G G,
+  MAG_AUTO_R R,
+  WAVG_MAG_PSF_G G_PSF,
+  WAVG_MAG_PSF_R R_PSF
+FROM Y3_GOLD_2_2
+WHERE
+   RA between 323.36-0.12 and 323.36+0.12 and
+   DEC between -0.82-0.12 and -0.82+0.12 and
+   WAVG_SPREAD_MODEL_I + 3.0*WAVG_SPREADERR_MODEL_I < 0.005 and
+   WAVG_SPREAD_MODEL_I > -1 and
+   IMAFLAGS_ISO_G = 0 and
+   IMAFLAGS_ISO_R = 0 and
+   SEXTRACTOR_FLAGS_G < 4 and
+   SEXTRACTOR_FLAGS_R < 4
+`
+        break;
+      default:
+        var query = '';
+        break;
+    }
+    // console.log(`Updating query to ${query}`);
+    store.dispatch(updateQuery(query));
+    // store.dispatch(loadPage('db-access', this.accessPages));
+    // dialog.opened = false;
+  }
+
+
+  _updateQueryEditorValue(query) {
+    var queryInitIntervalId = window.setInterval(() => {
+      console.log(`Query changed to\n${this.query}`);
+      let editorElement = this.shadowRoot.getElementById('query-input-editor').querySelector('.CodeMirror');
+      if (editorElement !== null) {
+        if (this.query !== '') {
+          console.log(`Updating code editor...`);
+          this.editor = editorElement.CodeMirror;
+          this.editor.doc.setValue(this.query);
+        }
+        window.clearInterval(queryInitIntervalId);
+      }
+    }, 100);
+  }
+
+  stateChanged(state) {
+    this.username = state.app.username;
+    if (this.query !== state.app.query) {
+      this.query = state.app.query;
+      this._updateQueryEditorValue(this.query);
+    }
+    this.db = state.app.db;
+    this.email = this.email === '' ? state.app.email : this.email;
+
   }
 
   firstUpdated() {
@@ -702,6 +825,18 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     this.shadowRoot.getElementById('check-syntax-button').addEventListener('click', () => {
       this._checkSyntax();
     });
+    var queryInitIntervalId = window.setInterval(() => {
+      if (this.shadowRoot.querySelector('.CodeMirror') !== null) {
+        this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
+        if (this.query !== '') {
+          this.editor.doc.setValue(this.query);
+        } else {
+          this.query = this.editor.doc.getValue();
+        }
+        window.clearInterval(queryInitIntervalId);
+      }
+    }, 200);
+
   }
 
   updated(changedProps) {
@@ -717,6 +852,8 @@ class DESDbAccess extends connect(store)(PageViewElement) {
           this._validateEmail();
         case 'customJobName':
           this._validateCustomJobName();
+        case 'query':
+          this._updateQueryEditorValue(this.query);
         default:
           // Assume that we want to revalidate the form when a property changes
           this._validateForm();

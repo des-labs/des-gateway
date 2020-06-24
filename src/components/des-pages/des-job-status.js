@@ -12,6 +12,7 @@ import '@vaadin/vaadin-grid/vaadin-grid-sort-column.js';
 import '@vaadin/vaadin-grid/vaadin-grid-selection-column.js';
 import '@vaadin/vaadin-icons/vaadin-icons.js';
 import '@polymer/paper-button/paper-button.js';
+import { loadPage, updateQuery } from '../../actions/app.js';
 
 
 class DESJobStatus extends connect(store)(PageViewElement) {
@@ -50,10 +51,12 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   static get properties() {
     return {
       username: {type: String},
+      query: {type: String},
       jobIdFromUrl: {type: String},
       jobToDelete: {type: String},
       refreshStatusIntervalId: {type: Number},
       initialJobInfoPopup: {type: Boolean},
+      accessPages: {type: Array},
       _selectedItems: {type: Array}
     };
   }
@@ -61,10 +64,12 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   constructor(){
     super();
     this.username = '';
+    this.query = '';
     this.jobIdFromUrl = '';
     this.initialJobInfoPopup = true;
     this.jobToDelete = '';
     this.refreshStatusIntervalId = 0;
+    this.accessPages = [];
     this._selectedItems = [];
     this.rendererAction = this._rendererAction.bind(this); // need this to invoke class methods in renderers
     this.rendererStatus = this._rendererStatus.bind(this); // need this to invoke class methods in renderers
@@ -182,6 +187,14 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     );
   }
 
+  _copyQueryToDbAccessPage(event, query, dialog) {
+    query = query.replace(/(  )+/g, '\n');
+    console.log(`Updating query to ${query}`);
+    store.dispatch(updateQuery(query));
+    store.dispatch(loadPage('db-access', this.accessPages));
+    dialog.opened = false;
+  }
+
   _showJobInfo(jobId) {
     const jobInfoPanel = this.shadowRoot.getElementById('job-info-container');
     const grid = this.shadowRoot.querySelector('vaadin-grid');
@@ -192,56 +205,66 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         break;
       }
     }
-    let taskSpecificInfo = null;
-    switch (job.type) {
-      case 'query':
-        if (job.query_files !== null) {
-          var numFiles = job.query_files.length;
-        } else {
-          var numFiles = 0;
-        }
-        taskSpecificInfo = html`
-          <div>Query</div><div><span class="monospace-column">${job.query}</span></div>
-          <div>Files (${numFiles})</div><div style="overflow: auto; height: 300px;"><span class="monospace-column">
-          ${job.query_files === null ?
-            html``:
-            html`
-              <ul style="list-style-type: square; margin: 0; padding: 0;">
-                ${job.query_files.map(i => html`<li><a href="${config.frontEndUrl}files/${this.username}/query/${job.id}/${i}">${i}</a></li>`)}
-              </ul>
-            `
-          }
-          </span></div>
-        `;
-        break;
-      case 'cutout':
-        if (job.cutout_files !== null) {
-          var numFiles = job.cutout_files.length;
-        } else {
-          var numFiles = 0;
-        }
-        taskSpecificInfo = html`
-          <div>Files (${numFiles})</div><div style="overflow: auto; height: 300px;"><span class="monospace-column">
-          ${job.cutout_files === null ?
-            html``:
-            html`
-              <ul style="list-style-type: square; margin: 0; padding: 0;">
-                ${job.cutout_files.map(i => html`<li><a href="${config.frontEndUrl}files/${this.username}/cutout/${i}">${i.split('/').splice(1).join('/')}</a></li>`)}
-              </ul>
-            `
-          }
-          </span></div>
-        `;
-        break;
-      default:
-        taskSpecificInfo = html``;
-        break;
-    }
     jobInfoPanel.renderer = (root, dialog) => {
       let container = root.firstElementChild;
       if (!container) {
         container = root.appendChild(document.createElement('div'));
       }
+
+      let taskSpecificInfo = null;
+      switch (job.type) {
+        case 'query':
+          if (job.query_files !== null) {
+            var numFiles = job.query_files.length;
+          } else {
+            var numFiles = 0;
+          }
+          taskSpecificInfo = html`
+            <div>Query
+              <a title="Copy query to editor" href="#" onclick="return false;">
+                <iron-icon @click="${(e) => {this._copyQueryToDbAccessPage(e, job.query, dialog)}}" icon="vaadin:copy-o" style="color: darkblue; margin-left: 2rem;"></iron-icon>
+              </a>
+            </div>
+            <div>
+              <textarea rows="6" style="border: 1px solid #CCCCCC; font-family: monospace; width: 80%;">${job.query.replace(/(  )+/g, '\n')}</textarea>
+            </div>
+            <div>Files (${numFiles})</div><div style="overflow: auto; height: 300px;"><span class="monospace-column">
+            ${job.query_files === null ?
+              html``:
+              html`
+                <ul style="list-style-type: square; margin: 0; padding: 0;">
+                  ${job.query_files.map(i => html`<li><a href="${config.frontEndUrl}files/${this.username}/query/${job.id}/${i}">${i}</a></li>`)}
+                </ul>
+              `
+            }
+            </span></div>
+          `;
+          break;
+        case 'cutout':
+          if (job.cutout_files !== null) {
+            var numFiles = job.cutout_files.length;
+          } else {
+            var numFiles = 0;
+          }
+          taskSpecificInfo = html`
+            <div>Files (${numFiles})</div><div style="overflow: auto; height: 300px;"><span class="monospace-column">
+            ${job.cutout_files === null ?
+              html``:
+              html`
+                <ul style="list-style-type: square; margin: 0; padding: 0;">
+                  ${job.cutout_files.map(i => html`<li><a href="${config.frontEndUrl}files/${this.username}/cutout/${i}">${i.split('/').splice(1).join('/')}</a></li>`)}
+                </ul>
+              `
+            }
+            </span></div>
+          `;
+          break;
+        default:
+          taskSpecificInfo = html``;
+          break;
+      }
+      let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+      viewportHeight = viewportHeight === 0 ? 600 : viewportHeight;
       render(
         html`
           <style>
@@ -260,7 +283,10 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               grid-template-columns: 20% 80%;
             }
           </style>
-          <div style="overflow: auto; width: 1000px; maxHeight: 1000px;">
+          <div style="overflow: auto; width: 1000px; height: ${0.9*viewportHeight}px;">
+            <a title="Close" href="#" onclick="return false;">
+              <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
+            </a>
             <h3>Job Results</h3>
             <div class="job-results-container">
               <div>Name</div><div><span class="monospace-column">${job.name}</span></div>
@@ -523,7 +549,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       ctr++;
       if (ctr === array.length) {
         grid.items = gridItems;
-        console.log(JSON.stringify(gridItems, null, 2));
+        // console.log(JSON.stringify(gridItems, null, 2));
         let dedupSelItems = [];
         for (var i in grid.selectedItems) {
           if (dedupSelItems.map((e) => {return e.job.id}).indexOf(grid.selectedItems[i].job.id) < 0) {
@@ -617,8 +643,10 @@ class DESJobStatus extends connect(store)(PageViewElement) {
 
   stateChanged(state) {
     this.username = state.app.username;
+    this.query = state.app.query;
     this.jobIdFromUrl = state.app.jobId;
     this._page = state.app.page;
+    this.accessPages = state.app.accessPages;
     if (this.refreshStatusIntervalId === 0) {
       this.refreshStatusIntervalId = window.setInterval(() => {
         if (this._page === 'status') {
