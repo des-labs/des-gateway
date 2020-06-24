@@ -792,11 +792,11 @@ WHERE
 
   _updateQueryEditorValue(query) {
     var queryInitIntervalId = window.setInterval(() => {
-      console.log(`Query changed to\n${this.query}`);
+      // console.log(`Query changed to\n${this.query}`);
       let editorElement = this.shadowRoot.getElementById('query-input-editor').querySelector('.CodeMirror');
       if (editorElement !== null) {
         if (this.query !== '') {
-          console.log(`Updating code editor...`);
+          // console.log(`Updating code editor...`);
           this.editor = editorElement.CodeMirror;
           this.editor.doc.setValue(this.query);
         }

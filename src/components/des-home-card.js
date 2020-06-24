@@ -68,19 +68,16 @@ class DESHomeCard extends  connect(store)(LitElement) {
   render() {
     return html`
       <paper-card id="des-home-card-${this.name}" on-click="change">
-      <iron-image
-      src="${this.image}"
-      alt="${this.alt}"
-      style="width:300px; height:150px;" sizing="cover"></iron-image>
+        <iron-image
+          src="${this.image}"
+          alt="${this.alt}"
+          style="width:300px; height:150px;" sizing="cover">
+        </iron-image>
 
-      <div class="card-content" id="des-home-card-${this.name}" on-click="change" >
-      <div class="card-header" id="des-home-card-${this.name}" on-click="change">${this.heading}
-      </div>
-      <p class="card-light" id="des-home-card-${this.name}" on-click="change">${this.desc}</p>
-      </div>
-      <div class="card-actions" id="des-home-card-${this.name}" on-click="change">
-      <paper-button style="text-transform: none;" id="des-home-card-${this.name}" on-click="change" class="card-explore">More...</paper-button>
-      </div>
+        <div class="card-content" id="des-home-card-${this.name}" on-click="change" >
+          <div class="card-header" id="des-home-card-${this.name}" on-click="change">${this.heading}</div>
+          <p class="card-light" id="des-home-card-${this.name}" on-click="change">${this.desc}</p>
+        </div>
       </paper-card>
     `;
   }

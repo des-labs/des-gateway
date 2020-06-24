@@ -48,89 +48,82 @@ updateUnlockChecked(e) {
   render() {
     return html`
 
-      <section>
-        <div>
-        <h2>DES Ticket</h2>
-        <center>
-        <h5>A DESDM database password and DESHELP JIRA ticket resolver</h5>
-        </center>
-        </div>
-        <br>
-        <br>
-       <div>
-          <p>Enter username, email, first or last name to check if user exists:</p>
-          <table id="search-table" style="width:100%">
+    <section>
+      <h3>A DESDM database password and DESHELP JIRA ticket resolver</h3>
+      <div>
+        <p>Enter username, email, first or last name to check if user exists:</p>
+        <table id="search-table" style="width:100%">
+        <tr class="submit-tr">
+        <td class="submit-td">
+          Search:
+        </td>
+        <td class="submit-td">
+        <input value="" @input="${e => this.searchString = e.target.value}">
+        </td>
+        </tr>
+        <tr class="submit-tr">
+        <td class="submit-td">
+        </td>
+        <td class="submit-td">
+        <button @click="${this._search}">Search</button>
+        </td>
+        </tr>
+        </table>
+        <pre> ${this.searchMessage}</pre>
+      </div>
+      <div>
+        <p> Enter username and email below to resolve db password request:</p>
+        <table id="form-submission-table" style="width:100%">
           <tr class="submit-tr">
           <td class="submit-td">
-            Search:
+            Username:
           </td>
           <td class="submit-td">
-          <input value="" @input="${e => this.searchString = e.target.value}">
+          <input value="" @input="${e => this.user = e.target.value}">
+          </td>
+          </tr>
+          <tr class="submit-tr">
+          <td class="submit-td">
+            Email:
+          </td>
+          <td class="submit-td">
+          <input value="" @input="${e => this.email = e.target.value}">
+          </td>
+          </tr>
+          <tr class="submit-tr">
+          <td class="submit-td">
+            JIRA ticket:
+          </td>
+          <td class="submit-td">
+          <input value="" @input="${e => this.jiraTicket = e.target.value}">
+          </td>
+          </tr>
+          <tr class="submit-tr">
+          <td class="submit-td">
+            Resolution options:
+          </td>
+          <td class="submit-td">
+          <input type="checkbox" id="reset" name="reset" ?checked="${this.resetChecked}"
+              @change="${this.updateResetChecked}"/>
+          <label for="reset">Reset/unlock</label>
+          <input type="checkbox" id="unlock" name="unlock" ?checked="${this.unlockChecked}"
+              @change="${this.updateUnlockChecked}"/>
+          <label for="unlock">Unlock only</label>
           </td>
           </tr>
           <tr class="submit-tr">
           <td class="submit-td">
           </td>
           <td class="submit-td">
-          <button @click="${this._search}">Search</button>
+          <button @click="${this._submit}">Submit</button>
           </td>
           </tr>
-          </table>
-          <pre> ${this.searchMessage}</pre>
-        </div>
-        <div>
-          <p> Enter username and email below to resolve db password request:</p>
-          <table id="form-submission-table" style="width:100%">
-            <tr class="submit-tr">
-            <td class="submit-td">
-              Username:
-            </td>
-            <td class="submit-td">
-            <input value="" @input="${e => this.user = e.target.value}">
-            </td>
-            </tr>
-            <tr class="submit-tr">
-            <td class="submit-td">
-              Email:
-            </td>
-            <td class="submit-td">
-            <input value="" @input="${e => this.email = e.target.value}">
-            </td>
-            </tr>
-            <tr class="submit-tr">
-            <td class="submit-td">
-              JIRA ticket:
-            </td>
-            <td class="submit-td">
-            <input value="" @input="${e => this.jiraTicket = e.target.value}">
-            </td>
-            </tr>
-            <tr class="submit-tr">
-            <td class="submit-td">
-              Resolution options:
-            </td>
-            <td class="submit-td">
-            <input type="checkbox" id="reset" name="reset" ?checked="${this.resetChecked}"
-                @change="${this.updateResetChecked}"/>
-            <label for="reset">Reset/unlock</label>
-            <input type="checkbox" id="unlock" name="unlock" ?checked="${this.unlockChecked}"
-                @change="${this.updateUnlockChecked}"/>
-            <label for="unlock">Unlock only</label>
-            </td>
-            </tr>
-            <tr class="submit-tr">
-            <td class="submit-td">
-            </td>
-            <td class="submit-td">
-            <button @click="${this._submit}">Submit</button>
-            </td>
-            </tr>
-          </table>
-        </div>
-        <p><font color="red">${this.msg}</font></p>
-        <p><font color="red">${this.existsMessage}</font></p>
-        <p>${this.submitMessage}</p>
-      </section>
+        </table>
+      </div>
+      <p><font color="red">${this.msg}</font></p>
+      <p><font color="red">${this.existsMessage}</font></p>
+      <p>${this.submitMessage}</p>
+    </section>
     `;
   }
 
@@ -164,7 +157,7 @@ updateUnlockChecked(e) {
       };
       const param = {
         headers: {'Content-Type': 'application/json',
-        'Authorization': this.ticketAuth,}, 
+        'Authorization': this.ticketAuth,},
         body: JSON.stringify(dataP),
         method: "POST"
       };

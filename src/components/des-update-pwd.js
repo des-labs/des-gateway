@@ -29,10 +29,10 @@ class DESUpdatePwd extends  connect(store)(LitElement) {
     SharedStyles,
       css`
       paper-card.des-card {
-        margin-top: 8px;
+        /* margin-top: 8px; */
         width: 100%;
         /* --paper-card-header-color: red; */
-        padding: 40px;
+        /* padding: 40px; */
       }
       `
     ];
@@ -77,10 +77,12 @@ class DESUpdatePwd extends  connect(store)(LitElement) {
   }
 
   render() {
+    let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    viewportHeight = viewportHeight === 0 ? 1000 : viewportHeight;
     return html`
       <min-length-validator id="min-length-validator" min-length="6"></min-length-validator>
       <match-passwords-validator id="match-passwords-validator" password=${this._newpwd}></match-passwords-validator>
-      <paper-card class="des-card" heading="Change Password  for [${this._db}]"  elevation="0">
+      <paper-card style="overflow-y: auto; overflow-x: auto; height: ${0.8*viewportHeight}px;" class="des-card" heading="Change Password  for [${this._db}]"  elevation="0">
         <div class="card-content">
           <paper-input always-float-label label="Username" disabled placeholder=${this._username}></paper-input>
           <paper-password-input

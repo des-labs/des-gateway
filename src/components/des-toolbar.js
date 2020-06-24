@@ -21,6 +21,7 @@ import { store } from '../store.js';
 class DESToolBar extends connect(store)(LitElement) {
     static get properties() {
       return {
+        name: { type: String },
         _profile: { type: Boolean }
       }
     }
@@ -180,6 +181,7 @@ class DESToolBar extends connect(store)(LitElement) {
           <div main-narrow-title>DES desaccess</div>
 
           ${this._profile ? html`
+            <div style="display: inline-block; color: white; position: absolute; right: 110px; font-size: 1rem;">${this.name}</div>
             <paper-menu-button class="profile">
               <iron-icon class="profile-icon" icon="account-circle" slot="dropdown-trigger"></iron-icon>
               <iron-icon style="margin-left:-5px;" icon="arrow-drop-down" slot="dropdown-trigger" alt="menu"></iron-icon>

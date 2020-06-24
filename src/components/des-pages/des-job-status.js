@@ -189,7 +189,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
 
   _copyQueryToDbAccessPage(event, query, dialog) {
     query = query.replace(/(  )+/g, '\n');
-    console.log(`Updating query to ${query}`);
+    // console.log(`Updating query to ${query}`);
     store.dispatch(updateQuery(query));
     store.dispatch(loadPage('db-access', this.accessPages));
     dialog.opened = false;

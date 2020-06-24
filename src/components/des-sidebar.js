@@ -79,13 +79,6 @@ class DESSideBar extends connect(store)(LitElement) {
         sizing="cover"
         src="images/DESDM_logo.png" @click="${this._ClickHandler}"></iron-image>
       </app-toolbar>
-      <div class="info-container">
-        <div class="image"></div>
-      </div>
-      <div class="self-info">
-        <div class="name">${this.name}</div>
-        <div class="email">${this.email}</div>
-      </div>
       `;
   }
 

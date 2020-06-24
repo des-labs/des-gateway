@@ -89,6 +89,7 @@ class DESMain extends connect(store)(LitElement) {
           background-color: var(--app-header-background-color);
           color: var(--app-header-text-color);
           border-bottom: 1px solid #eee;
+          z-index: 5;
         }
 
         .drawer-list {
@@ -96,6 +97,7 @@ class DESMain extends connect(store)(LitElement) {
           width: 100%;
           height: 100%;
           padding: 0px;
+          padding-top: 20px;
           background: var(--app-drawer-background-color);
           position: relative;
         }
@@ -164,7 +166,7 @@ class DESMain extends connect(store)(LitElement) {
     return html`
       <!-- Header -->
       <app-header fixed>
-        <des-toolbar @clickMenu=${this._menuButtonClicked}></des-toolbar>
+        <des-toolbar name=${this.name} @clickMenu=${this._menuButtonClicked}></des-toolbar>
       </app-header>
 
       <!-- Drawer content -->

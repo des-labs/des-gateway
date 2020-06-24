@@ -26,10 +26,10 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
       css`
 
       paper-card.des-card {
-        margin-top: 8px;
+        /* margin-top: 8px; */
         width: 100%;
         /* --paper-card-header-color: black; */
-        padding: 40px;
+        /* padding: 40px; */
       }
       `
     ];
@@ -73,8 +73,10 @@ class DESUpdateInfo extends  connect(store)(LitElement) {
   }
 
   render() {
+    let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    viewportHeight = viewportHeight === 0 ? 1000 : viewportHeight;
     return html`
-      <paper-card class="des-card" heading="Update Personal Profile" elevation="0">
+      <paper-card style="overflow-y: auto; overflow-x: auto; height: ${0.8*viewportHeight}px;" class="des-card" heading="Update Personal Profile" elevation="0">
         <div class="card-content">
           <paper-input always-float-label label="Username" disabled placeholder=${this._username}></paper-input>
           <paper-input always-float-label label="First Name" value=${this._name} @input="${e => this._name = e.target.value}"></paper-input>

@@ -37,9 +37,6 @@ class DESTestJob extends connect(store)(PageViewElement) {
     return html`
 
       <section>
-        <div>
-        <h2>Submit test job</h2>
-        </div>
        <div>
        name: <input value="${this.username}" @input="${e => this.name = e.target.value}">
        time: <input value="${this.time}" @input="${e => this.time = e.target.value}">
