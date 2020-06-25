@@ -32,7 +32,9 @@ const isauth = () => {
 };
 
 export const navigate = (path,persist,ap,session) => (dispatch) => {
-  // Strip preceding and trailing slashes from root path
+  // Strip preceding and trailing slashes from root path and location.pathname
+  // so that path and basePath are in general of the form `blah/blah` where only one slash
+  // separates each word and there are no surrounding slashes
   let iterstr = null;
   let basePath = config.rootPath;
   while(basePath !== iterstr) {
@@ -44,9 +46,11 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
     path = path.replace(/\/\//g, '/').replace(/\/+$/, '').replace(/^\/+/, '');
     iterstr = path.replace(/\/\//g, '/').replace(/\/+$/, '').replace(/^\/+/, '');
   }
-  // Now path and basePath are of the form `blah/blah` where only one slash
-  // separates each word and there are no surrounding slashes
 
+  // discard the root path from the location.pathname so that pathnames like
+  // `/desaccess/alpha/beta` become `alpha/beta`
+  path = path.substring(path.search(basePath)+basePath.length).replace(/\/\//g, '/').replace(/\/+$/, '').replace(/^\/+/, '');
+  var targetPath = path;
   // pathParts should have no zero-length strings because of the slash reduction above
   var pathParts = path.split('/');
   var basePathParts = basePath.split('/');
@@ -54,45 +58,32 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
   const auth = session ? true : isauth();
   if (auth === false) {
     // dispatch(storeTargetPath(path));
-    dispatch(loadPage('login', ap, pathParts));
+    dispatch(loadPage('login', ap, targetPath));
     return;
   }
-  var page = null;
-  let pageIdx = 0;
-  switch (true) {
-    case (basePathParts[0] === ''):
-      page = pathParts[0];
-      break;
-    case (basePathParts[0] === pathParts[0] && pathParts.length > 1):
-      page = pathParts[1];
-      pageIdx = 1;
-      break;
-    default:
-      page = 'home';
-      break;
-  }
-  // Highlight specific job in status if provided in URL {{location.origin}}/status/dkdh9s84ty3thj3wehg3
-  if (page === 'status' && pathParts.length > pageIdx + 1) {
-    let jobId = pathParts[pageIdx + 1]
-    dispatch(setJobId(jobId));
-  }
+  var page = pathParts[0];
   switch (page) {
     case '':
     case 'login':
       page = 'home';
-      pathParts[pageIdx] = page;
+      targetPath = ''
+      break;
+    case 'status':
+      // Highlight specific job in status if provided in URL {{location.origin}}/status/dkdh9s84ty3thj3wehg3
+      if (pathParts.length > 1) {
+        let jobId = pathParts[1];
+        dispatch(setJobId(jobId));
+      }
       break;
     default:
       break;
   }
-  dispatch(loadPage(page, ap, pathParts.slice(pageIdx)));
+
+  dispatch(loadPage(page, ap, targetPath));
   persist ? '' : dispatch(updateDrawerState(false));
 };
 
-export const loadPage = (page,ap,pathParts = []) => (dispatch) => {
-  if (pathParts.length === 0) {
-    pathParts = [page];
-  }
+export const loadPage = (page,ap,targetPath = '') => (dispatch) => {
   switch(page) {
     case 'login':
       import('../components/des-pages/des-login.js').then((module) => {
@@ -123,6 +114,9 @@ export const loadPage = (page,ap,pathParts = []) => (dispatch) => {
     case 'ticket':
       ap.includes('ticket') ?   import('../components/des-pages/des-ticket.js') : import('../components/des-pages/des-404.js') ;
       break;
+    case 'files':
+      window.location.href = config.frontEndUrl + targetPath;
+      break;
     default:
       page = 'des404';
       import('../components/des-pages/des-404.js');
@@ -132,8 +126,8 @@ export const loadPage = (page,ap,pathParts = []) => (dispatch) => {
     dispatch(updateDrawerPersist(window.innerWidth >= 1001));
     dispatch(updateLastValidPage(page));
   }
-  let newLocation = config.frontEndUrl + pathParts.join('/');
-  if (newLocation !== window.location.href) {
+  let newLocation = config.frontEndUrl + targetPath;
+  if (newLocation !== window.location.href+window.location.pathname) {
     history.pushState({}, '', newLocation);
   }
   dispatch(updatePage(page));

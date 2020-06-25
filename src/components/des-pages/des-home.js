@@ -42,7 +42,7 @@ class DESHome extends connect(store)(PageViewElement) {
             </a>
           ` : html``}
           ${this.accessPages.includes('ticket') ? html`
-            <a style = "text-transform: none; color:black;" href="status" tabindex="-1">
+            <a style = "text-transform: none; color:black;" href="ticket" tabindex="-1">
               <des-home-card heading="DES TICKET" image="images/decam.jpg" alt="DES Ticket" desc="DES database account management" name="ticket" ></des-home-card>
             </a>
           ` : html``}

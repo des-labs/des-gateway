@@ -298,7 +298,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
             var numFiles = 0;
           }
           taskSpecificInfo = html`
-            <div>Query
+            <div><a title="View all files" target="_blank" href="${config.frontEndOrigin}/files/${this.username}/query/${job.id}/">Query</a>
               <a title="Copy query to editor" href="#" onclick="return false;">
                 <iron-icon @click="${(e) => {this._copyQueryToDbAccessPage(e, job.query, dialog)}}" icon="vaadin:copy-o" style="color: darkblue; margin-left: 2rem;"></iron-icon>
               </a>
@@ -330,7 +330,8 @@ class DESJobStatus extends connect(store)(PageViewElement) {
             var numFiles = 0;
           }
           taskSpecificInfo = html`
-            <div>Files (${numFiles})</div><div style="overflow: auto; height: 300px;"><span class="monospace-column">
+            <div><a title="View all files" target="_blank" href="${config.frontEndOrigin}/files/${this.username}/cutout/${job.id}/">Files (${numFiles})</a></div>
+            <div style="overflow: auto; height: 300px;"><span class="monospace-column">
             ${job.cutout_files === null ?
               html``:
               html`
