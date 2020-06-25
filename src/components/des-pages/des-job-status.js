@@ -254,6 +254,25 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     jobDialogPanel.opened = true;
   }
 
+  _renderImage(fileUrl) {
+    let fileParts = fileUrl.split('.');
+    if (fileParts.length > 1) {
+      let fileExt = fileParts.pop().toLowerCase()
+      switch (fileExt) {
+        case 'png':
+        case 'jpg':
+          return html`
+            <img src=${fileUrl}>
+          `;
+          break;
+        default:
+          return html``;
+      }
+    } else {
+      return html``;
+    }
+  }
+
   _showJobInfo(jobId) {
     const jobInfoPanel = this.shadowRoot.getElementById('job-info-container');
     const grid = this.shadowRoot.querySelector('vaadin-grid');
@@ -292,7 +311,12 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               html``:
               html`
                 <ul style="list-style-type: square; margin: 0; padding: 0;">
-                  ${job.query_files.map(i => html`<li><a href="${config.frontEndUrl}files/${this.username}/query/${job.id}/${i}">${i}</a></li>`)}
+                  ${job.query_files.map(i => html`
+                    <li>
+                      <a target="_blank" href="${config.frontEndOrigin}/files/${this.username}/query/${job.id}/${i}">${i}</a>
+                      ${this._renderImage(`${config.frontEndOrigin}/files/${this.username}/query/${job.id}/${i}`)}
+                    </li>
+                  `)}
                 </ul>
               `
             }
@@ -311,7 +335,12 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               html``:
               html`
                 <ul style="list-style-type: square; margin: 0; padding: 0;">
-                  ${job.cutout_files.map(i => html`<li><a href="${config.frontEndUrl}files/${this.username}/cutout/${i}">${i.split('/').splice(1).join('/')}</a></li>`)}
+                  ${job.cutout_files.map(i => html`
+                    <li>
+                      <a target="_blank" href="${config.frontEndOrigin}/files/${this.username}/cutout/${i}">${i.split('/').splice(1).join('/')}</a>
+                      ${this._renderImage(`${config.frontEndOrigin}/files/${this.username}/cutout/${i}`)}
+                    </li>
+                  `)}
                 </ul>
               `
             }
@@ -340,6 +369,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               grid-gap: 1rem;
               padding: 1rem;
               grid-template-columns: 20% 80%;
+              grid-row-gap: 0;
             }
           </style>
           <div style="overflow: auto; width: 1000px; height: ${0.9*viewportHeight}px;">
