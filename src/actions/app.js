@@ -114,8 +114,8 @@ export const loadPage = (page,ap,targetPath = '') => (dispatch) => {
     case 'ticket':
       ap.includes('ticket') ?   import('../components/des-pages/des-ticket.js') : import('../components/des-pages/des-404.js') ;
       break;
-    case 'files':
-      window.location.href = config.frontEndUrl + targetPath;
+    case 'help':
+      import('../components/des-pages/des-help.js');
       break;
     default:
       page = 'des404';

@@ -258,6 +258,8 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   }
 
   _renderImage(fileUrl) {
+    // TODO: Disable rendering images in file list
+    return;
     let fileParts = fileUrl.split('.');
     if (fileParts.length > 1) {
       let fileExt = fileParts.pop().toLowerCase()
@@ -301,15 +303,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
             var numFiles = 0;
           }
           taskSpecificInfo = html`
-            <div><a title="View all files" target="_blank" href="${config.frontEndOrigin}/files/${this.username}/query/${job.id}/">Query</a>
-              <a title="Copy query to editor" href="#" onclick="return false;">
-                <iron-icon @click="${(e) => {this._copyQueryToDbAccessPage(e, job.query, dialog)}}" icon="vaadin:copy-o" style="color: darkblue; margin-left: 2rem;"></iron-icon>
-              </a>
-            </div>
-            <div>
-              <textarea rows="6" style="border: 1px solid #CCCCCC; font-family: monospace; width: 80%;">${job.query.replace(/(  )+/g, '\n')}</textarea>
-            </div>
-            <div>Files (${numFiles})</div><div style="overflow: auto; height: 300px;"><span class="monospace-column">
+            <div><a title="View all files" target="_blank" href="${config.frontEndOrigin}/files/${this.username}/query/${job.id}/">Files (${numFiles})</a></div><div style="overflow: auto;"><span class="monospace-column">
             ${job.query_files === null ?
               html``:
               html`
@@ -324,6 +318,14 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               `
             }
             </span></div>
+            <div>Query
+              <a title="Copy query to editor" href="#" onclick="return false;">
+                <iron-icon @click="${(e) => {this._copyQueryToDbAccessPage(e, job.query, dialog)}}" icon="vaadin:copy-o" style="color: darkblue; margin-left: 2rem;"></iron-icon>
+              </a>
+            </div>
+            <div>
+              <textarea rows="6" style="border: 1px solid #CCCCCC; font-family: monospace; width: 80%; height: 100%;">${job.query.replace(/(  )+/g, '\n')}</textarea>
+            </div>
           `;
           break;
         case 'cutout':
@@ -333,8 +335,9 @@ class DESJobStatus extends connect(store)(PageViewElement) {
             var numFiles = 0;
           }
           taskSpecificInfo = html`
+            <div></div><div></div>
             <div><a title="View all files" target="_blank" href="${config.frontEndOrigin}/files/${this.username}/cutout/${job.id}/">Files (${numFiles})</a></div>
-            <div style="overflow: auto; height: 300px;"><span class="monospace-column">
+            <div style="overflow: auto;"><span class="monospace-column">
             ${job.cutout_files === null ?
               html``:
               html`
@@ -373,6 +376,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               grid-gap: 1rem;
               padding: 1rem;
               grid-template-columns: 20% 80%;
+              grid-template-rows: min-content min-content min-content min-content min-content min-content 1fr;
               grid-row-gap: 0;
             }
           </style>
@@ -381,7 +385,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
             </a>
             <h3>Job Results</h3>
-            <div class="job-results-container">
+            <div class="job-results-container" style="overflow: auto; height: ${0.7*viewportHeight}px;">
               <div>Name</div><div><span class="monospace-column">${job.name}</span></div>
               <div>ID</div><div><span class="monospace-column">${job.id}  </span></div>
               <div>Status</div><div>${job.status}</div>
