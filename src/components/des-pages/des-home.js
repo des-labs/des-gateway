@@ -46,6 +46,9 @@ class DESHome extends connect(store)(PageViewElement) {
               <des-home-card heading="DES TICKET" image="images/decam.jpg" alt="DES Ticket" desc="DES database account management" name="ticket" ></des-home-card>
             </a>
           ` : html``}
+          <a style = "text-transform: none; color:black;" href="help" tabindex="-1">
+            <des-home-card heading="HELP" image="images/home-help.jpg" alt="Help" desc="Learn about DESaccess and request help" name="help" ></des-home-card>
+          </a>
         </div>
       </section>
     `;

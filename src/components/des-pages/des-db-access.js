@@ -367,6 +367,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       case (outputfile.endsWith('.fits')):
         valid = true;
         this.shadowRoot.getElementById('option-compress-files').checked = false;
+        this.compressOutputFile = false;
       default:
         this.shadowRoot.getElementById('option-compress-files').disabled = true;
         this.compressOutputFile = false;
@@ -507,6 +508,8 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       job: 'query',
       username: this.username,
       query: query,
+      compression: this.compressOutputFile ? "true" : "false",
+      filename: this.validOutputFile.file
     };
     if (this.quickQuery) {
       body.quick = "true";

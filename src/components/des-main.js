@@ -188,37 +188,39 @@ class DESMain extends connect(store)(LitElement) {
           ${this.accessPages.includes('cutout')    ? this._renderMenuItem('Cutout Service', 'cutout', 'vaadin:scissors') : html ``}
           ${this.accessPages.includes('status')    ? this._renderMenuItem('Job Status', 'status', 'vaadin:cogs') : html ``}
           ${this.accessPages.includes('ticket')    ? this._renderMenuItem('DES Ticket', 'ticket', 'vaadin:clipboard-user') : html ``}
+          ${this._renderMenuItem('Help', 'help', 'vaadin:question-circle-o')}
         </nav>
 
       </app-drawer>
 
       <!-- Main content -->
       <main role="main" class="main-content">
-         <des-login class="page" ?active="${this._page === 'login'}" ></des-login>
-         <des-home class="page" ?active="${this._page === 'home'}"></des-home>
+        <des-login class="page" ?active="${this._page === 'login'}" ></des-login>
+        <des-home class="page" ?active="${this._page === 'home'}"></des-home>
         ${this.accessPages.includes('test-job') ?
-           html`<des-test-job class="page" ?active="${this._page === 'test-job'}"></des-test-job>` :
-           html`<des-404 class="page" ?active="${this._page === 'test-job'}"></des-404>`}
+          html`<des-test-job class="page" ?active="${this._page === 'test-job'}"></des-test-job>` :
+          html`<des-404 class="page" ?active="${this._page === 'test-job'}"></des-404>`}
         ${this.accessPages.includes('db-access') ?
-           html`<des-db-access class="page" ?active="${this._page === 'db-access'}"></des-db-access>` :
-           html`<des-404 class="page" ?active="${this._page === 'db-access'}"></des-404>`}
+          html`<des-db-access class="page" ?active="${this._page === 'db-access'}"></des-db-access>` :
+          html`<des-404 class="page" ?active="${this._page === 'db-access'}"></des-404>`}
         ${this.accessPages.includes('cutout') ?
-           html`<des-cutout class="page" ?active="${this._page === 'cutout'}"></des-cutout>` :
-           html`<des-404 class="page" ?active="${this._page === 'cutout'}"></des-404>`}
+          html`<des-cutout class="page" ?active="${this._page === 'cutout'}"></des-cutout>` :
+          html`<des-404 class="page" ?active="${this._page === 'cutout'}"></des-404>`}
         ${this.accessPages.includes('status') ?
-           html`<des-job-status class="page" ?active="${this._page === 'status'}"></des-job-status>` :
-           html`<des-404 class="page" ?active="${this._page === 'status'}"></des-404>`}
+          html`<des-job-status class="page" ?active="${this._page === 'status'}"></des-job-status>` :
+          html`<des-404 class="page" ?active="${this._page === 'status'}"></des-404>`}
         ${this.accessPages.includes('ticket') ?
-           html`<des-ticket class="page" ?active="${this._page === 'ticket'}"></des-ticket>` :
-           html`<des-404 class="page" ?active="${this._page === 'ticket'}"></des-404>`}
+          html`<des-ticket class="page" ?active="${this._page === 'ticket'}"></des-ticket>` :
+          html`<des-404 class="page" ?active="${this._page === 'ticket'}"></des-404>`}
+        <des-help class="page" ?active="${this._page === 'help'}"></des-help>
 
         <des-404 class="page" ?active="${this._page === 'des404'}"></des-404>
       </main>
 
 
-      <!-- <footer>
-        <p> &copy; DESDM Team, 2020</p>
-      </footer> -->
+      <footer>
+        <p style="font-size: 0.8rem; color: darkgray;"> &copy; 2020 DESDM Team<br> <a href="https://des.ncsa.illinois.edu/terms" style="font-size: 0.7rem; text-decoration: none; font-weight: bold; color: darkgray;">Terms and Conditions</a></p>
+      </footer>
 
     `;
   }
