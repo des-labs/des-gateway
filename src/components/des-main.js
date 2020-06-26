@@ -116,6 +116,10 @@ class DESMain extends connect(store)(LitElement) {
           background-color: lightgray;
         }
 
+        .drawer-list > a:hover {
+          background-color: lightgray;
+        }
+
         /* Workaround for IE11 displaying <main> as inline */
         main {
           display: block;
@@ -212,9 +216,9 @@ class DESMain extends connect(store)(LitElement) {
       </main>
 
 
-      <footer>
+      <!-- <footer>
         <p> &copy; DESDM Team, 2020</p>
-      </footer>
+      </footer> -->
 
     `;
   }

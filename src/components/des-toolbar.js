@@ -55,9 +55,13 @@ class DESToolBar extends connect(store)(LitElement) {
               };
         }
 
-        .profileItem a {
+        .profileItem a,
+        paper-listbox a {
           color: inherit;
           text-decoration: none;
+        }
+        paper-listbox paper-item:hover {
+          background-color: lightgray;
         }
 
         .profile {
@@ -186,11 +190,9 @@ class DESToolBar extends connect(store)(LitElement) {
               <iron-icon class="profile-icon" icon="account-circle" slot="dropdown-trigger"></iron-icon>
               <iron-icon style="margin-left:-5px;" icon="arrow-drop-down" slot="dropdown-trigger" alt="menu"></iron-icon>
               <paper-listbox class="profile-listbox" slot="dropdown-content">
-                <paper-item class="profileItem" @click="${(e) => {this.shadowRoot.getElementById('UpdateProfileDialog').opened = true;}}">Update Profile</paper-item>
-                <paper-item class="profileItem" @click="${(e) => {this.shadowRoot.getElementById('ChangePasswordDialog').opened = true;}}">Change Password</paper-item>
-                <paper-item class="profileItem" @click="${ (e) => {window.location.href = config.frontEndUrl + 'logout';}}" >
-                  Log out
-                </paper-item>
+                <a title="Update profile info" href="#" onclick="return false;"><paper-item class="profileItem" @click="${(e) => {this.shadowRoot.getElementById('UpdateProfileDialog').opened = true;}}">Update Profile</paper-item></a>
+                <a title="Change password" href="#" onclick="return false;"><paper-item class="profileItem" @click="${(e) => {this.shadowRoot.getElementById('ChangePasswordDialog').opened = true;}}">Change Password</paper-item></a>
+                <a title="Logout" href="#" onclick="return false;"><paper-item class="profileItem" @click="${ (e) => {window.location.href = config.frontEndUrl + 'logout';}}">Log out</paper-item></a>
               </paper-listbox>
             </paper-menu-button>
 

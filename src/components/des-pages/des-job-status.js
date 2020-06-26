@@ -90,10 +90,13 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   }
 
   render() {
+
+    let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    viewportHeight = viewportHeight === 0 ? 500 : viewportHeight;
     return html`
 
     <section>
-      <vaadin-grid .multiSort="${true}">
+      <vaadin-grid .multiSort="${true}" style="height: ${0.7*viewportHeight}px;">
         <vaadin-grid-selection-column auto-select></vaadin-grid-selection-column>
         <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererStatus}" .headerRenderer="${this._headerRendererStatus}"></vaadin-grid-column>
         <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererAction}" .headerRenderer="${this._headerRendererAction}"></vaadin-grid-column>
