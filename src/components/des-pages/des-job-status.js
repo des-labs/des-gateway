@@ -281,12 +281,21 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   _showJobInfo(jobId) {
     const jobInfoPanel = this.shadowRoot.getElementById('job-info-container');
     const grid = this.shadowRoot.querySelector('vaadin-grid');
+    var job = null;
     for (var i in grid.items) {
       if (grid.items[i].job.id === jobId) {
         // console.log("job: " + JSON.stringify(grid.items[i].job));
         var job = grid.items[i].job;
         break;
       }
+    }
+    if (job === null) {
+      return;
+    }
+
+    let newLocation = `${config.frontEndUrl}status/${jobId}`;
+    if (newLocation !== window.location.href+window.location.pathname) {
+      history.pushState({}, '', newLocation);
     }
     jobInfoPanel.renderer = (root, dialog) => {
       let container = root.firstElementChild;
