@@ -12,6 +12,7 @@ import '@vaadin/vaadin-grid/vaadin-grid-sort-column.js';
 import '@vaadin/vaadin-grid/vaadin-grid-selection-column.js';
 import '@vaadin/vaadin-icons/vaadin-icons.js';
 import '@polymer/paper-button/paper-button.js';
+import '@polymer/iron-image/iron-image.js';
 import { loadPage, updateQuery } from '../../actions/app.js';
 
 
@@ -79,6 +80,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     this._rendererJobId = this._rendererJobId.bind(this); // need this to invoke class methods in renderers
     this._rendererJobName = this._rendererJobName.bind(this); // need this to invoke class methods in renderers
     this._jobRenameDialog = this._jobRenameDialog.bind(this); // need this to invoke class methods in renderers
+    this._showJobImageGallery = this._showJobImageGallery.bind(this); // need this to invoke class methods in renderers
 
     // Define the datetime functions used by the update time indicator
     Date.prototype.today = function () {
@@ -91,12 +93,12 @@ class DESJobStatus extends connect(store)(PageViewElement) {
 
   render() {
 
-    let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-    viewportHeight = viewportHeight === 0 ? 500 : viewportHeight;
+    // let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    // viewportHeight = viewportHeight === 0 ? 500 : viewportHeight;
     return html`
 
     <section>
-      <vaadin-grid .multiSort="${true}" style="height: ${0.7*viewportHeight}px;">
+      <vaadin-grid .multiSort="${true}" style="height: 70vh;">
         <vaadin-grid-selection-column auto-select></vaadin-grid-selection-column>
         <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererStatus}" .headerRenderer="${this._headerRendererStatus}"></vaadin-grid-column>
         <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererAction}" .headerRenderer="${this._headerRendererAction}"></vaadin-grid-column>
@@ -109,6 +111,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     </section>
     <vaadin-dialog id="job-info-container"></vaadin-dialog>
     <vaadin-dialog id="job-rename-dialog"></vaadin-dialog>
+    <vaadin-dialog id="job-image-gallery"></vaadin-dialog>
     <vaadin-dialog id="deleteConfirmDialog" no-close-on-esc no-close-on-outside-click></vaadin-dialog>
     `;
   }
@@ -207,8 +210,8 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       if (!container) {
         container = root.appendChild(document.createElement('div'));
       }
-      let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-      viewportHeight = viewportHeight === 0 ? 300 : viewportHeight;
+      // let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+      // viewportHeight = viewportHeight === 0 ? 300 : viewportHeight;
       render(
         html`
         <style>
@@ -257,9 +260,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     jobDialogPanel.opened = true;
   }
 
-  _renderImage(fileUrl) {
-    // TODO: Disable rendering images in file list
-    return;
+  _renderImage(fileUrl, relPath) {
     let fileParts = fileUrl.split('.');
     if (fileParts.length > 1) {
       let fileExt = fileParts.pop().toLowerCase()
@@ -267,7 +268,18 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         case 'png':
         case 'jpg':
           return html`
-            <img src=${fileUrl}>
+            <div style="display: grid; grid-template-columns: 1fr; grid-gap: 5px;">
+              <div style="width: 23vw; word-wrap: break-word; font-size: 0.7rem; font-family: monospace;">${relPath}</div>
+              <div>
+                <a style="text-decoration: none;" title="Open image" alt="${relPath}" href="${fileUrl}" target="_blank">
+                  <iron-image
+                    src="${fileUrl}"
+                    alt="${relPath}"
+                    style="width:23vw; height:23vw;" sizing="cover">
+                  </iron-image>
+                </a>
+              </div>
+            </div>
           `;
           break;
         default:
@@ -277,6 +289,75 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       return html``;
     }
   }
+
+  // _closeImageGallery(dialog, jobId) {
+  //   dialog.opened = false;
+  //   let newLocation = `${config.frontEndUrl}status/${jobId}`;
+  //   if (newLocation !== window.location.href+window.location.pathname) {
+  //     history.pushState({}, '', newLocation);
+  //   }
+  // }
+
+  _showJobImageGallery(jobId) {
+    const jobImageGallery = this.shadowRoot.getElementById('job-image-gallery');
+    const grid = this.shadowRoot.querySelector('vaadin-grid');
+    var job = null;
+    for (var i in grid.items) {
+      if (grid.items[i].job.id === jobId) {
+        // console.log("job: " + JSON.stringify(grid.items[i].job));
+        var job = grid.items[i].job;
+        break;
+      }
+    }
+    if (job === null) {
+      // If the job has been deleted or not found for some reason, do not open the dialog
+      return;
+    }
+    // // Set URL to the selected job ID so that refreshing the page will reopen the job info dialog
+    // let newLocation = `${config.frontEndUrl}status/${jobId}/gallery`;
+    // if (newLocation !== window.location.href+window.location.pathname) {
+    //   history.pushState({}, '', newLocation);
+    // }
+    jobImageGallery.renderer = (root, dialog) => {
+      let container = root.firstElementChild;
+      if (!container) {
+        container = root.appendChild(document.createElement('div'));
+      }
+      let images = html`
+        ${job.cutout_files.map(i => html`
+          ${this._renderImage(`${config.frontEndOrigin}/files/${this.username}/cutout/${i}`, i.split('/').splice(1).join('/'))}
+        `)}
+      `;
+      // let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+      // viewportHeight = viewportHeight === 0 ? 600 : viewportHeight;
+      // let viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+      // viewportWidth = viewportWidth === 0 ? 1000 : viewportWidth;
+      render(
+        html`
+          <style>
+            .job-images-container {
+              display: grid;
+              grid-gap: 1rem;
+              padding: 1rem;
+              grid-template-columns: 1fr 1fr 1fr;
+            }
+          </style>
+          <div style="overflow: auto; width: 85vw; height: 85vh;">
+            <a title="Close" href="#" onclick="return false;">
+              <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
+            </a>
+            <h3>Job Images</h3>
+            <div class="job-images-container" style="overflow: auto; height: 70vh;">
+              ${images}
+            </div>
+          </div>
+        `,
+        container
+      );
+    }
+    jobImageGallery.opened = true;
+  }
+
 
   _showJobInfo(jobId) {
     const jobInfoPanel = this.shadowRoot.getElementById('job-info-container');
@@ -290,9 +371,12 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       }
     }
     if (job === null) {
+      // If the job has been deleted or not found for some reason, do not open the dialog
       return;
     }
 
+    let showImageGallery = window.location.pathname.split('/').pop() === 'gallery';
+    // Set URL to the selected job ID so that refreshing the page will reopen the job info dialog
     let newLocation = `${config.frontEndUrl}status/${jobId}`;
     if (newLocation !== window.location.href+window.location.pathname) {
       history.pushState({}, '', newLocation);
@@ -312,7 +396,29 @@ class DESJobStatus extends connect(store)(PageViewElement) {
             var numFiles = 0;
           }
           taskSpecificInfo = html`
-            <div><a title="View all files" target="_blank" href="${config.frontEndOrigin}/files/${this.username}/query/${job.id}/">Files (${numFiles})</a></div><div style="overflow: auto;"><span class="monospace-column">
+            <style>
+              paper-button {
+                margin-top: 10px;
+                margin-bottom: 10px;
+                background-color: var(--paper-indigo-500);
+                color: white;
+                width: 100%;
+                text-transform: none;
+                --paper-button-raised-keyboard-focus: {
+                  background-color: var(--paper-indigo-a250) !important;
+                  color: white !important;
+                };
+              }
+            </style>
+            <div>
+              <a title="View all files" target="_blank" href="${config.frontEndOrigin}/files/${this.username}/query/${job.id}/">
+                <paper-button raised>
+                  <iron-icon style="margin-right: 10px;" icon="vaadin:folder-open"></iron-icon>
+                  View Files (${numFiles})
+                </paper-button>
+              </a>
+            </div>
+            <div style="overflow: auto;"><span class="monospace-column">
             ${job.query_files === null ?
               html``:
               html`
@@ -320,16 +426,18 @@ class DESJobStatus extends connect(store)(PageViewElement) {
                   ${job.query_files.map(i => html`
                     <li>
                       <a target="_blank" href="${config.frontEndOrigin}/files/${this.username}/query/${job.id}/${i}">${i}</a>
-                      ${this._renderImage(`${config.frontEndOrigin}/files/${this.username}/query/${job.id}/${i}`)}
                     </li>
                   `)}
                 </ul>
               `
             }
             </span></div>
-            <div>Query
-              <a title="Copy query to editor" href="#" onclick="return false;">
-                <iron-icon @click="${(e) => {this._copyQueryToDbAccessPage(e, job.query, dialog)}}" icon="vaadin:copy-o" style="color: darkblue; margin-left: 2rem;"></iron-icon>
+            <div>
+              <a title="Copy query to editor" href="#" onclick="return false;" @click="${(e) => {this._copyQueryToDbAccessPage(e, job.query, dialog)}}">
+                <paper-button raised>
+                  <iron-icon style="margin-right: 10px;" icon="vaadin:copy-o"></iron-icon>
+                  Copy query to editor
+                </paper-button>
               </a>
             </div>
             <div>
@@ -344,8 +452,37 @@ class DESJobStatus extends connect(store)(PageViewElement) {
             var numFiles = 0;
           }
           taskSpecificInfo = html`
+          <style>
+            paper-button {
+              margin-top: 10px;
+              margin-bottom: 10px;
+              background-color: var(--paper-indigo-500);
+              color: white;
+              width: 100%;
+              text-transform: none;
+              --paper-button-raised-keyboard-focus: {
+                background-color: var(--paper-indigo-a250) !important;
+                color: white !important;
+              };
+            }
+          </style>
             <div></div><div></div>
-            <div><a title="View all files" target="_blank" href="${config.frontEndOrigin}/files/${this.username}/cutout/${job.id}/">Files (${numFiles})</a></div>
+            <div>
+              <div>
+                <a title="View all files" target="_blank" href="${config.frontEndOrigin}/files/${this.username}/cutout/${job.id}/">
+                  <paper-button raised>
+                    <iron-icon style="margin-right: 10px;" icon="vaadin:folder-open"></iron-icon>
+                    View Files (${numFiles})
+                  </paper-button>
+                </a>
+              </div>
+              <div>
+                <paper-button @click="${(e) => {this._showJobImageGallery(job.id)}}" raised>
+                  <iron-icon style="margin-right: 10px;" icon="vaadin:picture"></iron-icon>
+                  Open image gallery
+                </paper-button>
+              </div>
+            </div>
             <div style="overflow: auto;"><span class="monospace-column">
             ${job.cutout_files === null ?
               html``:
@@ -354,7 +491,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
                   ${job.cutout_files.map(i => html`
                     <li>
                       <a target="_blank" href="${config.frontEndOrigin}/files/${this.username}/cutout/${i}">${i.split('/').splice(1).join('/')}</a>
-                      ${this._renderImage(`${config.frontEndOrigin}/files/${this.username}/cutout/${i}`)}
                     </li>
                   `)}
                 </ul>
@@ -367,8 +503,8 @@ class DESJobStatus extends connect(store)(PageViewElement) {
           taskSpecificInfo = html``;
           break;
       }
-      let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-      viewportHeight = viewportHeight === 0 ? 600 : viewportHeight;
+      // let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+      // viewportHeight = viewportHeight === 0 ? 600 : viewportHeight;
       render(
         html`
           <style>
@@ -389,12 +525,12 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               grid-row-gap: 0;
             }
           </style>
-          <div style="overflow: auto; width: 1000px; height: ${0.9*viewportHeight}px;">
+          <div style="overflow: auto; width: 85vw; height: 85vh;">
             <a title="Close" href="#" onclick="return false;">
               <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
             </a>
             <h3>Job Results</h3>
-            <div class="job-results-container" style="overflow: auto; height: ${0.7*viewportHeight}px;">
+            <div class="job-results-container" style="overflow: auto; height: 70vw;">
               <div>Name</div><div><span class="monospace-column">${job.name}</span></div>
               <div>ID</div><div><span class="monospace-column">${job.id}  </span></div>
               <div>Status</div><div>${job.status}</div>
@@ -408,6 +544,9 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       );
     }
     jobInfoPanel.opened = true;
+    if (showImageGallery) {
+      this._showJobImageGallery(jobId);
+    }
   }
 
   _displayDuration(timeStart, timeComplete) {
@@ -481,7 +620,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   }
 
   _renameJob(jobInfo, newJobName) {
-    console.log(jobInfo);
     var isValidJobName = newJobName === '' || (newJobName.match(/^[a-z0-9]([-a-z0-9]*[a-z0-9])*(\.[a-z0-9]([-a-z0-9]*[a-z0-9])*)*$/g) && newJobName.length < 129);
     if (!isValidJobName) {
       this._jobRenameDialog(jobInfo, 'Invalid job name');
