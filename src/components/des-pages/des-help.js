@@ -2,6 +2,8 @@ import { html,css } from 'lit-element';
 import { PageViewElement } from './des-base-page.js';
 import { SharedStyles } from '../styles/shared-styles.js';
 import '../des-home-card.js';
+import '../des-help-cutout.js';
+import '../des-help-db-access.js';
 import { connect } from 'pwa-helpers/connect-mixin.js';
 import { store } from '../../store.js';
 
@@ -25,17 +27,26 @@ class DESHelp extends connect(store)(PageViewElement) {
   render() {
     return html`
       <section>
-        <h2>Welcome to DESaccess!</h2>
+        <div style="font-size: 2rem; font-weight: bold;">DESaccess Help</div>
         <div class="horizontal layout around justified">
-          <p>DESaccess provides multiple tools you can use to access data from the Dark Energy Survey.</p>
+          <section>
+            <p>DESaccess provides multiple tools you can use to access data from
+            the Dark Energy Survey. Follow the links below to learn more:</p>
+            <ul style="list-style-type: none;">
+            <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:code"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('db-access-section').scrollIntoView();}}">DB Access</a></li>
+            <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:scissors"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('cutout-section').scrollIntoView();}}">Cutout Service</a></li>
+            </ul>
+          </section>
 
           ${this.accessPages.includes('db-access') ? html`
-            <h3>DB Access</h3>
-            <p>The database access page allows you to submit your own OracleDB queries directly to the database.</p>
+          <section id="db-access-section">
+            <des-help-db-access></des-help-db-access>
+          </section>
           ` : html``}
           ${this.accessPages.includes('cutout') ? html`
-            <h3>Cutout Service</h3>
-            <p>The Cutout Service allows you to download raw or color image data based on input coordinates and areal dimensions.</p>
+          <section id="cutout-section">
+            <des-help-cutout></des-help-cutout>
+          </section>
           ` : html``}
           ${this.accessPages.includes('ticket') ? html`
             <h3>DES Ticket</h3>

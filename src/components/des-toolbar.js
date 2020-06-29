@@ -14,6 +14,7 @@ import '@vaadin/vaadin-dialog/vaadin-dialog.js'
 import './des-update-info.js';
 import './des-update-pwd.js';
 import './des-app-card.js';
+import './des-help-button.js';
 import { menuIcon } from './des-icons.js';
 import {config} from './des-config.js';
 import { store } from '../store.js';
@@ -22,6 +23,7 @@ class DESToolBar extends connect(store)(LitElement) {
     static get properties() {
       return {
         name: { type: String },
+        page: { type: String },
         _profile: { type: Boolean }
       }
     }
@@ -197,6 +199,10 @@ class DESToolBar extends connect(store)(LitElement) {
             </paper-menu-button>
 
           ` : html``}
+
+          ${this.page !== 'help' ? html`
+            <des-help-button></des-help-button>
+          ` : html``}
         </app-toolbar>
       `;
     }
@@ -204,12 +210,14 @@ class DESToolBar extends connect(store)(LitElement) {
     constructor() {
       super();
       this._profile = false;
+      this.page = '';
       this._updateProfileRenderer = this._updateProfileRenderer.bind(this); // need this to invoke class methods in renderers
       this._changePasswordRenderer = this._changePasswordRenderer.bind(this); // need this to invoke class methods in renderers
     }
 
     stateChanged(state) {
       this._profile = state.app.session;
+      this.page = state.app.page;
     }
 
     firstUpdated() {

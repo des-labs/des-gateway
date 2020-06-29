@@ -1,4 +1,27 @@
 import { css } from 'lit-element';
+export const HelpStyles = css`
+  .image-container {
+    text-align: center;
+  }
+  .help-content-grid {
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    grid-template-columns: 100%;
+  }
+
+  img {
+    max-width: 50%;
+    border: 1px solid darkgray;
+    padding: 1rem;
+    margin: 1rem;
+  }
+  @media (min-width: 1001px) {
+    .help-content-grid {
+      grid-template-columns: 30% 70%;
+    }
+  }
+`;
 export const SharedStyles = css`
   :host {
     display: block;
@@ -91,7 +114,7 @@ export const SharedStyles = css`
     display: block;
     color : red;
     font-size: 0.9em;
-    word-wrap: break-word;    
+    word-wrap: break-word;
     margin-top: 2rem;
     text-align: left;
   }
