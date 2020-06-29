@@ -200,7 +200,7 @@ class DESToolBar extends connect(store)(LitElement) {
 
           ` : html``}
 
-          ${this.page !== 'help' ? html`
+          ${['help', 'login', 'logout'].indexOf(this.page) === -1 ? html`
             <des-help-button></des-help-button>
           ` : html``}
         </app-toolbar>

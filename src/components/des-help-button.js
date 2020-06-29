@@ -29,17 +29,12 @@ class DESHelpButton extends connect(store)(LitElement) {
           position: absolute;
           top: 70px;
           right: 0.5rem;
-          /* height: 50px;
-          width: 50px; */
           --iron-icon-width: 2.5rem;
           --iron-icon-height: 2.5rem;
           color: #f82a0d;
           border-radius: 50%;
           -moz-border-radius: 50%;
           -webkit-border-radius: 50%;
-          /* display: grid; */
-          /* align-items: center;
-          text-align: center; */
         }
         `
       ];
@@ -50,7 +45,7 @@ class DESHelpButton extends connect(store)(LitElement) {
       if (['cutout', 'db-access'].indexOf(this.page) > -1) {
         this.dialog.opened = true;
       } else {
-        store.dispatch(navigate('help', true, this.accessPages, true));
+        store.dispatch(navigate(`${config.rootPath.replace(/\/+$/, '')}/help`, true, this.accessPages, true));
       }
     }
 
