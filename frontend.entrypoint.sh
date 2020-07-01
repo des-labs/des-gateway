@@ -11,7 +11,7 @@ sed -i "s#{{WEB_ROOT_PATH}}#${WEB_ROOT_PATH}#g" src/components/des-config.js
 sed -i "s#{{FILESERVER_ROOT_PATH}}#${FILESERVER_ROOT_PATH}#g" src/components/des-config.js
 sed -i "s#{{TICKET_AUTH}}#${TICKET_AUTH}#g" src/components/des-config.js
 
-sed -i "s#{{SERVICE_WORKER_SCOPE}}#${FRONTEND_BASE_URL}#" index.html
+sed -i "s#{{SERVICE_WORKER_SCOPE}}#${WEB_ROOT_PATH}#" index.html
 
 if [[ "$LOCAL_DEV" == "true" ]]; then
 	npm install
