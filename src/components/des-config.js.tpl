@@ -2,6 +2,7 @@ let cnf = {
   "backEndOrigin" : "{{BACKEND_BASE_URL}}",
   "frontEndOrigin" : "{{FRONTEND_BASE_URL}}",
   "rootPath"  : "{{WEB_ROOT_PATH}}",
+  "fileServerRootPath"  : "{{FILESERVER_ROOT_PATH}}",
   "apiPath"  : "{{API_ROOT_PATH}}",
   "ticketAuth": "{{TICKET_AUTH}}",
 }
@@ -17,6 +18,12 @@ iterstr = null;
 while(cnf.apiPath !== iterstr) {
   cnf.apiPath = cnf.apiPath.replace(/\/\//g, '/').replace(/\/+$/, '').replace(/^\/+/, '');
   iterstr = cnf.apiPath.replace(/\/\//g, '/').replace(/\/+$/, '').replace(/^\/+/, '');
+}
+
+iterstr = null;
+while(cnf.fileServerRootPath !== iterstr) {
+  cnf.fileServerRootPath = cnf.fileServerRootPath.replace(/\/\//g, '/').replace(/\/+$/, '').replace(/^\/+/, '');
+  iterstr = cnf.fileServerRootPath.replace(/\/\//g, '/').replace(/\/+$/, '').replace(/^\/+/, '');
 }
 
 // Construct base URLs, ensuring exactly one trailing slash

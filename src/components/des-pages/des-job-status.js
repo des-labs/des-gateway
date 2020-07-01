@@ -325,7 +325,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       }
       let images = html`
         ${job.cutout_files.map(i => html`
-          ${this._renderImage(`${config.frontEndOrigin}/files/${this.username}/cutout/${i}`, i.split('/').splice(1).join('/'))}
+          ${this._renderImage(`${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/cutout/${i}`, i.split('/').splice(1).join('/'))}
         `)}
       `;
       // let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
@@ -411,7 +411,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               }
             </style>
             <div>
-              <a title="View all files" target="_blank" href="${config.frontEndOrigin}/files/${this.username}/query/${job.id}/">
+              <a title="View all files" target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/query/${job.id}/">
                 <paper-button raised>
                   <iron-icon style="margin-right: 10px;" icon="vaadin:folder-open"></iron-icon>
                   View Files (${numFiles})
@@ -425,7 +425,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
                 <ul style="list-style-type: square; margin: 0; padding: 0;">
                   ${job.query_files.map(i => html`
                     <li>
-                      <a target="_blank" href="${config.frontEndOrigin}/files/${this.username}/query/${job.id}/${i}">${i}</a>
+                      <a target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/query/${job.id}/${i}">${i}</a>
                     </li>
                   `)}
                 </ul>
@@ -469,7 +469,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
             <div></div><div></div>
             <div>
               <div>
-                <a title="View all files" target="_blank" href="${config.frontEndOrigin}/files/${this.username}/cutout/${job.id}/">
+                <a title="View all files" target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/cutout/${job.id}/">
                   <paper-button raised>
                     <iron-icon style="margin-right: 10px;" icon="vaadin:folder-open"></iron-icon>
                     View Files (${numFiles})
@@ -490,7 +490,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
                 <ul style="list-style-type: square; margin: 0; padding: 0;">
                   ${job.cutout_files.map(i => html`
                     <li>
-                      <a target="_blank" href="${config.frontEndOrigin}/files/${this.username}/cutout/${i}">${i.split('/').splice(1).join('/')}</a>
+                      <a target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/cutout/${i}">${i.split('/').splice(1).join('/')}</a>
                     </li>
                   `)}
                 </ul>
