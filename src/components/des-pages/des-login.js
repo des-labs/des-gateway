@@ -8,6 +8,8 @@ import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-card/paper-card.js';
 import '@polymer/paper-spinner/paper-spinner.js';
 import '@cwmr/paper-password-input/paper-password-input.js'
+import '@polymer/paper-radio-group/paper-radio-group.js';
+import '@polymer/paper-radio-button/paper-radio-button.js';
 import { loginUser,
          logoutUser,
          navigate,
@@ -62,6 +64,8 @@ class DESLogin extends connect(store)(PageViewElement) {
   constructor() {
     super();
     this.database='dessci';
+    this.username='';
+    this._passwd='';
   }
 
   render() {
@@ -74,7 +78,7 @@ class DESLogin extends connect(store)(PageViewElement) {
             <span>Use your Internal DES DB credentials. <br /></span>
             <span> Fill this <a href='https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/' target="_blank">form</a>
                  if you have trouble accessing the server</span> <br><br>
-            <form id="login-form" name="login-form" action="login" method="post">
+            <form id="login-form" name="login-form" onsubmit="${this._checkAndSubmit}">
 
             <custom-style>
               <style is="custom-style">
@@ -83,6 +87,16 @@ class DESLogin extends connect(store)(PageViewElement) {
                 }
               </style>
             </custom-style>
+
+            <div>
+              <label id="db-choice" style="font-weight: bold;">Choose database:</label>
+              <div>
+                <paper-radio-group selected="${this.database}" aria-labelledby="data-release-tag">
+                  <paper-radio-button @change="${e => this.database = e.target.name}" name="dessci">dessci</paper-radio-button>
+                  <paper-radio-button @change="${e => this.database = e.target.name}" name="desoper">desoper</paper-radio-button>
+                </paper-radio-group>
+              </div>
+            </div>
             <paper-input-container always-float-label>
               <label slot="label">Username</label>
               <iron-input slot="input">
@@ -96,13 +110,10 @@ class DESLogin extends connect(store)(PageViewElement) {
               </iron-input>
             </paper-input-container>
 
-              <!-- <paper-input always-float-label required="" label="Username" type="text" autocomplete="username" name="username" @input="${e => this.username = e.target.value}"></paper-input> -->
-              <!-- <paper-input always-float-label required="" label="Password" autocomplete="current-password" type="password" name="password" @input="${e => this._passwd = e.target.value}"></paper-input> -->
               <br>
               <div class="container">
-                <paper-button class="des-button" id="loginButton"raised @click="${this._prep0}" type="submit">dessci</paper-button>
-                <paper-button class="des-button" id="loginButton"raised @click="${this._prep1}" type="submit">desoper</paper-button>
-                <input type="submit" value="Dummy submit button" style="display: none;"></input>
+                <input type="submit" id="hidden-submit" @click="${this._checkAndSubmit}" value="Dummy submit button" style="display: none;"></input>
+                <paper-button class="des-button" id="loginButton" raised @click="${this._checkAndSubmit}" type="submit" disabled>Login</paper-button>
                 <paper-spinner id=loginSpinner></paper-spinner>
               </div>
             </form>
@@ -118,52 +129,68 @@ class DESLogin extends connect(store)(PageViewElement) {
     `;
   }
 
-
-_prep0(){
-  this.database='dessci';
-  this._submit();
-}
-
-_prep1(){
-  this.database='desoper';
-  this._submit();
-}
-
-_submit(){
-  // do request
-  this.shadowRoot.getElementById("loginButton").disabled=true;
-  this.shadowRoot.getElementById("loginSpinner").active=true;
-  const Url=config.backEndUrl + "login"
-  const formData = new FormData();
-  formData.append('username', this.username);
-  formData.append('password', this._passwd);
-  formData.append('database', this.database);
-  const data = new URLSearchParams(formData);
-  const param = {body: data, method: "POST"};
-  fetch(Url, param)
-  .then(response => {
-    return response.json();
-  })
-  .then(data => {
-    if (data.status == 'ok'){
-      localStorage.setItem("token", data.token);
-      store.dispatch(loginUser({"name": data.name, "username": data.username,
-      "lastname": data.lastname, "email":data.email, "session": true, "db": data.db, "roles": data.roles}));
-      store.dispatch(navigate(decodeURIComponent(window.location.pathname),true, getAccessPages(data.roles), true));
+  _checkAndSubmit(e) {
+    if (this.username !== '' && this._passwd !== '') {
+      this._submit();
     }
-    else {
-      localStorage.clear();
-      store.dispatch(logoutUser());
-      this.msg = data.message;
-      this.shadowRoot.getElementById("loginButton").disabled=false;
-      this.shadowRoot.getElementById("loginSpinner").active=false;
+    return false;
+  }
 
-    }
-  })
-  .catch((error) => {console.log(error);});
-}
+  _submit(){
+    this.shadowRoot.getElementById("loginButton").disabled=true;
+    this.shadowRoot.getElementById("loginSpinner").active=true;
+    const Url=config.backEndUrl + "login"
+    const formData = new FormData();
+    formData.append('username', this.username);
+    formData.append('password', this._passwd);
+    formData.append('database', this.database);
+    const data = new URLSearchParams(formData);
+    const param = {body: data, method: "POST"};
+    fetch(Url, param)
+    .then(response => {
+      return response.json();
+    })
+    .then(data => {
+      if (data.status == 'ok'){
+        localStorage.setItem("token", data.token);
+        store.dispatch(loginUser({"name": data.name, "username": data.username,
+        "lastname": data.lastname, "email":data.email, "session": true, "db": data.db, "roles": data.roles}));
+        store.dispatch(navigate(decodeURIComponent(window.location.pathname),true, getAccessPages(data.roles), true));
+      }
+      else {
+        localStorage.clear();
+        store.dispatch(logoutUser());
+        this.msg = data.message;
+        this.shadowRoot.getElementById("loginButton").disabled=false;
+        this.shadowRoot.getElementById("loginSpinner").active=false;
 
+      }
+    })
+    .catch((error) => {console.log(error);});
+    return false;
+  }
 
+  updated(changedProps) {
+    changedProps.forEach((oldValue, propName) => {
+      // console.log(`${propName} changed. oldValue: ${oldValue}`);
+      switch (propName) {
+        case 'username':
+        case '_passwd':
+          this.shadowRoot.getElementById('loginButton').disabled = this.username === '' || this._passwd === '';
+          break;
+        default:
+      }
+    });
+  }
+
+  firstUpdated() {
+    this.shadowRoot.getElementById('login-form').onkeydown = (e) => {
+      if (e.keyCode == 13) {
+        e.preventDefault();
+        this._checkAndSubmit(e) ;
+      }
+    };
+  }
 }
 
 window.customElements.define('des-login',DESLogin);
