@@ -23,6 +23,7 @@ class DESToolBar extends connect(store)(LitElement) {
     static get properties() {
       return {
         name: { type: String },
+        db: { type: String },
         page: { type: String },
         _profile: { type: Boolean }
       }
@@ -187,7 +188,10 @@ class DESToolBar extends connect(store)(LitElement) {
           <div main-narrow-title>DES desaccess</div>
 
           ${this._profile ? html`
-            <div style="display: inline-block; color: white; position: absolute; right: 110px; font-size: 1rem;">${this.name}</div>
+            <div style="display: inline-block; color: white; position: absolute; right: 110px; font-size: 1rem; font-weight: bold;">
+            ${this.name}
+            <div style="font-size: 0.8rem; font-style: italic; text-align: center; text-transform: uppercase; font-weight: normal;">${this.db}</div>
+            </div>
             <paper-menu-button class="profile">
               <iron-icon class="profile-icon" icon="account-circle" slot="dropdown-trigger"></iron-icon>
               <iron-icon style="margin-left:-5px;" icon="arrow-drop-down" slot="dropdown-trigger" alt="menu"></iron-icon>
@@ -211,6 +215,7 @@ class DESToolBar extends connect(store)(LitElement) {
       super();
       this._profile = false;
       this.page = '';
+      this.db = '';
       this._updateProfileRenderer = this._updateProfileRenderer.bind(this); // need this to invoke class methods in renderers
       this._changePasswordRenderer = this._changePasswordRenderer.bind(this); // need this to invoke class methods in renderers
     }
@@ -218,6 +223,7 @@ class DESToolBar extends connect(store)(LitElement) {
     stateChanged(state) {
       this._profile = state.app.session;
       this.page = state.app.page;
+      this.db = state.app.db;
     }
 
     firstUpdated() {
