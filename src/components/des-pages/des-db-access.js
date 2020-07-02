@@ -25,6 +25,8 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       results: {type: String},
       submit_disabled: {type: Boolean},
       validOutputFile: {type: Object},
+      lastSubmission: {type: String},
+      lastSubmissionDuplicate: {type: Boolean},
       refreshStatusIntervalId: {type: Number},
       compressOutputFile: {type: Boolean},
       quickQuery: {type: Boolean},
@@ -217,7 +219,9 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     this.results = '';
     this.msg = "";
     this.submit_disabled = true;
-    this.validOutputFile = {file: '',valid: false};
+    this.validOutputFile = {file: '', valid: false};
+    this.lastSubmission = '';
+    this.lastSubmissionDuplicate = false;
     this.compressOutputFile = false;
     this.quickQuery = false;
     this.refreshStatusIntervalId = 0;
@@ -437,6 +441,13 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     // Dim the other text for consistency if quick query
     this.shadowRoot.getElementById('options-controls').style.color = this.quickQuery ? 'lightgray' : 'black';
 
+    // Check for duplicate submission
+    let body = this._constructJobSubmitBody(this._getCurrentQuery());
+    this.lastSubmissionDuplicate = this.lastSubmission === JSON.stringify(body);
+    if (this.lastSubmissionDuplicate) {
+      validForm = false;
+    }
+
     // Enable/disable submit button
     if (this.refreshStatusIntervalId === 0) {
       this.submit_disabled = !validForm;
@@ -445,17 +456,8 @@ class DESDbAccess extends connect(store)(PageViewElement) {
 
   _checkSyntax(event) {
     const Url=config.backEndUrl + "page/db-access/check";
-    /* Removing comments from query string */
-    this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
-    var query_lines = this.editor.doc.getValue().split('\n');
-    let query = '';
-    var i;
-    for (i = 0; i < query_lines.length; i++) {
-      if (query_lines[i].startsWith('--') == false && query_lines[i] !== "") {
-        query += ' ' + query_lines[i];
-      }
-    }
-    var body = {
+    let query = this._getCurrentQuery();
+    let body = {
       job: 'query',
       username: this.username,
       query: query,
@@ -491,20 +493,8 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     });
   }
 
-  _submitJob(callback) {
-    const Url=config.backEndUrl + "job/submit";
-
-    /* Removing comments from query string */
-    this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
-    var query_lines = this.editor.doc.getValue().split('\n');
-    let query = '';
-    var i;
-    for (i = 0; i < query_lines.length; i++) {
-      if (query_lines[i].startsWith('--') == false && query_lines[i] !== "") {
-        query += ' ' + query_lines[i];
-      }
-    }
-    var body = {
+  _constructJobSubmitBody(query) {
+    let body = {
       job: 'query',
       username: this.username,
       query: query,
@@ -520,6 +510,29 @@ class DESDbAccess extends connect(store)(PageViewElement) {
     if (this.customJobName !== '') {
       body.job_name = this.customJobName;
     }
+    return body;
+  }
+
+  _getCurrentQuery() {
+    let query = '';
+    if (this.shadowRoot.querySelector('.CodeMirror') !== null) {
+      /* Removing comments from query string */
+      this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
+      let query_lines = this.editor.doc.getValue().split('\n');
+      let i;
+      for (i = 0; i < query_lines.length; i++) {
+        if (query_lines[i].startsWith('--') == false && query_lines[i] !== "") {
+          query += ' ' + query_lines[i];
+        }
+      }
+    }
+    return query;
+  }
+
+  _submitJob(callback) {
+    const Url=config.backEndUrl + "job/submit";
+    let query = this._getCurrentQuery();
+    let body = this._constructJobSubmitBody(query);
     const param = {
       method: "PUT",
       headers: {
@@ -528,6 +541,11 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       },
       body: JSON.stringify(body)
     };
+    // Do not submit job if it is a duplicate of the previous submission. This
+    // prevents submitting redundant jobs by accidentally clicking the submit button
+    // repeatedly.
+    this.lastSubmission = JSON.stringify(body);
+    this.lastSubmissionDuplicate = true;
     fetch(Url, param)
     .then(response => {
       return response.json()
@@ -648,14 +666,17 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   }
 
   _toggleSpinner(active, callback) {
-    this.submit_disabled = active;
+    this.submit_disabled = active || this.lastSubmissionDuplicate;
     this.shadowRoot.getElementById('submit-button-query').disabled = this.submit_disabled;
     this.shadowRoot.getElementById('submit-spinner').active = active;
     callback();
   }
 
   _submit(event) {
-    if (!this.submit_disabled) {
+    if (this.lastSubmissionDuplicate) {
+      this.shadowRoot.getElementById('toast-job-failure').text = 'Duplicate job ignored';
+      this.shadowRoot.getElementById('toast-job-failure').show();
+    } else if (!this.submit_disabled) {
       this._toggleSpinner(true, () => {
         this._submitJob(() => {
           this._toggleSpinner(this.quickQuery, () => {});
@@ -802,6 +823,7 @@ WHERE
           // console.log(`Updating code editor...`);
           this.editor = editorElement.CodeMirror;
           this.editor.doc.setValue(this.query);
+          this._validateForm();
         }
         window.clearInterval(queryInitIntervalId);
       }
@@ -836,6 +858,10 @@ WHERE
         } else {
           this.query = this.editor.doc.getValue();
         }
+        this.editor.on('blur', (event) => {
+          this.query = this.editor.doc.getValue();
+          this._validateForm();
+        });
         window.clearInterval(queryInitIntervalId);
       }
     }, 200);
@@ -846,6 +872,9 @@ WHERE
     changedProps.forEach((oldValue, propName) => {
       // console.log(`${propName} changed. oldValue: ${oldValue}`);
       switch (propName) {
+        case 'lastSubmissionDuplicate':
+          this.submit_disabled = this.submit_disabled || this.lastSubmissionDuplicate;
+          this.shadowRoot.getElementById('submit-button-query').disabled = this.submit_disabled;
         case 'submit_disabled':
           this.shadowRoot.getElementById('submit-button-query').disabled = this.submit_disabled;
           break;
