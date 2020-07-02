@@ -482,11 +482,11 @@ class DESDbAccess extends connect(store)(PageViewElement) {
           this.shadowRoot.getElementById('toast-job-success').text = 'Query syntax is valid';
           this.shadowRoot.getElementById('toast-job-success').show();
         } else {
-          this.shadowRoot.getElementById('toast-job-failure').text = 'Query syntax is invalid';
+          this.shadowRoot.getElementById('toast-job-failure').text = 'Query syntax is invalid: ' + data.msg;
           this.shadowRoot.getElementById('toast-job-failure').show();
         }
       } else {
-        this.shadowRoot.getElementById('toast-job-failure').text = 'Error checking query syntax';
+        this.shadowRoot.getElementById('toast-job-failure').text = 'Error checking query syntax ' + data.msg;
         this.shadowRoot.getElementById('toast-job-failure').show();
         console.log(JSON.stringify(data));
       }
@@ -559,7 +559,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
           this._pollQuickQueryResult(data.jobid);
         }
       } else {
-        this.shadowRoot.getElementById('toast-job-failure').text = 'Error submitting job';
+        this.shadowRoot.getElementById('toast-job-failure').text = 'Error submitting job: ' + data.message;
         this.shadowRoot.getElementById('toast-job-failure').show();
         console.log(JSON.stringify(data));
       }
@@ -617,7 +617,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
             this.results = '';
             this.shadowRoot.getElementById('results-textarea-container').innerHTML = '';
             this.shadowRoot.getElementById('results-textarea-container').style.display = 'none';
-            this.shadowRoot.getElementById('toast-job-failure').text = 'Quick query failed.';
+            this.shadowRoot.getElementById('toast-job-failure').text = 'Quick query failed: ' + data.jobs[0].job_status_message;
             this.shadowRoot.getElementById('toast-job-failure').show();
           }
         }

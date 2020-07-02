@@ -15,11 +15,13 @@ class DESHome extends connect(store)(PageViewElement) {
   static get properties() {
     return {
       accessPages: {type: Array},
+      database: {type: String},
     };
   }
   constructor(){
     super();
     this.accessPages = [];
+    this.database = '';
   }
 
   render() {
@@ -31,7 +33,7 @@ class DESHome extends connect(store)(PageViewElement) {
               <des-home-card heading="DB ACCESS" image="images/home-query.png" alt="Query" desc="Oracle SQL web client" name="query" ></des-home-card>
             </a>
           ` : html``}
-          ${this.accessPages.includes('cutout') ? html`
+          ${this.accessPages.includes('cutout') && this.database !== 'desoper' ? html`
             <a style = "text-transform: none; color:black;" href="cutout" tabindex="-1">
               <des-home-card heading="CUTOUT SERVICE" image="images/home-coadd.png" alt="Bulk Cutout Service" desc="Generate cutout images" name="cutout" ></des-home-card>
             </a>
@@ -56,6 +58,7 @@ class DESHome extends connect(store)(PageViewElement) {
 
   stateChanged(state) {
     this.accessPages = state.app.accessPages;
+    this.database = state.app.db;
   }
 }
 

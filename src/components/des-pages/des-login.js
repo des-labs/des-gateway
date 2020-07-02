@@ -91,7 +91,7 @@ class DESLogin extends connect(store)(PageViewElement) {
             <div>
               <label id="db-choice" style="font-weight: bold;">Choose database:</label>
               <div>
-                <paper-radio-group selected="${this.database}" aria-labelledby="data-release-tag">
+                <paper-radio-group id="database-selection" selected="${this.database}" aria-labelledby="data-release-tag">
                   <paper-radio-button @change="${e => this.database = e.target.name}" name="dessci">dessci</paper-radio-button>
                   <paper-radio-button @change="${e => this.database = e.target.name}" name="desoper">desoper</paper-radio-button>
                 </paper-radio-group>
@@ -139,6 +139,7 @@ class DESLogin extends connect(store)(PageViewElement) {
   _submit(){
     this.shadowRoot.getElementById("loginButton").disabled=true;
     this.shadowRoot.getElementById("loginSpinner").active=true;
+    this.database = this.shadowRoot.getElementById('database-selection').selected;
     const Url=config.backEndUrl + "login"
     const formData = new FormData();
     formData.append('username', this.username);

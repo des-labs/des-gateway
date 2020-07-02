@@ -17,11 +17,13 @@ class DESHelp extends connect(store)(PageViewElement) {
   static get properties() {
     return {
       accessPages: {type: Array},
+      database: {type: String},
     };
   }
   constructor(){
     super();
     this.accessPages = [];
+    this.database = '';
   }
 
   render() {
@@ -33,8 +35,12 @@ class DESHelp extends connect(store)(PageViewElement) {
             <p>DESaccess provides multiple tools you can use to access data from
             the Dark Energy Survey. Follow the links below to learn more:</p>
             <ul style="list-style-type: none;">
-            <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:code"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('db-access-section').scrollIntoView();}}">DB Access</a></li>
-            <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:scissors"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('cutout-section').scrollIntoView();}}">Cutout Service</a></li>
+            ${this.accessPages.includes('db-access') ? html`
+              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:code"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('db-access-section').scrollIntoView();}}">DB Access</a></li>
+            ` : html``}
+            ${this.accessPages.includes('cutout') && this.database !== 'desoper' ? html`
+              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:scissors"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('cutout-section').scrollIntoView();}}">Cutout Service</a></li>
+            ` : html``}
             </ul>
           </section>
 
@@ -43,7 +49,7 @@ class DESHelp extends connect(store)(PageViewElement) {
             <des-help-db-access></des-help-db-access>
           </section>
           ` : html``}
-          ${this.accessPages.includes('cutout') ? html`
+          ${this.accessPages.includes('cutout') && this.database !== 'desoper' ? html`
           <section id="cutout-section">
             <des-help-cutout></des-help-cutout>
           </section>
@@ -59,6 +65,7 @@ class DESHelp extends connect(store)(PageViewElement) {
 
   stateChanged(state) {
     this.accessPages = state.app.accessPages;
+    this.database = state.app.db;
   }
 }
 

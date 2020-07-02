@@ -520,7 +520,7 @@ class DESCutout extends connect(store)(PageViewElement) {
         that.shadowRoot.getElementById('toast-job-success').text = 'Job submitted';
         that.shadowRoot.getElementById('toast-job-success').show();
       } else {
-        that.shadowRoot.getElementById('toast-job-failure').text = 'Error submitting job';
+        that.shadowRoot.getElementById('toast-job-failure').text = 'Error submitting job: ' + data.message;
         that.shadowRoot.getElementById('toast-job-failure').show();
         console.log(JSON.stringify(data));
       }

@@ -50,6 +50,7 @@ class DESMain extends connect(store)(LitElement) {
       username: {type: String},
       name: {type: String},
       email: {type: String},
+      database: {type: String},
       accessPages: {type: Array},
       _listPages: {type: Array},
       roles: {type: Array}
@@ -185,7 +186,7 @@ class DESMain extends connect(store)(LitElement) {
           <a ?selected="${this._page === 'home'}" href="${config.frontEndUrl + 'home'}"><iron-icon icon="vaadin:home" style="color: black; margin-right: 1rem;"></iron-icon>Home</a>
           ${this.accessPages.includes('test-job')  ? this._renderMenuItem('Submit Test Job', 'test-job', 'vaadin:stopwatch') : html ``}
           ${this.accessPages.includes('db-access') ? this._renderMenuItem('DB Access', 'db-access', 'vaadin:code') : html ``}
-          ${this.accessPages.includes('cutout')    ? this._renderMenuItem('Cutout Service', 'cutout', 'vaadin:scissors') : html ``}
+          ${this.accessPages.includes('cutout') && this.database !== 'desoper'   ? this._renderMenuItem('Cutout Service', 'cutout', 'vaadin:scissors') : html ``}
           ${this.accessPages.includes('status')    ? this._renderMenuItem('Job Status', 'status', 'vaadin:cogs') : html ``}
           ${this.accessPages.includes('ticket')    ? this._renderMenuItem('DES Ticket', 'ticket', 'vaadin:clipboard-user') : html ``}
           ${this._renderMenuItem('Help', 'help', 'vaadin:question-circle-o')}
@@ -203,7 +204,7 @@ class DESMain extends connect(store)(LitElement) {
         ${this.accessPages.includes('db-access') ?
           html`<des-db-access class="page" ?active="${this._page === 'db-access'}"></des-db-access>` :
           html`<des-404 class="page" ?active="${this._page === 'db-access'}"></des-404>`}
-        ${this.accessPages.includes('cutout') ?
+        ${this.accessPages.includes('cutout') && this.database !== 'desoper' ?
           html`<des-cutout class="page" ?active="${this._page === 'cutout'}"></des-cutout>` :
           html`<des-404 class="page" ?active="${this._page === 'cutout'}"></des-404>`}
         ${this.accessPages.includes('status') ?
@@ -242,6 +243,7 @@ class DESMain extends connect(store)(LitElement) {
     this.name = state.app.name;
     this.roles = state.app.roles;
     this.accessPages = state.app.accessPages;
+    this.database = state.app.db;
   }
 
   firstUpdated() {
