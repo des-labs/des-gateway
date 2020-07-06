@@ -309,7 +309,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         break;
       }
     }
-    if (job === null) {
+    if (job === null || job.cutout_files === null) {
       // If the job has been deleted or not found for some reason, do not open the dialog
       return;
     }
