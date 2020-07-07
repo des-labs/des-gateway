@@ -298,21 +298,50 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   //   }
   // }
 
-  _showJobImageGallery(jobId) {
-    const jobImageGallery = this.shadowRoot.getElementById('job-image-gallery');
+  _imageCount(jobId) {
     const grid = this.shadowRoot.querySelector('vaadin-grid');
-    var job = null;
-    for (var i in grid.items) {
+    let numImages = 0;
+    let job = null;
+    for (let i in grid.items) {
       if (grid.items[i].job.id === jobId) {
-        // console.log("job: " + JSON.stringify(grid.items[i].job));
-        var job = grid.items[i].job;
+        job = grid.items[i].job;
         break;
       }
     }
-    if (job === null || job.cutout_files === null) {
+    for (let fileUrlIdx in job.cutout_files) {
+      let fileParts = job.cutout_files[fileUrlIdx].split('.');
+      if (fileParts.length > 1) {
+        let fileExt = fileParts.pop().toLowerCase()
+        switch (fileExt) {
+          case 'png':
+          case 'jpg':
+            numImages++;
+            break;
+          default:
+        }
+      }
+    }
+
+    return numImages;
+  }
+
+  _showJobImageGallery(jobId) {
+    const jobImageGallery = this.shadowRoot.getElementById('job-image-gallery');
+    const grid = this.shadowRoot.querySelector('vaadin-grid');
+    let job = null;
+    for (var i in grid.items) {
+      if (grid.items[i].job.id === jobId) {
+        // console.log("job: " + JSON.stringify(grid.items[i].job));
+        job = grid.items[i].job;
+        break;
+      }
+    }
+
+    if (job === null || job.cutout_files === null || this._imageCount(jobId) === 0) {
       // If the job has been deleted or not found for some reason, do not open the dialog
       return;
     }
+
     // // Set URL to the selected job ID so that refreshing the page will reopen the job info dialog
     // let newLocation = `${config.frontEndUrl}status/${jobId}/gallery`;
     // if (newLocation !== window.location.href+window.location.pathname) {
@@ -476,17 +505,26 @@ class DESJobStatus extends connect(store)(PageViewElement) {
                   </paper-button>
                 </a>
               </div>
-              <div>
-                <paper-button @click="${(e) => {this._showJobImageGallery(job.id)}}" raised>
-                  <iron-icon style="margin-right: 10px;" icon="vaadin:picture"></iron-icon>
-                  Open image gallery
-                </paper-button>
-              </div>
+              
+              ${this._imageCount(job.id) === 0 ?
+                html``:
+                html`
+                  <div>
+                    <paper-button @click="${(e) => {this._showJobImageGallery(job.id)}}" raised>
+                      <iron-icon style="margin-right: 10px;" icon="vaadin:picture"></iron-icon>
+                      Open image gallery
+                    </paper-button>
+                  </div>
+                `
+              }
             </div>
             <div style="overflow: auto;"><span class="monospace-column">
             ${job.cutout_files === null ?
               html``:
               html`
+                <p><a title="Download archive file" target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/cutout/${job.id}.tar.gz">
+                  Download compressed archive file containing all job files (<code>.tar.gz</code>)
+                </a></p>
                 <ul style="list-style-type: square; margin: 0; padding: 0;">
                   ${job.cutout_files.map(i => html`
                     <li>
