@@ -5,6 +5,7 @@ import { store } from '../store.js';
 import {navigate} from '../actions/app.js';
 import {config} from './des-config.js';
 import './des-help-cutout.js';
+import './des-help-status.js';
 import './des-help-db-access.js';
 import '@polymer/iron-icon/iron-icon.js';
 import '@vaadin/vaadin-dialog/vaadin-dialog.js'
@@ -42,7 +43,7 @@ class DESHelpButton extends connect(store)(LitElement) {
 
     _openDialog(event) {
       console.log(this.page);
-      if (['cutout', 'db-access'].indexOf(this.page) > -1) {
+      if (['cutout', 'db-access', 'status'].indexOf(this.page) > -1) {
         this.dialog.opened = true;
       } else {
         store.dispatch(navigate(`${config.rootPath.replace(/\/+$/, '')}/help`, true, this.accessPages, true));
@@ -109,6 +110,9 @@ class DESHelpButton extends connect(store)(LitElement) {
               ` : html``}
               ${this.page === 'cutout' ? html`
                 <des-help-cutout></des-help-cutout>
+              ` : html``}
+              ${this.page === 'status' ? html`
+                <des-help-status></des-help-status>
               ` : html``}
               ${this.page === 'ticket' ? html`
                 <h3>DES Ticket Help</h3>

@@ -3,6 +3,7 @@ import { PageViewElement } from './des-base-page.js';
 import { SharedStyles } from '../styles/shared-styles.js';
 import '../des-home-card.js';
 import '../des-help-cutout.js';
+import '../des-help-status.js';
 import '../des-help-db-access.js';
 import { connect } from 'pwa-helpers/connect-mixin.js';
 import { store } from '../../store.js';
@@ -41,6 +42,9 @@ class DESHelp extends connect(store)(PageViewElement) {
             ${this.accessPages.includes('cutout') && this.database !== 'desoper' ? html`
               <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:scissors"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('cutout-section').scrollIntoView();}}">Cutout Service</a></li>
             ` : html``}
+            ${this.accessPages.includes('status') ? html`
+              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:clipboard-user"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('status-section').scrollIntoView();}}">Job Status</a></li>
+            ` : html``}
             </ul>
           </section>
 
@@ -52,6 +56,11 @@ class DESHelp extends connect(store)(PageViewElement) {
           ${this.accessPages.includes('cutout') && this.database !== 'desoper' ? html`
           <section id="cutout-section">
             <des-help-cutout></des-help-cutout>
+          </section>
+          ` : html``}
+          ${this.accessPages.includes('status') ? html`
+          <section id="status-section">
+            <des-help-status></des-help-status>
           </section>
           ` : html``}
           ${this.accessPages.includes('ticket') ? html`

@@ -11,16 +11,24 @@ export const HelpStyles = css`
   }
 
   img {
-    max-width: 50%;
+    max-width: 70%;
     border: 1px solid darkgray;
     padding: 1rem;
     margin: 1rem;
+  }
+  pre {
+    font-size: 0.7rem;
+    background-color: #484848;
+    color: lime;
+    padding: 1rem;
+    overflow-x: auto;
   }
   @media (min-width: 1001px) {
     .help-content-grid {
       grid-template-columns: 30% 70%;
     }
   }
+
 `;
 export const SharedStyles = css`
   :host {
