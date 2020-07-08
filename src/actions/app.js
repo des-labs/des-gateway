@@ -128,7 +128,6 @@ export const loadPage = (page,ap,targetPath = '') => (dispatch) => {
   }
   let newLocation = config.frontEndUrl + targetPath;
   let currentLocation = window.location.origin+window.location.pathname;
-  console.log(`currentLocation: ${currentLocation}\nnewLocation: ${newLocation}`);
   if (newLocation !== currentLocation) {
     history.pushState({}, '', newLocation);
   }

@@ -408,7 +408,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     // Set URL to the selected job ID so that refreshing the page will reopen the job info dialog
     let newLocation = `${config.frontEndUrl}status/${jobId}`;
     let currentLocation = window.location.origin+window.location.pathname;
-    console.log(`currentLocation: ${currentLocation}\nnewLocation: ${newLocation}`);
     if (newLocation !== currentLocation) {
       history.pushState({}, '', newLocation);
     }

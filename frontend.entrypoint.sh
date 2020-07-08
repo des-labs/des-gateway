@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# cp package.tpl.json package.json
-# sed -i "s#{{SCRIPTS_BUILD}}#polymer build --base-path=${WEB_ROOT_PATH} --name=${WEB_ROOT_PATH} --preset=es5-bundled \&\& gulp prpl-server#" package.json
-export WEB_ROOT_PATH
 cp src/components/des-config.js.tpl src/components/des-config.js
 sed -i "s#{{BACKEND_BASE_URL}}#${BACKEND_BASE_URL}#g" src/components/des-config.js
 sed -i "s#{{API_ROOT_PATH}}#${API_ROOT_PATH}#g" src/components/des-config.js
@@ -11,11 +8,11 @@ sed -i "s#{{WEB_ROOT_PATH}}#${WEB_ROOT_PATH}#g" src/components/des-config.js
 sed -i "s#{{FILESERVER_ROOT_PATH}}#${FILESERVER_ROOT_PATH}#g" src/components/des-config.js
 sed -i "s#{{TICKET_AUTH}}#${TICKET_AUTH}#g" src/components/des-config.js
 
-cp index.html.tpl index.html
+cp index.tpl.html index.html
 sed -i "s#{{SERVICE_WORKER_SCOPE}}#${WEB_ROOT_PATH}#" index.html
-export VERSION="$(date | md5sum | cut -f1 -d' ')"
-cp "src/components/des-main.js" "src/components/des-main.${VERSION}.js"
-sed -i "s#{{VERSION}}#${VERSION}#" index.html
+
+cp polymer.tpl.json polymer.json
+sed -i "s#{{WEB_ROOT_PATH}}#${WEB_ROOT_PATH}#g" polymer.json
 
 if [[ "$LOCAL_DEV" == "true" ]]; then
 	npm install

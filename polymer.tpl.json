@@ -1,5 +1,6 @@
 {
   "entrypoint": "index.html",
+  "shell": "src/components/des-main.js",
   "sources": [
     "images/**/*"
   ],
@@ -8,7 +9,13 @@
     "node_modules/@webcomponents/webcomponentsjs/**",
     "push-manifest.json"
   ],
-  "builds": [],
+  "builds": [
+    {
+      "name": "{{WEB_ROOT_PATH}}",
+      "preset": "es5-bundled",
+      "basePath": "{{WEB_ROOT_PATH}}"
+    }
+  ],
   "moduleResolution": "node",
   "npm": true
 }

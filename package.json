@@ -8,7 +8,7 @@
   "repository": "",
   "scripts": {
     "start": "polymer serve --hostname 0.0.0.0 --port 8080",
-    "build": "bash polymer-build.sh",
+    "build": "polymer build && gulp prpl-server",
     "serve": "prpl-server --root server/build --host 0.0.0.0 --port 8080 --config polymer.json"
   },
   "dependencies": {
