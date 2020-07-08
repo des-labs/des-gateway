@@ -407,7 +407,9 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     let showImageGallery = window.location.pathname.split('/').pop() === 'gallery';
     // Set URL to the selected job ID so that refreshing the page will reopen the job info dialog
     let newLocation = `${config.frontEndUrl}status/${jobId}`;
-    if (newLocation !== window.location.href+window.location.pathname) {
+    let currentLocation = window.location.origin+window.location.pathname;
+    console.log(`currentLocation: ${currentLocation}\nnewLocation: ${newLocation}`);
+    if (newLocation !== currentLocation) {
       history.pushState({}, '', newLocation);
     }
     jobInfoPanel.renderer = (root, dialog) => {
@@ -505,7 +507,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
                   </paper-button>
                 </a>
               </div>
-              
+
               ${this._imageCount(job.id) === 0 ?
                 html``:
                 html`
