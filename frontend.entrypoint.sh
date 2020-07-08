@@ -13,7 +13,9 @@ sed -i "s#{{TICKET_AUTH}}#${TICKET_AUTH}#g" src/components/des-config.js
 
 cp index.html.tpl index.html
 sed -i "s#{{SERVICE_WORKER_SCOPE}}#${WEB_ROOT_PATH}#" index.html
-sed -i "s#{{VERSION}}#${DOCKER_IMAGE_FRONTEND}#" index.html
+export VERSION="$(date | md5sum | cut -f1 -d' ')"
+cp "src/components/des-main.js" "src/components/des-main.${VERSION}.js"
+sed -i "s#{{VERSION}}#${VERSION}#" index.html
 
 if [[ "$LOCAL_DEV" == "true" ]]; then
 	npm install

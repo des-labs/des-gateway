@@ -102,6 +102,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       Please enable JavaScript to view this website.
     </noscript>
     <script src="node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-    <script type="module" src="src/components/des-main.js?version={{VERSION}}"></script>
+    <script type="module" src="src/components/des-main.{{VERSION}}.js"></script>
   </body>
 </html>

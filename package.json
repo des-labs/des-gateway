@@ -9,9 +9,7 @@
   "scripts": {
     "start": "polymer serve --hostname 0.0.0.0 --port 8080",
     "build": "bash polymer-build.sh",
-    "build:static": "polymer build ",
-    "serve": "prpl-server --root server/build --host 0.0.0.0 --port 8080",
-    "serve:static": "polymer serve --port 5000 build/default"
+    "serve": "prpl-server --root server/build --host 0.0.0.0 --port 8080 --config polymer.json"
   },
   "dependencies": {
     "@cwmr/paper-password-input": "^3.0.1",
