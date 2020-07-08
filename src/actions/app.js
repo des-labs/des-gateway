@@ -114,6 +114,9 @@ export const loadPage = (page,ap,targetPath = '') => (dispatch) => {
     case 'ticket':
       ap.includes('ticket') ?   import('../components/des-pages/des-ticket.js') : import('../components/des-pages/des-404.js') ;
       break;
+    case 'users':
+      ap.includes('users') ?   import('../components/des-pages/des-users.js') : import('../components/des-pages/des-404.js') ;
+      break;
     case 'help':
       import('../components/des-pages/des-help.js');
       break;
@@ -229,14 +232,15 @@ export const getProfile = () => {
 };
 
 export const getAccessPages = (roles) => {
-  var ap = []
+  var ap = [];
+  roles.push('public');
   for (var i=0; i < rbac_bindings.length; i++) {
     if (roles.indexOf(rbac_bindings[i]["role_name"]) !== -1) {
       var pages = rbac_bindings[i]["pages"]
       for (var j=0; j < pages.length; j++) {
-        var page = pages[j]
+        var page = pages[j];
         if (ap.indexOf(page) === -1) {
-          ap.push(page)
+          ap.push(page);
         }
       }
     }

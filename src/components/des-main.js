@@ -189,6 +189,7 @@ class DESMain extends connect(store)(LitElement) {
           ${this.accessPages.includes('cutout') && this.database !== 'desoper'   ? this._renderMenuItem('Cutout Service', 'cutout', 'vaadin:scissors') : html ``}
           ${this.accessPages.includes('status')    ? this._renderMenuItem('Job Status', 'status', 'vaadin:cogs') : html ``}
           ${this.accessPages.includes('ticket')    ? this._renderMenuItem('DES Ticket', 'ticket', 'vaadin:clipboard-user') : html ``}
+          ${this.accessPages.includes('users')    ? this._renderMenuItem('User Management', 'users', 'vaadin:users') : html ``}
           ${this._renderMenuItem('Help', 'help', 'vaadin:question-circle-o')}
         </nav>
 
@@ -213,6 +214,9 @@ class DESMain extends connect(store)(LitElement) {
         ${this.accessPages.includes('ticket') ?
           html`<des-ticket class="page" ?active="${this._page === 'ticket'}"></des-ticket>` :
           html`<des-404 class="page" ?active="${this._page === 'ticket'}"></des-404>`}
+        ${this.accessPages.includes('users') ?
+          html`<des-users class="page" ?active="${this._page === 'users'}"></des-users>` :
+          html`<des-404 class="page" ?active="${this._page === 'users'}"></des-404>`}
         <des-help class="page" ?active="${this._page === 'help'}"></des-help>
 
         <des-404 class="page" ?active="${this._page === 'des404'}"></des-404>
