@@ -22,6 +22,7 @@ class DESUsers extends connect(store)(PageViewElement) {
   static get properties() {
     return {
       accessPages: {type: Array},
+      allUsers: {type: Array},
       grid: {type: Object}
     };
   }
@@ -30,20 +31,31 @@ class DESUsers extends connect(store)(PageViewElement) {
     super();
     this.accessPages = [];
     this.grid = null;
+    this.allUsers = [];
   }
 
   render() {
     return html`
       <section>
-        <div style="font-size: 2rem; font-weight: bold;">DESaccess User Management</div>
+        <div style="font-size: 2rem; font-weight: bold;">
+        DESaccess User Management
+        </div>
+        <paper-button @click="${(e) => {this.newUserDialog.opened = true; }}" class="des-button" raised style="font-size: 1rem; margin: 1rem; height: 2rem;"><iron-icon icon="vaadin:plus" style="height: 2rem; "></iron-icon>Add user</paper-button>
+
         <vaadin-grid .multiSort="${true}" style="height: 70vh;">
           <vaadin-grid-selection-column auto-select></vaadin-grid-selection-column>
-          <vaadin-grid-column path="user.name" .renderer="${this._rendererJobId}"   header="Username">  </vaadin-grid-column>
+          <vaadin-grid-column auto-width flex-grow="0" .renderer="${this._rendererTableIndex}" header="#"></vaadin-grid-column>
+          <vaadin-grid-filter-column path="user.name" header="Username"></vaadin-grid-filter-column>
+          <vaadin-grid-sort-column path="user.firstname" header="First name"></vaadin-grid-sort-column>
+          <vaadin-grid-sort-column path="user.lastname" header="Last name"></vaadin-grid-sort-column>
+          <vaadin-grid-sort-column path="user.email" header="Email"></vaadin-grid-sort-column>
+          <vaadin-grid-sort-column path="user.roles" header="Roles"></vaadin-grid-sort-column>
           <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererAction}" .headerRenderer="${this._headerRendererAction}"></vaadin-grid-column>
-          <vaadin-grid-column path="user.roles" .renderer="${this._rendererJobName}" header="Roles"></vaadin-grid-column>
         </vaadin-grid>
       </section>
+      <vaadin-dialog id="new-user-dialog"></vaadin-dialog>
       <vaadin-dialog id="edit-user-dialog"></vaadin-dialog>
+      <vaadin-dialog id="reset-user-dialog" no-close-on-esc no-close-on-outside-click></vaadin-dialog>
     `;
   }
 
@@ -55,7 +67,180 @@ class DESUsers extends connect(store)(PageViewElement) {
     this.grid = this.shadowRoot.querySelector('vaadin-grid');
     this.rendererAction = this._rendererAction.bind(this); // need this to invoke class methods in renderers
     this.userEditDialog = this._userEditDialog.bind(this); // need this to invoke class methods in renderers
-    this._fetchUserList();
+
+    this.newUserDialog = this.shadowRoot.getElementById('new-user-dialog');
+    this.newUserDialog.renderer = (root, dialog) => {
+      let container = root.firstElementChild;
+      if (!container) {
+        container = root.appendChild(document.createElement('div'));
+      }
+      render(
+        html`
+          <style>
+            paper-button {
+              width: 100px;
+              text-transform: none;
+              --paper-button-raised-keyboard-focus: {
+                background-color: var(--paper-indigo-a250) !important;
+                color: white !important;
+              };
+            }
+            paper-button.indigo {
+              background-color: var(--paper-indigo-500);
+              color: white;
+              width: 100px;
+              text-transform: none;
+              --paper-button-raised-keyboard-focus: {
+                background-color: var(--paper-indigo-a250) !important;
+                color: white !important;
+              };
+            }
+            paper-button.des-button {
+                background-color: white;
+                color: black;
+                width: 100px;
+                text-transform: none;
+                --paper-button-raised-keyboard-focus: {
+                  background-color: white !important;
+                  color: black !important;
+                };
+            }
+          </style>
+          <div style="width: 50vw">
+            <a title="Close" href="#" onclick="return false;">
+              <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
+            </a>
+            <h3>Add user</h3>
+            <paper-input id="new-username" always-float-label label="Username" placeholder="AstroBuff"></paper-input>
+            <paper-button @click="${(e) => {dialog.opened = false; this._addNewUser(document.getElementById('new-username').value);}}" class="des-button" raised>Add user</paper-button>
+            <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo" raised>Cancel</paper-button>
+          </div>
+        `,
+        container
+      );
+    }
+
+
+    this.resetUserDialog = this.shadowRoot.getElementById('reset-user-dialog');
+    this.resetUserDialog.renderer = (root, dialog) => {
+      let container = root.firstElementChild;
+      if (container) {
+        root.removeChild(root.childNodes[0]);
+      }
+      container = root.appendChild(document.createElement('div'));
+      render(
+        html`
+        <style>
+          paper-button {
+            width: 100px;
+            text-transform: none;
+            --paper-button-raised-keyboard-focus: {
+              background-color: var(--paper-indigo-a250) !important;
+              color: white !important;
+            };
+          }
+          paper-button.indigo {
+            background-color: var(--paper-indigo-500);
+            color: white;
+            width: 100px;
+            text-transform: none;
+            --paper-button-raised-keyboard-focus: {
+              background-color: var(--paper-indigo-a250) !important;
+              color: white !important;
+            };
+          }
+          paper-button.des-button {
+              background-color: white;
+              color: black;
+              width: 100px;
+              text-transform: none;
+              --paper-button-raised-keyboard-focus: {
+                background-color: white !important;
+                color: black !important;
+              };
+          }
+
+        </style>
+        <div>
+          <p style="text-align: center;font-size: 1.2rem;">Set user <b>${this.userToReset}</b><br>to the default role?</p>
+          <paper-button @click="${(e) => {dialog.opened = false; this._resetUser(this.userToReset);}}" class="des-button" raised>Yes</paper-button>
+          <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo" raised>Cancel</paper-button>
+        </div>
+        `,
+        container
+      );
+    }
+
+    this._fetchAllUsers();
+  }
+
+  _rendererTableIndex(root, column, rowData) {
+    root.textContent = rowData.index;
+  }
+
+  _addNewUser(username) {
+    if (username === '') {
+      return;
+    }
+    if (username !== username.trim().replace(/\s/g, "_").replace(/[^a-z0-9]/g, "")) {
+      console.log('Username may only consist of lowercase alphanumeric characters');
+      return;
+    }
+    const Url=config.backEndUrl + "user/role/add"
+    let body = {
+      'username': username,
+      'roles': ['default']
+    };
+    const param = {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem("token")
+      },
+      body: JSON.stringify(body)
+    };
+    fetch(Url, param)
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      if (data.status === "ok") {
+        // console.log(JSON.stringify(data.users, null, 2));
+        this._fetchAllUsers();
+      } else {
+        console.log(JSON.stringify(data, null, 2));
+      }
+    });
+  }
+
+  _resetUser(username) {
+    if (username === '') {
+      return;
+    }
+    const Url=config.backEndUrl + "user/role/reset"
+    let body = {
+      'username': username
+    };
+    const param = {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem("token")
+      },
+      body: JSON.stringify(body)
+    };
+    fetch(Url, param)
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      if (data.status === "ok") {
+        // console.log(JSON.stringify(data.users, null, 2));
+        this._fetchAllUsers();
+      } else {
+        console.log(JSON.stringify(data, null, 2));
+      }
+    });
   }
 
   _headerRendererAction(root) {
@@ -87,7 +272,8 @@ class DESUsers extends connect(store)(PageViewElement) {
     if (selected.length === 0) {
       render(
         html`
-          <a title="Edit user ${rowData.item.user.name}..." onclick="return false;"><iron-icon @click="${(e) => {this.userEditDialog(rowData.item.user);}}" icon="vaadin:pencil" style="color: darkgray;"></iron-icon></a>
+          <a title="Reset user ${rowData.item.user.name}" onclick="return false;"><iron-icon @click="${(e) => { this.userToReset = rowData.item.user.name; this.resetUserDialog.opened = true;}}" icon="vaadin:eraser" style="color: darkgray;"></iron-icon></a>
+          <a title="Edit user ${rowData.item.user.name}" onclick="return false;"><iron-icon @click="${(e) => {this.userEditDialog(rowData.item.user);}}" icon="vaadin:pencil" style="color: darkgray;"></iron-icon></a>
         `,
         container
       );
@@ -165,7 +351,7 @@ class DESUsers extends connect(store)(PageViewElement) {
               <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
             </a>
             <h3 class="${classList}">${headerText}</h3>
-            <paper-input id="roles-input" always-float-label label="Update assigned roles" class="${classList}" value="${placeholderText}" placeholder="${placeholderText}"></paper-input>
+            <paper-input id="roles-input" always-float-label label="Input comma-separated list of roles (e.g. collaborator, admin)" class="${classList}" value="${placeholderText}" placeholder="${placeholderText}"></paper-input>
 
             <paper-button @click="${(e) => {dialog.opened = false; this._setUserRoles(userInfo, document.getElementById('roles-input').value);}}" class="des-button" raised>Apply</paper-button>
             <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo" raised>Cancel</paper-button>
@@ -195,7 +381,7 @@ class DESUsers extends connect(store)(PageViewElement) {
     if (newRoles === userInfo.roles) {
       return;
     }
-    const Url=config.backEndUrl + "user/update/roles"
+    const Url=config.backEndUrl + "user/role/update"
     let body = {
       'username': userInfo.name,
       'new_roles': newRoles
@@ -215,7 +401,35 @@ class DESUsers extends connect(store)(PageViewElement) {
     .then(data => {
       if (data.status === "ok") {
         // console.log(JSON.stringify(data.users, null, 2));
-        this._fetchUserList();
+        this._fetchAllUsers();
+      } else {
+        console.log(JSON.stringify(data, null, 2));
+      }
+    });
+  }
+
+  _fetchAllUsers() {
+    const Url=config.backEndUrl + "user/list"
+    let body = {
+      'username': 'all'
+    };
+    const param = {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem("token")
+      },
+      body: JSON.stringify(body)
+    };
+    fetch(Url, param)
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      if (data.status === "ok") {
+        // console.log(JSON.stringify(data.users, null, 2));
+        this.allUsers = data.users;
+        this._fetchUserList()
       } else {
         console.log(JSON.stringify(data, null, 2));
       }
@@ -223,7 +437,7 @@ class DESUsers extends connect(store)(PageViewElement) {
   }
 
   _fetchUserList() {
-    const Url=config.backEndUrl + "page/users/list"
+    const Url=config.backEndUrl + "user/role/list"
     let body = {};
     const param = {
       method: "POST",
@@ -247,18 +461,29 @@ class DESUsers extends connect(store)(PageViewElement) {
     });
   }
 
-  _updateUserTable(users) {
+  _updateUserTable(userRoles) {
     let grid = this.grid;
     let gridItems = [];
     // If there are no jobs in the returned list, allow an empty table
-    if (users.length === 0) {
+    if (this.allUsers.length === 0) {
       grid.items = gridItems;
+      return;
     }
     let ctr = 0;
-    users.forEach((item, index, array) => {
+    this.allUsers.forEach((item, index, array) => {
       let user = {};
-      user.name = item.username;
-      user.roles = item.roles;
+      user.name = item[0];
+      user.firstname = item[1];
+      user.lastname = item[2];
+      user.email = item[3];
+      user.roles = [];
+      for (let i in userRoles) {
+        let rolesIdx = userRoles.map((e) => {return e.username}).indexOf(user.name);
+        if (rolesIdx > -1) {
+          user.roles = userRoles[rolesIdx].roles.sort();
+          break;
+        }
+      }
       gridItems.push({user: user});
       ctr++;
       if (ctr === array.length) {
