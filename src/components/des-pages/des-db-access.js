@@ -694,8 +694,6 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       root.removeChild(root.childNodes[0]);
     }
     container = root.appendChild(document.createElement('div'));
-    let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-    viewportHeight = viewportHeight === 0 ? 1000 : viewportHeight;
     render(
       html`
       <style>
@@ -704,30 +702,32 @@ class DESDbAccess extends connect(store)(PageViewElement) {
           font-size: 0.8rem;
         }
       </style>
-      <div style="overflow-x: auto; overflow-y: auto; height: ${0.9*viewportHeight}px; width: 1000px;">
+      <div style="overflow: auto; width: 85vw; max-width: 1000px; height: 85vh;">
         <a title="Close" href="#" onclick="return false;">
-          <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 4rem; color: darkgray;"></iron-icon>
+          <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
         </a>
-        <h3>Sample Basic information
-        <a title="Copy query to editor" href="#" onclick="return false;">
-          <iron-icon id="copy-example-0" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
-        </a></h3>
-        <div id="query-example-0" class="query-input-box" style="border: 1px solid #CCCCCC;">
-          <wc-codemirror id="query-example-editor-0" mode="sql" src="images/example-query-0.sql"></wc-codemirror>
-        </div>
-        <h3>Limit Basic information by region and number of rows
-        <a title="Copy query to editor" href="#" onclick="return false;">
-          <iron-icon id="copy-example-1" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
-        </a></h3>
-        <div id="query-example-1" class="query-input-box" style="border: 1px solid #CCCCCC;">
-          <wc-codemirror id="query-example-editor-1" mode="sql" src="images/example-query-1.sql"></wc-codemirror>
-        </div>
-        <h3>Select stars from M2 Globular Cluster
-        <a title="Copy query to editor" href="#" onclick="return false;">
-          <iron-icon id="copy-example-2" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
-        </a></h3>
-        <div id="query-example-2" class="query-input-box" style="border: 1px solid #CCCCCC;">
-          <wc-codemirror id="query-example-editor-2" mode="sql" src="images/example-query-2.sql"></wc-codemirror>
+        <div class="examples-container" style="overflow: auto; height: 75vh; margin-top: 3rem; padding: 1rem; border: 1px lightgray solid;">
+          <h3>Sample Basic information
+          <a title="Copy query to editor" href="#" onclick="return false;">
+            <iron-icon id="copy-example-0" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+          </a></h3>
+          <div id="query-example-0" class="query-input-box" style="border: 1px solid #CCCCCC;">
+            <wc-codemirror id="query-example-editor-0" mode="sql" src="images/example-query-0.sql"></wc-codemirror>
+          </div>
+          <h3>Limit Basic information by region and number of rows
+          <a title="Copy query to editor" href="#" onclick="return false;">
+            <iron-icon id="copy-example-1" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+          </a></h3>
+          <div id="query-example-1" class="query-input-box" style="border: 1px solid #CCCCCC;">
+            <wc-codemirror id="query-example-editor-1" mode="sql" src="images/example-query-1.sql"></wc-codemirror>
+          </div>
+          <h3>Select stars from M2 Globular Cluster
+          <a title="Copy query to editor" href="#" onclick="return false;">
+            <iron-icon id="copy-example-2" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+          </a></h3>
+          <div id="query-example-2" class="query-input-box" style="border: 1px solid #CCCCCC;">
+            <wc-codemirror id="query-example-editor-2" mode="sql" src="images/example-query-2.sql"></wc-codemirror>
+          </div>
         </div>
       </div>
       `,

@@ -178,14 +178,28 @@ class DESToolBar extends connect(store)(LitElement) {
 
     render() {
       return html`
+        <style>
 
+        .title-name {
+          color: white;
+          font-weight: bold;
+          font-style: italic;
+        }
+        .title-first-letter {
+          color: white;
+          font-weight: bold;
+        }
+        .title-other-letters {
+          color: lightgray;
+        }
+        </style>
         <vaadin-dialog id="UpdateProfileDialog" aria-label="simple"></vaadin-dialog>
         <vaadin-dialog id="ChangePasswordDialog" aria-label="simple"></vaadin-dialog>
 
         <app-toolbar class="toolbar-top" sticky>
           <button class="menu-btn" title="Menu" @click="${this._ClickHandler}">${menuIcon}</button>
-          <div main-wide-title>DARK ENERGY SURVEY desaccess</div>
-          <div main-narrow-title>DES desaccess</div>
+          <div main-wide-title><span class="title-first-letter">D</span><span class="title-other-letters">ARK</span> <span class="title-first-letter">E</span><span class="title-other-letters">NERGY</span> <span class="title-first-letter">S</span><span class="title-other-letters">URVEY</span> <span class="title-name">DESaccess</span></div>
+          <div main-narrow-title><span class="title-name">DESaccess</span></div>
 
           ${this._profile ? html`
             <div style="display: inline-block; color: white; position: absolute; right: 110px; font-size: 1rem; font-weight: bold;">

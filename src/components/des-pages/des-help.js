@@ -11,7 +11,19 @@ import { store } from '../../store.js';
 class DESHelp extends connect(store)(PageViewElement) {
   static get styles() {
     return [
-      SharedStyles
+      SharedStyles,
+      css`
+        a {
+          text-decoration: none;
+          font-weight: bold;
+        }
+        a:hover {
+          text-decoration: underline;
+        }
+        .red-links a {
+          color: darkred;
+        }
+      `
     ];
   }
 
@@ -33,8 +45,13 @@ class DESHelp extends connect(store)(PageViewElement) {
         <div style="font-size: 2rem; font-weight: bold;">DESaccess Help</div>
         <div class="horizontal layout around justified">
           <section>
-            <p>DESaccess provides multiple tools you can use to access data from
-            the Dark Energy Survey. Follow the links below to learn more:</p>
+            <p class="red-links">DESaccess is a collection of apps and services from the <a href="https://deslabs.ncsa.illinois.edu/" target="_blank">DES Labs</a>
+            team at the <a href="http://www.ncsa.illinois.edu/" target="_blank">National Center for Supercomputing Applications</a> that
+            provides multiple tools you can use to access data from
+            the <a href="https://www.darkenergysurvey.org/" target="_blank">Dark Energy Survey</a>.
+            </p>
+            <p>
+            Follow the links below to learn more about the available apps:</p>
             <ul style="list-style-type: none;">
             ${this.accessPages.includes('db-access') ? html`
               <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:code"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('db-access-section').scrollIntoView();}}">DB Access</a></li>

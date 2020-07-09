@@ -269,13 +269,13 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         case 'jpg':
           return html`
             <div style="display: grid; grid-template-columns: 1fr; grid-gap: 5px;">
-              <div style="width: 23vw; word-wrap: break-word; font-size: 0.7rem; font-family: monospace;">${relPath}</div>
+              <div style="width: 23vw; max-width: 300px; word-wrap: break-word; font-size: 0.7rem; font-family: monospace;">${relPath}</div>
               <div>
                 <a style="text-decoration: none;" title="Open image" alt="${relPath}" href="${fileUrl}" target="_blank">
                   <iron-image
                     src="${fileUrl}"
                     alt="${relPath}"
-                    style="width:23vw; height:23vw;" sizing="cover">
+                    style="width:23vw; ; max-width: 300px; height:23vw; max-height: 300px;" sizing="cover">
                   </iron-image>
                 </a>
               </div>
@@ -369,9 +369,10 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               grid-gap: 1rem;
               padding: 1rem;
               grid-template-columns: 1fr 1fr 1fr;
+              box-shadow: inset 0px 5px 5px 0px rgb(200, 200, 200);
             }
           </style>
-          <div style="overflow: auto; width: 85vw; height: 85vh;">
+          <div style="overflow: auto; width: 85vw; max-width: 1000px; height: 85vh;">
             <a title="Close" href="#" onclick="return false;">
               <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
             </a>
@@ -439,6 +440,12 @@ class DESJobStatus extends connect(store)(PageViewElement) {
                   color: white !important;
                 };
               }
+              .file-list-box {
+                overflow: auto;
+                /* box-shadow: inset 0px 5px 5px 2px rgb(200, 200, 200); */
+                padding: 1rem;
+                /* height: 50vh; */
+              }
             </style>
             <div>
               <a title="View all files" target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/query/${job.id}/">
@@ -448,7 +455,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
                 </paper-button>
               </a>
             </div>
-            <div style="overflow: auto;"><span class="monospace-column">
+            <div class="file-list-box"><span class="monospace-column">
             ${job.query_files === null ?
               html``:
               html`
@@ -495,6 +502,12 @@ class DESJobStatus extends connect(store)(PageViewElement) {
                 color: white !important;
               };
             }
+            .file-list-box {
+              overflow: auto;
+              box-shadow: inset 0px 5px 5px 2px rgb(200, 200, 200);
+              padding: 2rem;
+              height: 45vh;
+            }
           </style>
             <div></div><div></div>
             <div>
@@ -519,7 +532,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
                 `
               }
             </div>
-            <div style="overflow: auto;"><span class="monospace-column">
+            <div class="file-list-box" style=""><span class="monospace-column">
             ${job.cutout_files === null ?
               html``:
               html`
@@ -561,15 +574,15 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               padding: 1rem;
               grid-template-columns: 20% 80%;
               grid-template-rows: min-content min-content min-content min-content min-content min-content 1fr;
-              grid-row-gap: 0;
+              grid-row-gap: 5px;
             }
           </style>
-          <div style="overflow: auto; width: 85vw; height: 85vh;">
+          <div style="overflow: auto; width: 85vw; max-width: 1000px; height: 85vh;">
             <a title="Close" href="#" onclick="return false;">
               <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
             </a>
             <h3>Job Results</h3>
-            <div class="job-results-container" style="overflow: auto; height: 70vw;">
+            <div class="job-results-container" style="overflow: auto; height: 70vh;">
               <div>Name</div><div><span class="monospace-column">${job.name}</span></div>
               <div>ID</div><div><span class="monospace-column">${job.id}  </span></div>
               <div>Status</div><div>${job.status}</div>
