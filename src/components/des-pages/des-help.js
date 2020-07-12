@@ -1,12 +1,19 @@
 import { html,css } from 'lit-element';
+import { render } from 'lit-html';
 import { PageViewElement } from './des-base-page.js';
 import { SharedStyles } from '../styles/shared-styles.js';
 import '../des-home-card.js';
 import '../des-help-cutout.js';
 import '../des-help-status.js';
 import '../des-help-db-access.js';
+import '../des-help-form.js';
 import { connect } from 'pwa-helpers/connect-mixin.js';
 import { store } from '../../store.js';
+import '@polymer/paper-checkbox/paper-checkbox.js';
+import '@polymer/paper-input/paper-input.js';
+import '@polymer/paper-button/paper-button.js';
+import '@polymer/iron-autogrow-textarea/iron-autogrow-textarea.js';
+import '@polymer/paper-toast/paper-toast.js';
 
 class DESHelp extends connect(store)(PageViewElement) {
   static get styles() {
@@ -31,12 +38,22 @@ class DESHelp extends connect(store)(PageViewElement) {
     return {
       accessPages: {type: Array},
       database: {type: String},
+      email: {type: String},
+      firstname: {type: String},
+      lastname: {type: String},
+      submit_disabled: {type: Boolean},
+      formTopicOther: {type: Boolean},
     };
   }
   constructor(){
     super();
     this.accessPages = [];
     this.database = '';
+    this.email = '';
+    this.firstname = '';
+    this.lastname = '';
+    this.formTopicOther = false;
+    this.submit_disabled = true;
   }
 
   render() {
@@ -50,6 +67,9 @@ class DESHelp extends connect(store)(PageViewElement) {
             provides multiple tools you can use to access data from
             the <a href="https://www.darkenergysurvey.org/" target="_blank">Dark Energy Survey</a>.
             </p>
+            <div style="text-align: center;">
+              <paper-button @click="${(e) => {this.helpFormDialog.opened = true; }}" raised style="font-size: 1rem; margin: 1rem;"><iron-icon icon="vaadin:comments-o" style="height: 3rem; margin-right: 1rem;"></iron-icon>Contact us for help</paper-button>
+            </div>
             <p>
             Follow the links below to learn more about the available apps:</p>
             <ul style="list-style-type: none;">
@@ -86,12 +106,42 @@ class DESHelp extends connect(store)(PageViewElement) {
           ` : html``}
         </div>
       </section>
+      <vaadin-dialog id="help-form-dialog"></vaadin-dialog>
+      <paper-toast class="toast-position toast-success" text="Your help request was received." duration="7000"></paper-toast>
     `;
   }
 
   stateChanged(state) {
     this.accessPages = state.app.accessPages;
     this.database = state.app.db;
+    this.email = this.email === '' ? state.app.email : this.email;
+    this.firstname = this.firstname === '' ? state.app.name : this.firstname;
+    this.lastname = this.lastname === '' ? state.app.lastname : this.lastname;
+  }
+
+  firstUpdated() {
+
+    this.helpFormDialog = this.shadowRoot.getElementById('help-form-dialog');
+    this.helpFormDialog.renderer = (root, dialog) => {
+      let container = root.firstElementChild;
+      if (!container) {
+        container = root.appendChild(document.createElement('div'));
+      }
+      render(
+        html`
+          <div style="width: 85vw; max-width: 700px; height: 85vh; max-height: 850px;">
+            <a title="Close" href="#" onclick="return false;">
+              <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
+            </a>
+            <des-help-form
+              @closeHelpDialog="${(e) => {dialog.opened = false;}}"
+              @showHelpSuccessMessage="${(e) => {this.shadowRoot.querySelector('paper-toast').show();}}"
+            ></des-help-form>
+          </div>
+        `,
+        container
+      );
+    }
   }
 }
 

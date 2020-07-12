@@ -129,4 +129,12 @@ export const SharedStyles = css`
   .dialog-warning-text {
     color: red; font-size: 0.8rem; margin-top: 2rem; text-align: center;
   }
+  .toast-error {
+    --paper-toast-color: #FFD2D2 ;
+    --paper-toast-background-color: #D8000C;
+  }
+  .toast-success {
+    --paper-toast-color:  #DFF2BF;
+    --paper-toast-background-color: #4F8A10;
+  }
 `;

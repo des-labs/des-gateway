@@ -355,7 +355,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   _updateEmailOption(event) {
     this.shadowRoot.getElementById('custom-email').disabled = !event.target.checked;
     this.shadowRoot.getElementById('custom-email').invalid = this.shadowRoot.getElementById('custom-email').invalid && !this.shadowRoot.getElementById('custom-email').disabled;
-    this.validEmail = this._validateEmailAddress(this.email);
+    this.validEmail = this.validateEmailAddress(this.email);
     this._validateForm();
   }
 
@@ -384,7 +384,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   }
 
   _validateEmail(event){
-    this.validEmail = this._validateEmailAddress(this.email);
+    this.validEmail = this.validateEmailAddress(this.email);
     let criterion = this.validEmail || this.quickQuery;
     this.shadowRoot.getElementById('custom-email').invalid = !criterion;
     this.shadowRoot.getElementById('send-email').disabled = this.quickQuery;
