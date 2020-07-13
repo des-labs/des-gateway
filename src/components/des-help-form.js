@@ -128,7 +128,7 @@ class DESHelpForm extends connect(store)(LitElement) {
           this.topics.push(e.target.value);
         } else {
           if (this.topics.indexOf(e.target.value) > -1) {
-            this.topics.splice(topics.indexOf(e.target.value), 1);
+            this.topics.splice(this.topics.indexOf(e.target.value), 1);
           }
         }
       });

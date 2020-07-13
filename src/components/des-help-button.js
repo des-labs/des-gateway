@@ -42,7 +42,6 @@ class DESHelpButton extends connect(store)(LitElement) {
     }
 
     _openDialog(event) {
-      console.log(this.page);
       if (['cutout', 'db-access', 'status'].indexOf(this.page) > -1) {
         this.dialog.opened = true;
       } else {

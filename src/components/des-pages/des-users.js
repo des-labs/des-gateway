@@ -40,9 +40,10 @@ class DESUsers extends connect(store)(PageViewElement) {
         <div style="font-size: 2rem; font-weight: bold;">
         DESaccess User Management
         </div>
-        <paper-button @click="${(e) => {this.newUserDialog.opened = true; }}" class="des-button" raised style="font-size: 1rem; margin: 1rem; height: 2rem;"><iron-icon icon="vaadin:plus" style="height: 2rem; "></iron-icon>Add user</paper-button>
-
-        <vaadin-grid .multiSort="${true}" style="height: 70vh;">
+        <!--
+          <paper-button @click="${(e) => {this.newUserDialog.opened = true; }}" class="des-button" raised style="font-size: 1rem; margin: 1rem; height: 2rem;"><iron-icon icon="vaadin:plus" style="height: 2rem; "></iron-icon>Add user</paper-button>
+        -->
+        <vaadin-grid .multiSort="${true}" style="height: 70vh; max-width: 85vw;">
           <vaadin-grid-selection-column auto-select></vaadin-grid-selection-column>
           <vaadin-grid-column auto-width flex-grow="0" .renderer="${this._rendererTableIndex}" header="#"></vaadin-grid-column>
           <vaadin-grid-filter-column path="user.name" header="Username"></vaadin-grid-filter-column>
@@ -50,6 +51,8 @@ class DESUsers extends connect(store)(PageViewElement) {
           <vaadin-grid-sort-column path="user.lastname" header="Last name"></vaadin-grid-sort-column>
           <vaadin-grid-sort-column path="user.email" header="Email"></vaadin-grid-sort-column>
           <vaadin-grid-sort-column path="user.roles" header="Roles"></vaadin-grid-sort-column>
+          <vaadin-grid-sort-column path="user.needs_help" header="Needs help"></vaadin-grid-sort-column>
+          <vaadin-grid-column .renderer="${this.rendererJiraLinks}" header="Help Requests"></vaadin-grid-column>
           <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererAction}" .headerRenderer="${this._headerRendererAction}"></vaadin-grid-column>
         </vaadin-grid>
       </section>
@@ -66,6 +69,8 @@ class DESUsers extends connect(store)(PageViewElement) {
   firstUpdated() {
     this.grid = this.shadowRoot.querySelector('vaadin-grid');
     this.rendererAction = this._rendererAction.bind(this); // need this to invoke class methods in renderers
+    this.rendererJiraLinks = this._rendererJiraLinks.bind(this); // need this to invoke class methods in renderers
+    this.helpRequestSorter = this._helpRequestSorter.bind(this); // need this to invoke class methods in renderers
     this.userEditDialog = this._userEditDialog.bind(this); // need this to invoke class methods in renderers
 
     this.newUserDialog = this.shadowRoot.getElementById('new-user-dialog');
@@ -252,16 +257,6 @@ class DESUsers extends connect(store)(PageViewElement) {
     );
   }
 
-  _getRolesForUser(username) {
-    let roles = [];
-    for (let i in this.grid.items) {
-      if (username === this.grid.items[i].user.name) {
-        roles = this.grid.items[i].user.roles
-        break;
-      }
-    }
-    return roles;
-  }
 
   _rendererAction(root, column, rowData) {
     let container = root.firstElementChild;
@@ -272,8 +267,8 @@ class DESUsers extends connect(store)(PageViewElement) {
     if (selected.length === 0) {
       render(
         html`
-          <a title="Reset user ${rowData.item.user.name}" onclick="return false;"><iron-icon @click="${(e) => { this.userToReset = rowData.item.user.name; this.resetUserDialog.opened = true;}}" icon="vaadin:eraser" style="color: darkgray;"></iron-icon></a>
-          <a title="Edit user ${rowData.item.user.name}" onclick="return false;"><iron-icon @click="${(e) => {this.userEditDialog(rowData.item.user);}}" icon="vaadin:pencil" style="color: darkgray;"></iron-icon></a>
+          <a title="Reset user ${rowData.item.user.name}" href="#" onclick="return false;"><iron-icon @click="${(e) => { this.userToReset = rowData.item.user.name; this.resetUserDialog.opened = true;}}" icon="vaadin:eraser" style="color: darkgray;"></iron-icon></a>
+          <a title="Edit user ${rowData.item.user.name}" href="#" onclick="return false;"><iron-icon @click="${(e) => {this.userEditDialog(rowData.item.user);}}" icon="vaadin:pencil" style="color: darkgray;"></iron-icon></a>
         `,
         container
       );
@@ -294,6 +289,33 @@ class DESUsers extends connect(store)(PageViewElement) {
       }
     }
   }
+
+  _rendererJiraLinks(root, column, rowData) {
+    let container = root.firstElementChild;
+    if (!container) {
+      container = root.appendChild(document.createElement('div'));
+    }
+    render(
+      html`
+        <div class="jira-links">
+        ${rowData.item.user.help_requests === null ?
+          html``:
+          html`
+            <ul style="list-style-type: none; margin: 0; padding: 0;">
+              ${rowData.item.user.help_requests.map(i => html`
+                <li>
+                  <a target="_blank" href="https://opensource.ncsa.illinois.edu/jira/browse/${i}">${i}</a>
+                </li>
+              `)}
+            </ul>
+          `
+        }
+        </div>
+      `,
+      container
+    );
+  }
+
 
   _userEditDialog(userInfo) {
     const editUserDialog = this.shadowRoot.getElementById('edit-user-dialog');
@@ -477,13 +499,17 @@ class DESUsers extends connect(store)(PageViewElement) {
       user.lastname = item[2];
       user.email = item[3];
       user.roles = [];
+      user.help_requests = [];
       for (let i in userRoles) {
         let rolesIdx = userRoles.map((e) => {return e.username}).indexOf(user.name);
         if (rolesIdx > -1) {
           user.roles = userRoles[rolesIdx].roles.sort();
+          user.help_requests = userRoles[rolesIdx].help_requests.sort();
           break;
         }
       }
+      user.roles = user.roles.length == 0 ? ['default'] : user.roles;
+      user.needs_help = user.help_requests.length > 0 ? 'Yes' : 'No';
       gridItems.push({user: user});
       ctr++;
       if (ctr === array.length) {
