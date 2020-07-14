@@ -1,9 +1,11 @@
 import { html,css } from 'lit-element';
+import { render } from 'lit-html';
 import { PageViewElement } from './des-base-page.js';
 import { SharedStyles } from '../styles/shared-styles.js';
 import '../des-home-card.js';
 import { connect } from 'pwa-helpers/connect-mixin.js';
 import { store } from '../../store.js';
+import { config } from '../des-config.js';
 
 class DESHome extends connect(store)(PageViewElement) {
   static get styles() {
@@ -58,12 +60,46 @@ class DESHome extends connect(store)(PageViewElement) {
           </a>
         </div>
       </section>
+      <vaadin-dialog></vaadin-dialog>
     `;
   }
 
   stateChanged(state) {
     this.accessPages = state.app.accessPages;
     this.database = state.app.db;
+  }
+
+  firstUpdated() {
+
+    this.alphaWelcomeDialog = this.shadowRoot.querySelector('vaadin-dialog');
+    this.alphaWelcomeDialog.renderer = (root, dialog) => {
+      let container = root.firstElementChild;
+      if (!container) {
+        container = root.appendChild(document.createElement('div'));
+      }
+      render(
+        html`
+          <style>
+          </style>
+          <div style="max-width: 1000px; width: 85vw;">
+            <a title="Close" href="#" onclick="return false;">
+              <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
+            </a>
+            <h3>Welcome to the <i>DESaccess Alpha Release</i></h3>
+            <p>Thank you for participating in the DESaccess alpha release testing. While we hope
+            that everything works perfectly for you, we know that some bugs are best found by actual
+              users doing what they do best (and also by definition): <i>use the software</i>!</p>
+            <p>When you encounter problems, first take a look at the available documentation by pressing the red Help button
+              <iron-icon icon="vaadin:question-circle-o" style="color: red;"></iron-icon>
+            in the upper right corner of the page. If you think you have discovered a bug, or if you simply have suggestions
+            for how to make DESaccess better, please <a href="${config.rootPath.replace(/\/+$/, '')}/help/form" @click="${(e) => {dialog.opened = false;}}">contact us using the Help Request form</a>.</p>
+            <p>Sincerely,<br><b>the DES Labs Team</b></p>
+          </div>
+        `,
+        container
+      );
+    }
+    this.alphaWelcomeDialog.opened = true;
   }
 }
 

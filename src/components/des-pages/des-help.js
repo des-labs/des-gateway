@@ -9,6 +9,7 @@ import '../des-help-db-access.js';
 import '../des-help-form.js';
 import { connect } from 'pwa-helpers/connect-mixin.js';
 import { store } from '../../store.js';
+import { triggerHelpForm } from '../../actions/app.js';
 import '@polymer/paper-checkbox/paper-checkbox.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/paper-button/paper-button.js';
@@ -43,6 +44,7 @@ class DESHelp extends connect(store)(PageViewElement) {
       lastname: {type: String},
       submit_disabled: {type: Boolean},
       formTopicOther: {type: Boolean},
+      triggerHelpForm: {type: Boolean},
     };
   }
   constructor(){
@@ -54,6 +56,7 @@ class DESHelp extends connect(store)(PageViewElement) {
     this.lastname = '';
     this.formTopicOther = false;
     this.submit_disabled = true;
+    this.triggerHelpForm = false;
   }
 
   render() {
@@ -114,6 +117,7 @@ class DESHelp extends connect(store)(PageViewElement) {
   stateChanged(state) {
     this.accessPages = state.app.accessPages;
     this.database = state.app.db;
+    this.triggerHelpForm = state.app.triggerHelpForm;
     this.email = this.email === '' ? state.app.email : this.email;
     this.firstname = this.firstname === '' ? state.app.name : this.firstname;
     this.lastname = this.lastname === '' ? state.app.lastname : this.lastname;
@@ -141,6 +145,10 @@ class DESHelp extends connect(store)(PageViewElement) {
         `,
         container
       );
+    }
+    if (this.triggerHelpForm) {
+      this.helpFormDialog.opened = true;
+      store.dispatch(triggerHelpForm(false));
     }
   }
 }

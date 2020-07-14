@@ -9,6 +9,7 @@ export const UPDATE_DRAWER_PERSIST = 'UPDATE_DRAWER_PERSIST';
 export const LOGIN_USER = 'LOGIN_USER';
 export const LOGOUT_USER = 'LOGOUT_USER';
 export const UPDATE_QUERY = 'UPDATE_QUERY';
+export const TRIGGER_HELP_FORM = 'TRIGGER_HELP_FORM';
 
 // TODO: double request to /profile
 const isauth = () => {
@@ -73,6 +74,12 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
       if (pathParts.length > 1) {
         let jobId = pathParts[1];
         dispatch(setJobId(jobId));
+      }
+      break;
+    case 'help':
+      // Highlight specific job in status if provided in URL {{location.origin}}/status/dkdh9s84ty3thj3wehg3
+      if (pathParts.length > 1 && pathParts[1] === 'form') {
+        dispatch(triggerHelpForm(true));
       }
       break;
     default:
@@ -162,6 +169,13 @@ export const setJobId = (jobId) => {
   return {
     type: UPDATE_JOB_ID,
     jobId
+  };
+};
+
+export const triggerHelpForm = (arm) => {
+  return {
+    type: TRIGGER_HELP_FORM,
+    arm
   };
 };
 

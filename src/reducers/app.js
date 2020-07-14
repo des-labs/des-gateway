@@ -16,7 +16,8 @@ import {
   UPDATE_DRAWER_PERSIST,
   UPDATE_QUERY,
   LOGIN_USER,
-  LOGOUT_USER
+  LOGOUT_USER,
+  TRIGGER_HELP_FORM
 } from '../actions/app.js';
 
 const INITIAL_STATE = {
@@ -33,7 +34,8 @@ const INITIAL_STATE = {
   accessPages: [],
   session: false,
   drawerOpened: false,
-  drawerPersisted: false
+  drawerPersisted: false,
+  triggerHelpForm: false
 };
 
 const app = (state = INITIAL_STATE, action) => {
@@ -71,6 +73,11 @@ const app = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         jobId: action.jobId
+      };
+    case TRIGGER_HELP_FORM:
+      return {
+        ...state,
+        triggerHelpForm: action.arm
       };
     case UPDATE_LAST_VALID_PAGE:
       return {
