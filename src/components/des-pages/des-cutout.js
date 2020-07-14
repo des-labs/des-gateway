@@ -56,11 +56,9 @@ class DESCutout extends connect(store)(PageViewElement) {
               position: absolute;
               opacity: 0;
               top: 0;
-              bottom: 0;
               left: 0;
-              right: 0;
-              /*border: 2px dotted #8da6ce;*/
-              /*border-style: outset;*/
+              width: 100%;
+              height: 100%;
           }
           .card-content {
               @apply(--layout-vertical);
@@ -216,6 +214,17 @@ class DESCutout extends connect(store)(PageViewElement) {
             padding-left:2rem;
             max-width: 500px;
           }
+          .output-format-grid {
+            display: grid;
+            grid-gap: 1rem;
+            grid-template-columns: 1fr;
+          }
+
+          @media (min-width: 1001px) {
+            .output-format-grid {
+              grid-template-columns: 1fr 1fr;
+            }
+          }
         `,
 
     ];
@@ -319,7 +328,7 @@ class DESCutout extends connect(store)(PageViewElement) {
 
             <div>
             <p style="margin-top: 0;">Enter positions using RA/DEC coordinates or coadd object ID numbers. Values can be entered manually or by uploading a CSV-formatted text file.</p>
-              <iron-autogrow-textarea style="font-family: monospace; width: 90%; margin-left: 2rem; margin-right: 2rem;" id="position-textarea" max-rows="10" rows=7 placeholder="RA,DEC\n21.5,3.48\n36.6,-15.68\n--- or ---\nCOADD_OBJECT_ID\n61407318\n61407582\n" value=""></iron-autogrow-textarea>
+              <iron-autogrow-textarea style="font-family: monospace; width: 90%; margin-left: 0; margin-right: 2rem;" id="position-textarea" max-rows="10" rows=7 placeholder="RA,DEC\n21.5,3.48\n36.6,-15.68\n--- or ---\nCOADD_OBJECT_ID\n61407318\n61407582\n" value=""></iron-autogrow-textarea>
               <paper-button raised class="indigo" id="bc_uploadFile">
                 <span style="overflow-x: auto; overflow-wrap: break-word;">Upload CSV file</span>
                 <input type="file" id="csv-upload" class="upload" @change="${e => this._fileChange(e)}" accept=".csv, .CSV" />
@@ -333,7 +342,7 @@ class DESCutout extends connect(store)(PageViewElement) {
       <section>
           <h2>Output format and size</h2>
           <p>Check all desired output files. FITS format requires selection of one or more bands. RGB color images require selection of exactly three bands.</p>
-          <div style="display: grid; grid-gap: 1rem; grid-template-columns: 50% 50%;">
+          <div class="output-format-grid">
             <div>
               <h3>FITS format</h3>
               <p>FITS format requires selection of <span id="criterion-fits-band-selected">one or more bands</span>.</p>

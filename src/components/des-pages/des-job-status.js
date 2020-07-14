@@ -44,6 +44,15 @@ class DESJobStatus extends connect(store)(PageViewElement) {
             color: white !important;
           };
         }
+        vaadin-grid {
+          height: 70vh;
+          max-width: 90vw;
+        }
+        @media (min-width: 1001px) {
+          vaadin-grid {
+          max-width: 70vw;
+          }
+        }
         `,
 
     ];
@@ -98,7 +107,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     return html`
 
     <section>
-      <vaadin-grid .multiSort="${true}" style="height: 70vh;">
+      <vaadin-grid .multiSort="${true}" style="">
         <vaadin-grid-selection-column auto-select></vaadin-grid-selection-column>
         <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererStatus}" .headerRenderer="${this._headerRendererStatus}"></vaadin-grid-column>
         <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererAction}" .headerRenderer="${this._headerRendererAction}"></vaadin-grid-column>
