@@ -117,9 +117,7 @@ class DESLogin extends connect(store)(PageViewElement) {
                 <paper-spinner id=loginSpinner></paper-spinner>
               </div>
             </form>
-            <br>
             <div class="errormessage"> <b>${this.msg}</b></div>
-            <br>
           </div>
           <div class="card-content">
             <a href="https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/" style="font-size: 11px; margin-left: 5px;" target="_blank"> Forgot Password? </a>
@@ -152,6 +150,8 @@ class DESLogin extends connect(store)(PageViewElement) {
       return response.json();
     })
     .then(data => {
+      this.shadowRoot.getElementById("loginButton").disabled=false;
+      this.shadowRoot.getElementById("loginSpinner").active=false;
       if (data.status == 'ok'){
         localStorage.setItem("token", data.token);
         store.dispatch(loginUser({"name": data.name, "username": data.username,
@@ -162,12 +162,15 @@ class DESLogin extends connect(store)(PageViewElement) {
         localStorage.clear();
         store.dispatch(logoutUser());
         this.msg = data.message;
-        this.shadowRoot.getElementById("loginButton").disabled=false;
-        this.shadowRoot.getElementById("loginSpinner").active=false;
 
       }
     })
-    .catch((error) => {console.log(error);});
+    .catch((error) => {
+      console.log(error);
+      this.msg = error;
+      this.shadowRoot.getElementById("loginButton").disabled=false;
+      this.shadowRoot.getElementById("loginSpinner").active=false;
+    });
     return false;
   }
 
