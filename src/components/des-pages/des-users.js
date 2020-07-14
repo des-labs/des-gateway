@@ -11,6 +11,7 @@ import '@vaadin/vaadin-grid/vaadin-grid-filter-column.js';
 import '@vaadin/vaadin-grid/vaadin-grid-sort-column.js';
 import '@vaadin/vaadin-grid/vaadin-grid-selection-column.js';
 import '@vaadin/vaadin-icons/vaadin-icons.js';
+import '@polymer/paper-spinner/paper-spinner.js';
 
 class DESUsers extends connect(store)(PageViewElement) {
   static get styles() {
@@ -38,7 +39,11 @@ class DESUsers extends connect(store)(PageViewElement) {
     return html`
       <section>
         <div style="font-size: 2rem; font-weight: bold;">
-        DESaccess User Management
+          DESaccess User Management
+          <paper-spinner class="big"></paper-spinner>
+        </div>
+        <div>
+          <p>Manage user roles (RBAC) and view active help requests. <b>The page must be reloaded to refresh the data.</b></p>
         </div>
         <!--
           <paper-button @click="${(e) => {this.newUserDialog.opened = true; }}" class="des-button" raised style="font-size: 1rem; margin: 1rem; height: 2rem;"><iron-icon icon="vaadin:plus" style="height: 2rem; "></iron-icon>Add user</paper-button>
@@ -70,7 +75,6 @@ class DESUsers extends connect(store)(PageViewElement) {
     this.grid = this.shadowRoot.querySelector('vaadin-grid');
     this.rendererAction = this._rendererAction.bind(this); // need this to invoke class methods in renderers
     this.rendererJiraLinks = this._rendererJiraLinks.bind(this); // need this to invoke class methods in renderers
-    this.helpRequestSorter = this._helpRequestSorter.bind(this); // need this to invoke class methods in renderers
     this.userEditDialog = this._userEditDialog.bind(this); // need this to invoke class methods in renderers
 
     this.newUserDialog = this.shadowRoot.getElementById('new-user-dialog');
@@ -117,7 +121,7 @@ class DESUsers extends connect(store)(PageViewElement) {
             </a>
             <h3>Add user</h3>
             <paper-input id="new-username" always-float-label label="Username" placeholder="AstroBuff"></paper-input>
-            <paper-button @click="${(e) => {dialog.opened = false; this._addNewUser(document.getElementById('new-username').value);}}" class="des-button" raised>Add user</paper-button>
+            <!-- <paper-button @click="${(e) => {dialog.opened = false; this._addNewUser(document.getElementById('new-username').value);}}" class="des-button" raised>Add user</paper-button> -->
             <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo" raised>Cancel</paper-button>
           </div>
         `,
@@ -183,41 +187,6 @@ class DESUsers extends connect(store)(PageViewElement) {
     root.textContent = rowData.index;
   }
 
-  _addNewUser(username) {
-    if (username === '') {
-      return;
-    }
-    if (username !== username.trim().replace(/\s/g, "_").replace(/[^a-z0-9]/g, "")) {
-      console.log('Username may only consist of lowercase alphanumeric characters');
-      return;
-    }
-    const Url=config.backEndUrl + "user/role/add"
-    let body = {
-      'username': username,
-      'roles': ['default']
-    };
-    const param = {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + localStorage.getItem("token")
-      },
-      body: JSON.stringify(body)
-    };
-    fetch(Url, param)
-    .then(response => {
-      return response.json()
-    })
-    .then(data => {
-      if (data.status === "ok") {
-        // console.log(JSON.stringify(data.users, null, 2));
-        this._fetchAllUsers();
-      } else {
-        console.log(JSON.stringify(data, null, 2));
-      }
-    });
-  }
-
   _resetUser(username) {
     if (username === '') {
       return;
@@ -256,7 +225,6 @@ class DESUsers extends connect(store)(PageViewElement) {
       root
     );
   }
-
 
   _rendererAction(root, column, rowData) {
     let container = root.firstElementChild;
@@ -315,7 +283,6 @@ class DESUsers extends connect(store)(PageViewElement) {
       container
     );
   }
-
 
   _userEditDialog(userInfo) {
     const editUserDialog = this.shadowRoot.getElementById('edit-user-dialog');
@@ -431,6 +398,7 @@ class DESUsers extends connect(store)(PageViewElement) {
   }
 
   _fetchAllUsers() {
+    this.shadowRoot.querySelector('paper-spinner').active = true;
     const Url=config.backEndUrl + "user/list"
     let body = {
       'username': 'all'
@@ -528,9 +496,45 @@ class DESUsers extends connect(store)(PageViewElement) {
           }
         }
         grid.recalculateColumnWidths();
+        this.shadowRoot.querySelector('paper-spinner').active = false;
       }
     })
   }
+
+  // _addNewUser(username) {
+  //   if (username === '') {
+  //     return;
+  //   }
+  //   if (username !== username.trim().replace(/\s/g, "_").replace(/[^a-z0-9]/g, "")) {
+  //     console.log('Username may only consist of lowercase alphanumeric characters');
+  //     return;
+  //   }
+  //   const Url=config.backEndUrl + "user/role/add"
+  //   let body = {
+  //     'username': username,
+  //     'roles': ['default']
+  //   };
+  //   const param = {
+  //     method: "POST",
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Authorization': 'Bearer ' + localStorage.getItem("token")
+  //     },
+  //     body: JSON.stringify(body)
+  //   };
+  //   fetch(Url, param)
+  //   .then(response => {
+  //     return response.json()
+  //   })
+  //   .then(data => {
+  //     if (data.status === "ok") {
+  //       // console.log(JSON.stringify(data.users, null, 2));
+  //       this._fetchAllUsers();
+  //     } else {
+  //       console.log(JSON.stringify(data, null, 2));
+  //     }
+  //   });
+  // }
 }
 
 window.customElements.define('des-users', DESUsers);
