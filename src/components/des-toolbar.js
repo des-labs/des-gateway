@@ -198,7 +198,7 @@ class DESToolBar extends connect(store)(LitElement) {
 
         <app-toolbar class="toolbar-top" sticky>
           <button class="menu-btn" title="Menu" @click="${this._ClickHandler}">${menuIcon}</button>
-          <div main-wide-title><span class="title-first-letter">D</span><span class="title-other-letters">ARK</span> <span class="title-first-letter">E</span><span class="title-other-letters">NERGY</span> <span class="title-first-letter">S</span><span class="title-other-letters">URVEY</span> <span class="title-name">DESaccess</span></div>
+          <div main-wide-title><span class="title-first-letter">D</span><span class="title-other-letters">ARK</span> <span class="title-first-letter">E</span><span class="title-other-letters">NERGY</span> <span class="title-first-letter">S</span><span class="title-other-letters">URVEY</span> <span class="title-name">DESaccess (alpha)</span></div>
           <div main-narrow-title><span class="title-name">DESaccess</span></div>
 
           ${this._profile ? html`
