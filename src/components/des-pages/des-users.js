@@ -53,10 +53,10 @@ class DESUsers extends connect(store)(PageViewElement) {
           <vaadin-grid-column auto-width flex-grow="0" .renderer="${this._rendererTableIndex}" header="#"></vaadin-grid-column>
           <vaadin-grid-filter-column path="user.name" header="Username"></vaadin-grid-filter-column>
           <vaadin-grid-sort-column path="user.firstname" header="First name"></vaadin-grid-sort-column>
-          <vaadin-grid-sort-column path="user.lastname" header="Last name"></vaadin-grid-sort-column>
+          <vaadin-grid-sort-column path="user.lastname" header="Last name" direction="asc"></vaadin-grid-sort-column>
           <vaadin-grid-sort-column path="user.email" header="Email"></vaadin-grid-sort-column>
           <vaadin-grid-sort-column path="user.roles" header="Roles"></vaadin-grid-sort-column>
-          <vaadin-grid-sort-column path="user.needs_help" header="Needs help"></vaadin-grid-sort-column>
+          <vaadin-grid-sort-column path="user.needs_help" header="Needs help" direction="desc"></vaadin-grid-sort-column>
           <vaadin-grid-column .renderer="${this.rendererJiraLinks}" header="Help Requests"></vaadin-grid-column>
           <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererAction}" .headerRenderer="${this._headerRendererAction}"></vaadin-grid-column>
         </vaadin-grid>
