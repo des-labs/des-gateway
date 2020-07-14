@@ -55,8 +55,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
         }
         .query-input-controls {
             display: grid;
-            /* grid-gap: 1rem; */
-            /* padding: 1rem; */
+            justify-items: start;
         }
 
         @media all and (min-width: 1000px) {
@@ -70,7 +69,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
           }
 
           .query-input-controls {
-            grid-template-columns: 33% 33% 33%;
+          grid-template-columns: 40px 1fr 1fr 2fr;
           }
         }
 
@@ -313,6 +312,9 @@ class DESDbAccess extends connect(store)(PageViewElement) {
               <wc-codemirror id="query-input-editor" mode="sql" src="images/example-query-0.sql"></wc-codemirror>
           </div>
           <div class="query-input-controls">
+              <div style="vertical-align: middle;">
+                <paper-spinner class="small" style="padding-top: 5px;" aria-hidden="true"></paper-spinner>
+              </div>
               <div class="btn-wrap">
                 <paper-button id="check-syntax-button" class="indigo medium" raised>Check syntax</paper-button>
               </div>
@@ -455,6 +457,8 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   }
 
   _checkSyntax(event) {
+    this.shadowRoot.getElementById('check-syntax-button').disabled = true;
+    this.shadowRoot.querySelector('paper-spinner[class="small"]').active = true;
     const Url=config.backEndUrl + "page/db-access/check";
     let query = this._getCurrentQuery();
     let body = {
@@ -476,6 +480,8 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       return response.json()
     })
     .then(data => {
+      this.shadowRoot.getElementById('check-syntax-button').disabled = false;
+      this.shadowRoot.querySelector('paper-spinner[class="small"]').active = false;
       if (data.status === "ok") {
         // console.log(JSON.stringify(data));
         if (data.valid) {
