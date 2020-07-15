@@ -92,7 +92,7 @@ class DESHome extends connect(store)(PageViewElement) {
             <p>When you encounter problems, first take a look at the available documentation by pressing the red Help button
               <iron-icon icon="vaadin:question-circle-o" style="color: red;"></iron-icon>
             in the upper right corner of the page. If you think you have discovered a bug, or if you simply have suggestions
-            for how to make DESaccess better, please <a href="${config.rootPath.replace(/\/+$/, '')}/help/form" @click="${(e) => {dialog.opened = false;}}">contact us using the Help Request form</a>.</p>
+            for how to make DESaccess better, please <a href="${config.frontEndUrl}help/form" @click="${(e) => {dialog.opened = false;}}">contact us using the Help Request form</a>.</p>
             <p>Sincerely,<br><b>the DES Labs Team</b></p>
           </div>
         `,
