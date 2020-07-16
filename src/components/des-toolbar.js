@@ -25,7 +25,8 @@ class DESToolBar extends connect(store)(LitElement) {
         name: { type: String },
         db: { type: String },
         page: { type: String },
-        _profile: { type: Boolean }
+        _profile: { type: Boolean },
+        notifications: { type: Array },
       }
     }
 
@@ -182,7 +183,7 @@ class DESToolBar extends connect(store)(LitElement) {
 
         .title-name {
           color: white;
-          font-weight: bold;
+          /* font-weight: bold; */
           font-style: italic;
         }
         .title-first-letter {
@@ -192,15 +193,40 @@ class DESToolBar extends connect(store)(LitElement) {
         .title-other-letters {
           color: lightgray;
         }
+        #message-notification-icon {
+          display: none;
+          position: absolute;
+          right: 180px;
+          font-size: 1rem;
+          font-weight: bold;
+          color: white;
+        }
+        #message-notification-icon > a {
+          color: white;
+          text-decoration: none;
+          transition: color 0.7s;
+
+        }
         </style>
         <vaadin-dialog id="UpdateProfileDialog" aria-label="simple"></vaadin-dialog>
         <vaadin-dialog id="ChangePasswordDialog" aria-label="simple"></vaadin-dialog>
+        <vaadin-dialog id="notifications-dialog"></vaadin-dialog>
 
         <app-toolbar class="toolbar-top" sticky>
           <button class="menu-btn" title="Menu" @click="${this._ClickHandler}">${menuIcon}</button>
-          <div main-wide-title><span class="title-first-letter">D</span><span class="title-other-letters">ARK</span> <span class="title-first-letter">E</span><span class="title-other-letters">NERGY</span> <span class="title-first-letter">S</span><span class="title-other-letters">URVEY</span> <span class="title-name">DESaccess (alpha)</span></div>
-          <div main-narrow-title><span class="title-name">DESaccess</span></div>
+          <div main-wide-title>
+            <span class="title-first-letter">DES</span><span class="title-name">access</span>
+            <!-- <span class="title-first-letter">D</span><span class="title-other-letters">ARK</span> <span class="title-first-letter">E</span><span class="title-other-letters">NERGY</span> <span class="title-first-letter">S</span><span class="title-other-letters">URVEY</span> <span class="title-name">DESaccess (alpha)</span> -->
+          </div>
+          <div main-narrow-title>
+            <span class="title-first-letter">DES</span><span class="title-name">access</span>
+          </div>
 
+          <div id="message-notification-icon" @click="${this._showNotifications}">
+            <a title="View notifications" onclick="return false;" href="#">
+              <iron-icon icon="vaadin:bell"></iron-icon>
+            </a>
+          </div>
           ${this._profile ? html`
             <div style="display: inline-block; color: white; position: absolute; right: 110px; font-size: 1rem; font-weight: bold;">
             ${this.name}
@@ -230,12 +256,18 @@ class DESToolBar extends connect(store)(LitElement) {
       this._profile = false;
       this.page = '';
       this.db = '';
+      this.notifications = [];
       this._updateProfileRenderer = this._updateProfileRenderer.bind(this); // need this to invoke class methods in renderers
       this._changePasswordRenderer = this._changePasswordRenderer.bind(this); // need this to invoke class methods in renderers
+      this.messagesFetched = false;
     }
 
     stateChanged(state) {
       this._profile = state.app.session;
+      if (!this.messagesFetched && this._profile && localStorage.getItem("token")) {
+        this.messagesFetched = true;
+        this._fetchNotifications();
+      }
       this.page = state.app.page;
       this.db = state.app.db;
     }
@@ -243,6 +275,123 @@ class DESToolBar extends connect(store)(LitElement) {
     firstUpdated() {
       this.shadowRoot.getElementById('UpdateProfileDialog').renderer = this._updateProfileRenderer;
       this.shadowRoot.getElementById('ChangePasswordDialog').renderer = this._changePasswordRenderer;
+
+      this.notificationsDialog = this.shadowRoot.querySelector('#notifications-dialog');
+      this.notificationsDialog.renderer = (root, dialog) => {
+        let container = root.firstElementChild;
+        if (!container) {
+          container = root.appendChild(document.createElement('div'));
+        }
+        render(
+          html`
+            <style>
+            </style>
+            <div style="max-width: 600px; width: 85vw;">
+              <a title="Close" href="#" onclick="return false;">
+                <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
+              </a>
+              <h3><iron-icon icon="vaadin:bell"></iron-icon> Your Notifications</h3>
+              <div style="padding: 1rem; margin-top: 3rem; overflow: auto; max-height: 70vh;">
+                ${this.notifications.map(i => html`
+                  <div id="notification-message-${i.id}">
+                    <h4>
+                      <a title="Dismiss" href="#" onclick="return false;" @click="${(e) => {e.target.parentNode.parentNode.parentNode.style.textDecoration = 'line-through'; this._dismissNotification(i.id);}}"><iron-icon style="margin-right: 2rem; color: black;" icon="vaadin:check-square-o"></iron-icon></a>
+                      ${i.time}: ${i.title}
+                    </h4>
+                    <p>${i.body}</p>
+                  </div>
+
+                `)}
+              </div>
+            </div>
+          `,
+          container
+        );
+      }
+    }
+
+    updated(changedProps) {
+      changedProps.forEach((oldValue, propName) => {
+        // console.log(`${propName} changed. oldValue: ${oldValue}`);
+        switch (propName) {
+          case 'notifications':
+            if (this.notifications.length > 0) {
+              this.shadowRoot.querySelector('#message-notification-icon').style.display = 'inline-block';
+              this.notificationBlinkSetIntervalId = setInterval(() => {
+                if(this.shadowRoot.querySelector('#message-notification-icon a').style.color != 'darkgray') {
+                  this.shadowRoot.querySelector('#message-notification-icon a').style.color = 'darkgray';
+                } else {
+                  this.shadowRoot.querySelector('#message-notification-icon a').style.color = 'white';
+                }
+              }, 1000);
+            } else {
+              this.shadowRoot.querySelector('#message-notification-icon').style.display = 'none';
+            }
+            break;
+          default:
+        }
+      });
+    }
+
+    _fetchNotifications() {
+
+      const Url=config.backEndUrl + "notifications/fetch"
+      let body = {
+        'message': 'new'
+      };
+      const param = {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem("token")
+        },
+        body: JSON.stringify(body)
+      };
+      fetch(Url, param)
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+        if (data.status === "ok") {
+          // console.log(JSON.stringify(data.messages, null, 2));
+          this.notifications = data.messages;
+        } else {
+          console.log(JSON.stringify(data, null, 2));
+        }
+      });
+    }
+
+    _dismissNotification(messageId) {
+      console.log(`messageId: ${messageId}`);
+      const Url=config.backEndUrl + "notifications/mark"
+      let body = {
+        'message-id': messageId
+      };
+      const param = {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem("token")
+        },
+        body: JSON.stringify(body)
+      };
+      fetch(Url, param)
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+        if (data.status === "ok") {
+          console.log(JSON.stringify(data, null, 2));
+        } else {
+          console.log(JSON.stringify(data, null, 2));
+        }
+      });
+    }
+
+    _showNotifications(event) {
+      clearInterval(this.notificationBlinkSetIntervalId);
+      this.shadowRoot.querySelector('#message-notification-icon a').style.color = 'white';
+      this.notificationsDialog.opened = true;
     }
   }
 

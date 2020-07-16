@@ -31,6 +31,10 @@ class DESHelp extends connect(store)(PageViewElement) {
         .red-links a {
           color: darkred;
         }
+        paper-button:hover {
+          background-color: red;
+          color: white;
+        }
       `
     ];
   }
@@ -71,7 +75,7 @@ class DESHelp extends connect(store)(PageViewElement) {
             the <a href="https://www.darkenergysurvey.org/" target="_blank">Dark Energy Survey</a>.
             </p>
             <div style="text-align: center;">
-              <paper-button @click="${(e) => {this.helpFormDialog.opened = true; }}" raised style="font-size: 1rem; margin: 1rem;"><iron-icon icon="vaadin:comments-o" style="height: 3rem; margin-right: 1rem;"></iron-icon>Contact us for help</paper-button>
+              <paper-button @click="${(e) => {this.helpFormDialog.opened = true; }}" raised style="font-size: 1rem; margin: 1rem; padding-left: 2rem; padding-right: 2rem;"><iron-icon icon="vaadin:comments-o" style="height: 3rem; margin-right: 1rem;"></iron-icon>Contact us for help</paper-button>
             </div>
             <p>
             Follow the links below to learn more about the available apps:</p>

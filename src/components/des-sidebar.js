@@ -75,9 +75,9 @@ class DESSideBar extends connect(store)(LitElement) {
 
       <app-toolbar style="background-color: black;">
         <iron-image
-        style="width:60px; height:60px;"
+        style="width:224px; height:42px;"
         sizing="cover"
-        src="images/DESDM_logo.png" @click="${this._ClickHandler}"></iron-image>
+        src="images/des-logo-rev-lg.png" @click="${this._ClickHandler}"></iron-image>
       </app-toolbar>
       `;
   }

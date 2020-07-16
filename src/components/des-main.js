@@ -191,6 +191,7 @@ class DESMain extends connect(store)(LitElement) {
           ${this.accessPages.includes('ticket')    ? this._renderMenuItem('DES Ticket', 'ticket', 'vaadin:clipboard-user') : html ``}
           ${this.accessPages.includes('users')    ? this._renderMenuItem('User Management', 'users', 'vaadin:users') : html ``}
           ${this._renderMenuItem('Help', 'help', 'vaadin:question-circle-o')}
+          <iron-image src="images/ncsa-logo.jpg" sizing="cover" style="width: 100px;height: 18px;position: absolute; bottom: 10%;left: 10%;"></iron-image>
         </nav>
 
       </app-drawer>

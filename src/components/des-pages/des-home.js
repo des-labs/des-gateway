@@ -85,15 +85,18 @@ class DESHome extends connect(store)(PageViewElement) {
             <a title="Close" href="#" onclick="return false;">
               <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
             </a>
-            <h3>Welcome to the <i>DESaccess Alpha Release</i></h3>
+            <h3>Welcome to the <i>DESaccess Alpha Release !</i></h3>
             <p>Thank you for participating in the DESaccess alpha release testing. While we hope
-            that everything works perfectly for you, we know that some bugs are best found by actual
-              users doing what they do best (and also by definition): <i>use the software</i>!</p>
+            that everything works perfectly for you, we know that some bugs are best found when actual
+              users like you do what you do best: <i>use the software</i>!</p>
             <p>When you encounter problems, first take a look at the available documentation by pressing the red Help button
               <iron-icon icon="vaadin:question-circle-o" style="color: red;"></iron-icon>
             in the upper right corner of the page. If you think you have discovered a bug, or if you simply have suggestions
             for how to make DESaccess better, please <a href="${config.frontEndUrl}help/form" @click="${(e) => {dialog.opened = false;}}">contact us using the Help Request form</a>.</p>
-            <p>Sincerely,<br><b>the DES Labs Team</b></p>
+            <p>As we continue to update this alpha release, in part based on your feedback, we will inform you of the changes
+            via this site and our dedicated Slack channel <a href="https://darkenergysurvey.slack.com/archives/G017KUZ67U1" target="_blank">#desaccess-alpha-testing</a>.
+            A notification icon <iron-icon icon="vaadin:bell" style="color: auto;"></iron-icon> will appear in the toolbar when you have new messages.</p>
+            <p>Sincerely,<br><b>DES Labs Team</b></p>
           </div>
         `,
         container
