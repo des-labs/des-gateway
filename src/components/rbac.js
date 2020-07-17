@@ -1,7 +1,7 @@
 
 const pages_default = []
 const pages_collaborator = [...pages_default, 'db-access', 'cutout', 'status']
-const pages_admin = [...pages_collaborator, 'test-job', 'ticket', 'users']
+const pages_admin = [...pages_collaborator, 'test-job', 'ticket', 'users', 'notifications']
 
 export const rbac_bindings = [
 		{

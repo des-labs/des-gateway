@@ -55,6 +55,11 @@ class DESHome extends connect(store)(PageViewElement) {
               <des-home-card heading="DES USERS" image="images/users_app_art.png" alt="User Management" desc="DES user management" name="users" ></des-home-card>
             </a>
           ` : html``}
+          ${this.accessPages.includes('notifications') ? html`
+            <a style = "text-transform: none; color:black;" href="notifications" tabindex="-1">
+              <des-home-card heading="DES NOTIFICATIONS" image="images/notifications_app_art.png" alt="Notifications Management" desc="DES notifications" name="notifications" ></des-home-card>
+            </a>
+          ` : html``}
           <a style = "text-transform: none; color:black;" href="help" tabindex="-1">
             <des-home-card heading="HELP" image="images/home-help.jpg" alt="Help" desc="View documentation and seek help" name="help" ></des-home-card>
           </a>

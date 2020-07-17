@@ -124,6 +124,9 @@ export const loadPage = (page,ap,targetPath = '') => (dispatch) => {
     case 'users':
       ap.includes('users') ?   import('../components/des-pages/des-users.js') : import('../components/des-pages/des-404.js') ;
       break;
+    case 'notifications':
+      ap.includes('notifications') ?   import('../components/des-pages/des-notifications.js') : import('../components/des-pages/des-404.js') ;
+      break;
     case 'help':
       import('../components/des-pages/des-help.js');
       break;

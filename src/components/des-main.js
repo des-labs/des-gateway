@@ -190,6 +190,7 @@ class DESMain extends connect(store)(LitElement) {
           ${this.accessPages.includes('status')    ? this._renderMenuItem('Job Status', 'status', 'vaadin:cogs') : html ``}
           ${this.accessPages.includes('ticket')    ? this._renderMenuItem('DES Ticket', 'ticket', 'vaadin:clipboard-user') : html ``}
           ${this.accessPages.includes('users')    ? this._renderMenuItem('User Management', 'users', 'vaadin:users') : html ``}
+          ${this.accessPages.includes('notifications')    ? this._renderMenuItem('Notifications', 'notifications', 'vaadin:envelope-open-o') : html ``}
           ${this._renderMenuItem('Help', 'help', 'vaadin:question-circle-o')}
           <iron-image src="images/ncsa-logo.jpg" sizing="cover" style="width: 100px;height: 18px;position: absolute; bottom: 10%;left: 10%;"></iron-image>
         </nav>
@@ -218,6 +219,9 @@ class DESMain extends connect(store)(LitElement) {
         ${this.accessPages.includes('users') ?
           html`<des-users class="page" ?active="${this._page === 'users'}"></des-users>` :
           html`<des-404 class="page" ?active="${this._page === 'users'}"></des-404>`}
+        ${this.accessPages.includes('notifications') ?
+          html`<des-notifications class="page" ?active="${this._page === 'notifications'}"></des-notifications>` :
+          html`<des-404 class="page" ?active="${this._page === 'notifications'}"></des-404>`}
         <des-help class="page" ?active="${this._page === 'help'}"></des-help>
 
         <des-404 class="page" ?active="${this._page === 'des404'}"></des-404>

@@ -397,7 +397,7 @@ class DESToolBar extends connect(store)(LitElement) {
       })
       .then(data => {
         if (data.status === "ok") {
-          console.log(JSON.stringify(data.messages, null, 2));
+          // console.log(JSON.stringify(data.messages, null, 2));
           this.notifications = data.messages;
           callback()
         } else {
