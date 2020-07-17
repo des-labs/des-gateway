@@ -194,15 +194,15 @@ class DESToolBar extends connect(store)(LitElement) {
           color: lightgray;
         }
         #message-notification-icon {
-          display: none;
+          display: inline-block;
           position: absolute;
           right: 180px;
           font-size: 1rem;
           font-weight: bold;
-          color: white;
+          color: darkgray;
         }
         #message-notification-icon > a {
-          color: white;
+          color: darkgray;
           text-decoration: none;
           transition: color 0.7s;
 
@@ -266,7 +266,9 @@ class DESToolBar extends connect(store)(LitElement) {
       this._profile = state.app.session;
       if (!this.messagesFetched && this._profile && localStorage.getItem("token")) {
         this.messagesFetched = true;
-        this._fetchNotifications();
+        this._fetchNotifications('new', () => {
+          this.hideDismissButton = false;
+        });
       }
       this.page = state.app.page;
       this.db = state.app.db;
@@ -285,23 +287,62 @@ class DESToolBar extends connect(store)(LitElement) {
         render(
           html`
             <style>
+              .change-icon {
+                display: inline-block;
+              }
+              .change-icon > .toggle-icon + .toggle-icon,
+              .change-icon:hover > .toggle-icon {
+                display: none;
+              }
+              .change-icon:hover > .toggle-icon + .toggle-icon {
+                display: inline-block;
+              }
             </style>
             <div style="max-width: 600px; width: 85vw;">
               <a title="Close" href="#" onclick="return false;">
                 <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
               </a>
-              <h3><iron-icon icon="vaadin:bell"></iron-icon> Your Notifications</h3>
-              <div style="padding: 1rem; margin-top: 3rem; overflow: auto; max-height: 70vh;">
-                ${this.notifications.map(i => html`
-                  <div id="notification-message-${i.id}">
-                    <h4>
-                      <a title="Dismiss" href="#" onclick="return false;" @click="${(e) => {e.target.parentNode.parentNode.parentNode.style.textDecoration = 'line-through'; this._dismissNotification(i.id);}}"><iron-icon style="margin-right: 2rem; color: black;" icon="vaadin:check-square-o"></iron-icon></a>
-                      ${i.time}: ${i.title}
-                    </h4>
-                    <p>${i.body}</p>
-                  </div>
-
-                `)}
+              <h3><iron-icon icon="vaadin:bell" style="margin-right: 1rem;"></iron-icon> Your Notifications</h3>
+              <div style="left: 8%;position: relative;width: 90%;font-size: 0.8rem;">
+                <span style="margin-right: 1rem;" @click="${(e) => {this._fetchNotifications('all', () => {this.hideDismissButton = true;});}}">
+                  <a title="View all notifications" href="#" onclick="return false;" style="text-decoration: none; color: inherit;">
+                  <iron-icon icon="vaadin:time-backward" style="margin-right: 0.5rem;"></iron-icon>
+                  View all messages
+                </a></span>
+                <span @click="${(e) => {this._fetchNotifications('new', () => {this.hideDismissButton = false;});}}">
+                  <a title="View new notifications" href="#" onclick="return false;" style="text-decoration: none; color: inherit;">
+                  <iron-icon icon="vaadin:envelopes-o" style="margin-right: 0.5rem;"></iron-icon>
+                  Show new messages only
+                </a></span>
+              </div>
+              <div style="padding: 1rem; overflow: auto; max-height: 70vh;">
+                ${this.notifications.length > 0 ? html`
+                  ${this.notifications.map(i => html`
+                    <div id="notification-message-${i.id}" style="display: grid; grid-template-columns: 3rem 1fr; align-items: center;">
+                      <div>
+                        ${this.hideDismissButton ? html`
+                            <iron-icon style="margin-right: 2rem; color: black;" icon="vaadin:envelope-open-o"></iron-icon>
+                          ` : html`
+                            <a title="Dismiss" href="#" onclick="return false;"
+                              @click="${(e) => {e.target.parentNode.parentNode.parentNode.parentNode.style.textDecoration = 'line-through'; this._dismissNotification(i.id);}}">
+                              <div class="change-icon">
+                              <iron-icon class="toggle-icon" style="margin-right: 2rem; color: black;" icon="vaadin:envelope-o"></iron-icon>
+                              <iron-icon class="toggle-icon" style="margin-right: 2rem; color: black;" icon="vaadin:envelope-open-o"></iron-icon>
+                              </div>
+                            </a>
+                        `}
+                      </div>
+                      <div style="line-height: 0.5rem;">
+                        <p style="font-size: 1.2rem; font-weight: bold;">${i.title}</p>
+                        <p style="font-size: 0.8rem;">${i.time}</p>
+                      </div>
+                      <div style="grid-column: 1 / span 2;">${i.body}</div>
+                    </div>
+                  `)}
+                ` : html`
+                  <p>No new messages.</p>
+                `
+                }
               </div>
             </div>
           `,
@@ -316,16 +357,19 @@ class DESToolBar extends connect(store)(LitElement) {
         switch (propName) {
           case 'notifications':
             if (this.notifications.length > 0) {
-              this.shadowRoot.querySelector('#message-notification-icon').style.display = 'inline-block';
+              this.shadowRoot.querySelector('#message-notification-icon').style.color = 'white';
+            } else {
+              this.shadowRoot.querySelector('#message-notification-icon').style.color = 'darkgray';
+            }
+            this.notificationsDialog.render();
+            if (!this.notificationBlinkSetIntervalId && this.notifications.length > 0) {
               this.notificationBlinkSetIntervalId = setInterval(() => {
-                if(this.shadowRoot.querySelector('#message-notification-icon a').style.color != 'darkgray') {
-                  this.shadowRoot.querySelector('#message-notification-icon a').style.color = 'darkgray';
+                if(this.shadowRoot.querySelector('#message-notification-icon a').style.color != 'red') {
+                  this.shadowRoot.querySelector('#message-notification-icon a').style.color = 'red';
                 } else {
                   this.shadowRoot.querySelector('#message-notification-icon a').style.color = 'white';
                 }
               }, 1000);
-            } else {
-              this.shadowRoot.querySelector('#message-notification-icon').style.display = 'none';
             }
             break;
           default:
@@ -333,11 +377,11 @@ class DESToolBar extends connect(store)(LitElement) {
       });
     }
 
-    _fetchNotifications() {
+    _fetchNotifications(newOrAll, callback) {
 
       const Url=config.backEndUrl + "notifications/fetch"
       let body = {
-        'message': 'new'
+        'message': newOrAll
       };
       const param = {
         method: "POST",
@@ -353,8 +397,9 @@ class DESToolBar extends connect(store)(LitElement) {
       })
       .then(data => {
         if (data.status === "ok") {
-          // console.log(JSON.stringify(data.messages, null, 2));
+          console.log(JSON.stringify(data.messages, null, 2));
           this.notifications = data.messages;
+          callback()
         } else {
           console.log(JSON.stringify(data, null, 2));
         }
@@ -362,7 +407,6 @@ class DESToolBar extends connect(store)(LitElement) {
     }
 
     _dismissNotification(messageId) {
-      console.log(`messageId: ${messageId}`);
       const Url=config.backEndUrl + "notifications/mark"
       let body = {
         'message-id': messageId
@@ -390,8 +434,12 @@ class DESToolBar extends connect(store)(LitElement) {
 
     _showNotifications(event) {
       clearInterval(this.notificationBlinkSetIntervalId);
-      this.shadowRoot.querySelector('#message-notification-icon a').style.color = 'white';
-      this.notificationsDialog.opened = true;
+      this.shadowRoot.querySelector('#message-notification-icon a').style.color = 'darkgray';
+      this._fetchNotifications('new', () => {
+        this.hideDismissButton = false;
+        this.notificationsDialog.opened = true;
+      });
+
     }
   }
 
