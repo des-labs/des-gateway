@@ -332,9 +332,9 @@ class DESToolBar extends connect(store)(LitElement) {
                             </a>
                         `}
                       </div>
-                      <div style="line-height: 0.5rem;">
-                        <p style="font-size: 1.2rem; font-weight: bold;">${i.title}</p>
-                        <p style="font-size: 0.8rem;">${i.time}</p>
+                      <div style="">
+                        <p style="margin: 0; font-size: 1.2rem; font-weight: bold;">${i.title}</p>
+                        <p style="margin: 0; margin-bottom: 0.5rem; font-size: 0.8rem;">${i.time}</p>
                       </div>
                       <div style="grid-column: 1 / span 2;">${i.body}</div>
                     </div>

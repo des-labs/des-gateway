@@ -85,8 +85,9 @@ class DESHelpButton extends connect(store)(LitElement) {
               .dialog-content-wrapper {
                 overflow-y: auto;
                 width: 85vw;
-                height: 85vh;
-
+                max-width: 1000px;
+                max-height: 70vh;
+                padding: 1rem;
               }
               .close-dialog-button {
                 color: darkgray;

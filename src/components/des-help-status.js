@@ -27,7 +27,7 @@ class DESHelpStatus extends LitElement {
           The <b>Job Type</b> column, labeled by the <iron-icon icon="vaadin:cubes"></iron-icon> icon, indicates the type of the job. For most people this is either a database query <iron-icon icon="vaadin:code"></iron-icon> or a cutout <iron-icon icon="vaadin:scissors"></iron-icon> type.
           </p>
           <p>
-          Jobs may be sorted on multiple columns. For example, you may want to list jobs in progress at the top of the list, where they are then sorted by job type. Alternatively, you may want to see all of you database query jobs first, sorted by status to you can see all the query jobs still in progress at the top.
+          Jobs may be sorted on multiple columns. For example, you may want to list jobs in progress at the top of the list, where they are then sorted by job type. Alternatively, you may want to see all of you database query jobs first, sorted by status so you can see all the query jobs still in progress at the top.
           </p>
         </div>
         <div class="image-container">
@@ -35,9 +35,9 @@ class DESHelpStatus extends LitElement {
         </div>
         <div>
           <p>
-            Filter the job list by typing part of the desired job name or ID into the column filter input field.
-            Job IDs are unique, but job names can be used for multiple jobs to help group related jobs for use with
-            the job table filter.
+            <b>Filter the job list</b> by typing part of the desired job name or ID into the column header text fields.
+            Job <i><b>IDs</b></i> are unique, but the same job <i><b>name</b></i> can be applied to multiple jobs, providing a way
+            to filter your job list to show a group of related jobs.
           </p>
         </div>
         <div class="image-container">

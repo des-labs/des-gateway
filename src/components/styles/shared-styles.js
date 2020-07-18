@@ -25,7 +25,8 @@ export const HelpStyles = css`
   }
   @media (min-width: 1001px) {
     .help-content-grid {
-      grid-template-columns: 30% 70%;
+      // grid-template-columns: 30% 70%;
+      grid-template-columns: 100%;
     }
   }
 
