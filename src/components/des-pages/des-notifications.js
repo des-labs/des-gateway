@@ -12,6 +12,7 @@ import '@vaadin/vaadin-grid/vaadin-grid-sort-column.js';
 import '@vaadin/vaadin-grid/vaadin-grid-selection-column.js';
 import '@vaadin/vaadin-icons/vaadin-icons.js';
 import '@polymer/paper-spinner/paper-spinner.js';
+import '@polymer/iron-autogrow-textarea/iron-autogrow-textarea.js';
 
 class DESNotifications extends connect(store)(PageViewElement) {
   static get styles() {
@@ -44,9 +45,13 @@ class DESNotifications extends connect(store)(PageViewElement) {
           <paper-spinner class="big"></paper-spinner>
         </div>
         <div>
-          <p>Manage notifications. <b>The page must be reloaded to refresh the data.</b></p>
+          <p>Send notifications to DESaccess users based on their role.</p>
         </div>
-        <paper-button @click="${(e) => {this.newMessageDialog.opened = true; }}" class="des-button" raised style="font-size: 1rem; margin: 1rem; height: 2rem;"><iron-icon icon="vaadin:plus" style="height: 2rem; "></iron-icon>New Message</paper-button>
+        <paper-button @click="${(e) => {this.newMessageDialog.opened = true; }}" class="des-button" raised 
+          style="font-size: 1rem; margin: 1rem; height: 2.2rem; width: auto;">
+          <iron-icon icon="vaadin:pencil" style="height: 2rem; margin-right: 1rem;"></iron-icon>
+          Compose New Message
+        </paper-button>
         <vaadin-grid .multiSort="${true}" style="height: 70vh; max-width: 85vw;">
           <vaadin-grid-selection-column auto-select></vaadin-grid-selection-column>
           <vaadin-grid-column auto-width flex-grow="0" .renderer="${this._rendererTableIndex}" header="#"></vaadin-grid-column>
@@ -82,7 +87,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
         html`
         <style>
           paper-button {
-            width: 100px;
+            width: auto;
             text-transform: none;
             --paper-button-raised-keyboard-focus: {
               background-color: var(--paper-indigo-a250) !important;
@@ -92,7 +97,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
           paper-button.indigo {
             background-color: var(--paper-indigo-500);
             color: white;
-            width: 100px;
+            width: auto;
             text-transform: none;
             --paper-button-raised-keyboard-focus: {
               background-color: var(--paper-indigo-a250) !important;
@@ -102,7 +107,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
           paper-button.des-button {
               background-color: white;
               color: black;
-              width: 100px;
+              width: auto;
               text-transform: none;
               --paper-button-raised-keyboard-focus: {
                 background-color: white !important;
@@ -131,7 +136,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
         html`
           <style>
             paper-button {
-              width: 100px;
+              width: auto;
               text-transform: none;
               --paper-button-raised-keyboard-focus: {
                 background-color: var(--paper-indigo-a250) !important;
@@ -141,7 +146,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
             paper-button.indigo {
               background-color: var(--paper-indigo-500);
               color: white;
-              width: 100px;
+              width: auto;
               text-transform: none;
               --paper-button-raised-keyboard-focus: {
                 background-color: var(--paper-indigo-a250) !important;
@@ -151,7 +156,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
             paper-button.des-button {
                 background-color: white;
                 color: black;
-                width: 100px;
+                width: auto;
                 text-transform: none;
                 --paper-button-raised-keyboard-focus: {
                   background-color: white !important;
@@ -164,9 +169,17 @@ class DESNotifications extends connect(store)(PageViewElement) {
               <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
             </a>
             <h3>Compose message</h3>
+            <p>Specifying no roles will apply the <b>default</b> role to the notification (everyone will see it).</p>
+            <paper-input id="new-msg-roles" always-float-label label="Roles" placeholder="collaborator, admin" @change="${(e) => this.newMessageRoles = e.target.value}"></paper-input>
             <paper-input id="new-msg-title" always-float-label label="Title" placeholder="" @change="${(e) => this.newMessageTitle = e.target.value}"></paper-input>
-            <paper-input id="new-msg-body" always-float-label label="Message" placeholder="" @change="${(e) => this.newMessageBody = e.target.value}"></paper-input>
-            <paper-button @click="${(e) => {dialog.opened = false; this._createMessage();}}" class="des-button" raised>Create Message</paper-button>
+            <div>
+              <p><b>Notification message</b></p>
+              <iron-autogrow-textarea id="new-msg-body" name="question" rows="6"
+                style="width:90%; padding: 1rem;" 
+                placeholder="">
+              </iron-autogrow-textarea>
+            </div>
+            <paper-button @click="${(e) => {dialog.newMessageBody = document.querySelector('#new-msg-body').value; dialog.opened = false; this._createMessage();}}" class="des-button" raised>Create Message</paper-button>
             <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo" raised>Cancel</paper-button>
           </div>
         `,
@@ -178,12 +191,29 @@ class DESNotifications extends connect(store)(PageViewElement) {
   }
 
   _createMessage() {
-    console.log('Creating message...');
+    // Validate message body
+    this.newMessageBody = this.newMessageDialog.newMessageBody;
+    if (this.newMessageBody === '') {
+      console.log('Empty message ignored.');
+      return;
+    }
+    // TODO: Refactor this common role-string-to-role-array code into a common utility function
+    // Validate roles
+    let roles = [];
+    // Convert input CSV string to array, trimming surrounding whitespace and replacing remaining whitespace with underscores
+    let msgRoles = this.newMessageRoles.split(',');
+    for (let i in msgRoles) {
+      let newRole = msgRoles[i].trim().replace(/\s/g, "_");
+      if (newRole !== '') {
+        roles.push(newRole);
+      }
+    }
+    msgRoles = roles;
     const Url=config.backEndUrl + "notifications/create"
     let body = {
       'title': this.newMessageTitle,
       'body': this.newMessageBody,
-      'roles': []
+      'roles': msgRoles
     };
     const param = {
       method: "PUT",
@@ -311,8 +341,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
       msg.title = item.title;
       msg.message = item.body;
       msg.time = item.time;
-      // TODO: Get roles associated with each message
-      msg.roles = ['default'];
+      msg.roles = item.roles;
       gridItems.push({msg: msg});
       ctr++;
       if (ctr === array.length) {

@@ -32,7 +32,7 @@ class DESHelp extends connect(store)(PageViewElement) {
           color: darkred;
         }
         paper-button:hover {
-          background-color: red;
+          background-color: darkred;
           color: white;
         }
       `
