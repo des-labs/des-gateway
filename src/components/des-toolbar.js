@@ -222,12 +222,12 @@ class DESToolBar extends connect(store)(LitElement) {
             <span class="title-first-letter">DES</span><span class="title-name">access</span>
           </div>
 
-          <div id="message-notification-icon" @click="${this._showNotifications}">
-            <a title="View notifications" onclick="return false;" href="#">
-              <iron-icon icon="vaadin:bell"></iron-icon>
-            </a>
-          </div>
           ${this._profile ? html`
+            <div id="message-notification-icon" @click="${this._showNotifications}">
+              <a title="View notifications" onclick="return false;" href="#">
+                <iron-icon icon="vaadin:bell"></iron-icon>
+              </a>
+            </div>
             <div style="display: inline-block; color: white; position: absolute; right: 110px; font-size: 1rem; font-weight: bold;">
             ${this.name}
             <div style="font-size: 0.8rem; font-style: italic; text-align: center; text-transform: uppercase; font-weight: normal;">${this.db}</div>
