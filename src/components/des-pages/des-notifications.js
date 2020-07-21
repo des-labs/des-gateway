@@ -35,6 +35,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
     this.accessPages = [];
     this.newMessageTitle = '';
     this.newMessageBody = '';
+    this.newMessageRoles = '';
   }
 
   render() {
