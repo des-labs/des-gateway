@@ -105,15 +105,25 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     // let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
     // viewportHeight = viewportHeight === 0 ? 500 : viewportHeight;
     return html`
-
+    <style>
+      vaadin-grid-sort-column {
+        font-family: monospace; 
+        font-size: 0.7rem;
+      }
+      vaadin-grid vaadin-grid-cell-content {
+        font-family: monospace;
+        font-size: 0.8rem;
+      }
+    </style>
     <section>
       <vaadin-grid .multiSort="${true}" style="">
         <vaadin-grid-selection-column auto-select></vaadin-grid-selection-column>
         <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererStatus}" .headerRenderer="${this._headerRendererStatus}"></vaadin-grid-column>
         <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererAction}" .headerRenderer="${this._headerRendererAction}"></vaadin-grid-column>
         <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererJobType}" .headerRenderer="${this._headerRendererJobType}"></vaadin-grid-column>
-        <vaadin-grid-column width="25%" path="job.id"   .renderer="${this._rendererJobId}"   .headerRenderer="${this._headerRendererJobId}">  </vaadin-grid-column>
-        <vaadin-grid-column width="40%" path="job.name" .renderer="${this._rendererJobName}" .headerRenderer="${this._headerRendererJobName}"></vaadin-grid-column>
+        <vaadin-grid-column width="12rem" flex-grow="0" text-align="center" path="job.time_submitted" .headerRenderer="${this._headerRendererJobTimeSubmitted}"></vaadin-grid-column>
+        <vaadin-grid-column width="15rem" path="job.id"   .renderer="${this._rendererJobId}"   .headerRenderer="${this._headerRendererJobId}">  </vaadin-grid-column>
+        <vaadin-grid-column auto-width path="job.name" .renderer="${this._rendererJobName}" .headerRenderer="${this._headerRendererJobName}"></vaadin-grid-column>
       </vaadin-grid>
       <div id="last-updated" style="text-align: right; font-family: monospace;"></div>
 
@@ -187,6 +197,17 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       html`
       <vaadin-grid-sorter path="job.status">
         <a title="Job Status"><iron-icon icon="vaadin:dashboard"></iron-icon></a>
+      </vaadin-grid-sorter>
+      `,
+      root
+    );
+  }
+
+  _headerRendererJobTimeSubmitted(root) {
+    render(
+      html`
+      <vaadin-grid-sorter path="job.time_submitted" direction="desc">
+        <a title="Time Submitted"><iron-icon icon="vaadin:clock"></iron-icon></a>
       </vaadin-grid-sorter>
       `,
       root
@@ -657,6 +678,16 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   }
 
 
+  _rendererJobSubmitTime(root, column, rowData) {
+    render(
+      html`
+        <span class="monospace-column">${rowData.item.job.time_submitted}</span>
+      `,
+      root
+    );
+  }
+
+
   _rendererJobName(root, column, rowData) {
     let monospaceText = rowData.item.job.name;
     render(
@@ -888,6 +919,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       job.type = item.job_type;
       job.time_start = item.job_time_start;
       job.time_complete = item.job_time_complete;
+      job.time_submitted = item.job_time_submitted || '0000-00-00 00:00:00';
       job.data = typeof(item.data) === 'string' ? JSON.parse(item.data) : null;
       job.query = item.query;
       job.query_files = typeof(item.query_files) === 'string' ? JSON.parse(item.query_files) : null;

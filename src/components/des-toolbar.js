@@ -260,6 +260,7 @@ class DESToolBar extends connect(store)(LitElement) {
       this._updateProfileRenderer = this._updateProfileRenderer.bind(this); // need this to invoke class methods in renderers
       this._changePasswordRenderer = this._changePasswordRenderer.bind(this); // need this to invoke class methods in renderers
       this.messagesFetched = false;
+      this.newMessages = false;
     }
 
     stateChanged(state) {
@@ -356,20 +357,22 @@ class DESToolBar extends connect(store)(LitElement) {
         // console.log(`${propName} changed. oldValue: ${oldValue}`);
         switch (propName) {
           case 'notifications':
-            if (this.notifications.length > 0) {
-              this.shadowRoot.querySelector('#message-notification-icon').style.color = 'white';
-            } else {
-              this.shadowRoot.querySelector('#message-notification-icon').style.color = 'darkgray';
-            }
-            this.notificationsDialog.render();
-            if (!this.notificationBlinkSetIntervalId && this.notifications.length > 0) {
-              this.notificationBlinkSetIntervalId = setInterval(() => {
-                if(this.shadowRoot.querySelector('#message-notification-icon a').style.color != 'red') {
-                  this.shadowRoot.querySelector('#message-notification-icon a').style.color = 'red';
-                } else {
-                  this.shadowRoot.querySelector('#message-notification-icon a').style.color = 'white';
-                }
-              }, 1000);
+            if (this.shadowRoot.querySelector('#message-notification-icon')){
+              if (this.notifications.length > 0) {
+                this.shadowRoot.querySelector('#message-notification-icon').style.color = 'white';
+              } else {
+                this.shadowRoot.querySelector('#message-notification-icon').style.color = 'darkgray';
+              }
+              this.notificationsDialog.render();
+              if (this.newMessages && !this.notificationBlinkSetIntervalId && this.notifications.length > 0) {
+                this.notificationBlinkSetIntervalId = setInterval(() => {
+                  if(this.shadowRoot.querySelector('#message-notification-icon a').style.color != 'red') {
+                    this.shadowRoot.querySelector('#message-notification-icon a').style.color = 'red';
+                  } else {
+                    this.shadowRoot.querySelector('#message-notification-icon a').style.color = 'white';
+                  }
+                }, 1000);
+              }
             }
             break;
           default:
@@ -399,6 +402,9 @@ class DESToolBar extends connect(store)(LitElement) {
         if (data.status === "ok") {
           // console.log(JSON.stringify(data.messages, null, 2));
           this.notifications = data.messages;
+          if (newOrAll === 'new' && this.notifications.length > 0) {
+            this.newMessages = true;
+          }
           callback()
         } else {
           console.log(JSON.stringify(data, null, 2));
