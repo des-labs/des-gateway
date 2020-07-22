@@ -730,7 +730,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       },
       body: JSON.stringify(body)
     };
-    var that = this;
     fetch(Url, param)
     .then(response => {
       return response.json()
@@ -749,7 +748,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     if (!container) {
       container = root.appendChild(document.createElement('div'));
     }
-    let that = this;
     // Assign the listener callback to a variable
     // TODO: Add a "cancel job" button that stops the process but does not delete the generated files.
     // if (rowData.item.job.status === "started" || rowData.item.job.status === "init") {
@@ -875,7 +873,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       },
       body: JSON.stringify(body)
     };
-    var that = this;
     fetch(Url, param)
     .then(response => {
       return response.json()
@@ -883,8 +880,8 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     .then(data => {
       if (data.status === "ok") {
         // console.log(JSON.stringify(data, null, 2));
-        that._updateGridData(data.jobs);
-        that._updateLastUpdatedDisplay();
+        this._updateGridData(data.jobs);
+        this._updateLastUpdatedDisplay();
       } else {
         console.log(JSON.stringify(data, null, 2));
       }
@@ -919,7 +916,17 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       job.type = item.job_type;
       job.time_start = item.job_time_start;
       job.time_complete = item.job_time_complete;
-      job.time_submitted = item.job_time_submitted || '0000-00-00 00:00:00';
+      job.time_submitted = '0000-00-00 00:00:00';
+      if (item.job_time_submitted) {
+        let submitTimeSecondsUTC = Date.parse(item.job_time_submitted);
+        let timeOffsetSecondsUTC = (new Date()).getTimezoneOffset()*60*1000;
+        let displayTime = new Date(submitTimeSecondsUTC-timeOffsetSecondsUTC);
+        job.time_submitted = 
+          displayTime.getFullYear() + "/" + (((displayTime.getMonth()+1) < 10)?"0":"") + (displayTime.getMonth()+1) + "/" + ((displayTime.getDate() < 10)?"0":"") + displayTime.getDate()
+          + ' ' +
+          ((displayTime.getHours() < 10)?"0":"") + displayTime.getHours() +":"+ ((displayTime.getMinutes() < 10)?"0":"") + displayTime.getMinutes() +":"+ ((displayTime.getSeconds() < 10)?"0":"") + displayTime.getSeconds();
+      } 
+      // job.time_submitted = item.job_time_submitted ? Date.parse(item.job_time_submitted)/1000 || '0000-00-00 00:00:00';
       job.data = typeof(item.data) === 'string' ? JSON.parse(item.data) : null;
       job.query = item.query;
       job.query_files = typeof(item.query_files) === 'string' ? JSON.parse(item.query_files) : null;
@@ -988,7 +995,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         },
         body: JSON.stringify(body)
       };
-      var that = this;
       fetch(Url, param)
       .then(response => {
         return response.json()
@@ -996,7 +1002,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       .then(data => {
         if (data.status === "ok") {
           // console.log(JSON.stringify(data));
-          that._updateStatus();
+          this._updateStatus();
         } else {
           console.log(JSON.stringify(data));
         }
