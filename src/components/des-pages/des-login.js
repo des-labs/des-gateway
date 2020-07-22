@@ -154,8 +154,17 @@ class DESLogin extends connect(store)(PageViewElement) {
       this.shadowRoot.getElementById("loginSpinner").active=false;
       if (data.status == 'ok'){
         localStorage.setItem("token", data.token);
-        store.dispatch(loginUser({"name": data.name, "username": data.username,
-        "lastname": data.lastname, "email":data.email, "session": true, "db": data.db, "roles": data.roles}));
+        console.log(data);
+        store.dispatch(loginUser({
+          "name": data.name, 
+          "username": data.username,
+          "lastname": data.lastname, 
+          "email":data.email, 
+          "session": true, 
+          "db": data.db, 
+          "roles": data.roles, 
+          "preferences": data.preferences
+        }));
         store.dispatch(navigate(decodeURIComponent(window.location.pathname),true, getAccessPages(data.roles), true));
       }
       else {

@@ -206,7 +206,8 @@ export const loginUser = (userObj) => {
     lastname: userObj.lastname,
     session: userObj.session,
     roles: userObj.roles,
-    accessPages: getAccessPages(userObj.roles)
+    accessPages: getAccessPages(userObj.roles),
+    preferences: userObj.preferences
   };
 };
 
@@ -232,8 +233,16 @@ export const getProfile = () => {
         return fetch(Url, param).then(resp => resp.json())
           .then(data => {
             if (data.status == 'ok') {
-              dispatch(loginUser({"username":data.username, "lastname": data.lastname, "email": data.email,
-              "name": data.name, "session": true, "db": data.db, "roles": data.roles}));
+              dispatch(loginUser({
+                "name": data.name, 
+                "username":data.username, 
+                "lastname": data.lastname, 
+                "email": data.email,
+                "session": true, 
+                "db": data.db, 
+                "roles": data.roles, 
+                "preferences": data.preferences
+              }));
               localStorage.setItem("token", data.new_token);
               return true;
             }

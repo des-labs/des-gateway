@@ -35,7 +35,8 @@ const INITIAL_STATE = {
   session: false,
   drawerOpened: false,
   drawerPersisted: false,
-  triggerHelpForm: false
+  triggerHelpForm: false,
+  preferences: {'preferencesNotYetFetched': true}
 };
 
 const app = (state = INITIAL_STATE, action) => {
@@ -50,7 +51,8 @@ const app = (state = INITIAL_STATE, action) => {
         lastname: action.lastname,
         email: action.email,
         roles: action.roles,
-        accessPages: action.accessPages
+        accessPages: action.accessPages,
+        preferences: action.preferences
       };
     case LOGOUT_USER:
       return {
@@ -62,7 +64,8 @@ const app = (state = INITIAL_STATE, action) => {
         session: false,
         email: '',
         roles: [],
-        accessPages: []
+        accessPages: [],
+        preferences: {'preferencesNotYetFetched': true}
       };
     case UPDATE_PAGE:
       return {
