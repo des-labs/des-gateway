@@ -561,7 +561,6 @@ class DESDbAccess extends connect(store)(PageViewElement) {
         this.shadowRoot.getElementById('toast-job-success').text = 'Job submitted';
         this.shadowRoot.getElementById('toast-job-success').show();
         if (this.quickQuery) {
-          // TODO: Set up polling of status until results are fetched.
           this._pollQuickQueryResult(data.jobid);
         }
       } else {
@@ -627,7 +626,6 @@ class DESDbAccess extends connect(store)(PageViewElement) {
             this.shadowRoot.getElementById('toast-job-failure').show();
           }
         }
-        //TODO: Display results
       } else {
         console.log(JSON.stringify(data));
       }
@@ -742,12 +740,9 @@ class DESDbAccess extends connect(store)(PageViewElement) {
 
     var ivlIds = [0,0,0];
     for (let editorId in [0, 1, 2]) {
-      // console.log(`Trying to set format (${editorId})...`);
       ivlIds[editorId] = window.setInterval(() => {
-        // console.log(`    intervalId: ${ivlIds[editorId]}`);
         var editorElement = document.getElementById(`query-example-editor-${editorId}`).querySelector('.CodeMirror');
         if (editorElement !== null) {
-          // console.log(editorElement);
           this.editor = editorElement.CodeMirror;
           this.editor.doc.cm.setOption('lineNumbers', false);
           editorElement.style['height'] = 'auto';
@@ -762,9 +757,6 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   }
 
   _copyQueryToDbAccessPage(event) {
-    // query = query.replace(/(  )+/g, '\n');
-    // console.log(`queryidx: ${queryIdx}`);
-    // console.log(event.target.id);
     switch (event.target.id) {
       case "copy-example-0":
         var query = `--
@@ -813,20 +805,15 @@ WHERE
         var query = '';
         break;
     }
-    // console.log(`Updating query to ${query}`);
     store.dispatch(updateQuery(query));
-    // store.dispatch(loadPage('db-access', this.accessPages));
-    // dialog.opened = false;
   }
 
 
   _updateQueryEditorValue(query) {
     var queryInitIntervalId = window.setInterval(() => {
-      // console.log(`Query changed to\n${this.query}`);
       let editorElement = this.shadowRoot.getElementById('query-input-editor').querySelector('.CodeMirror');
       if (editorElement !== null) {
         if (this.query !== '') {
-          // console.log(`Updating code editor...`);
           this.editor = editorElement.CodeMirror;
           this.editor.doc.setValue(this.query);
           this._validateForm();

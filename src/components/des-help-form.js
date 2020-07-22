@@ -31,15 +31,16 @@ class DESHelpForm extends connect(store)(LitElement) {
     };
   }
 
-  constructor(){
+  constructor() {
     super();
     this.email = '';
     this.firstname = '';
     this.lastname = '';
     this.topicOtherChecked = false;
-    this.messageEdited = false;
     this.topicOtherName = '';
-    this.messageText = '';
+    // Set an initial value to indicate whether the user has edited the message
+    this.initMessageText = 'hfi834yzxcb65xz3235u6iea7tuqwr3t';
+    this.messageText = this.initMessageText;
     this.topics = [];
   }
 
@@ -70,7 +71,7 @@ class DESHelpForm extends connect(store)(LitElement) {
 
         <div>
           <p><b>How can we help?</b></p>
-          <iron-autogrow-textarea name="question" rows="6" style="width:90%; padding: 1rem;" placeholder="Write your message to us here."></iron-autogrow-textarea>
+          <iron-autogrow-textarea name="question" rows="6" style="width:90%; padding: 1rem; height: 8rem; max-height: 8rem;" placeholder="Write your message to us here."></iron-autogrow-textarea>
         </div>
 
         <p><b>Select all relevant topics:</b></p>
@@ -103,22 +104,21 @@ class DESHelpForm extends connect(store)(LitElement) {
   }
 
   firstUpdated() {
-    // The onchange attribute does not seem to work, so manually add event listeners
-    // to the message text input to capture the value as text is typed. The
-    // messageEdited boolean prevent a red warning before the user has a chance to
-    // enter text.
-    let messageInput = this.shadowRoot.querySelector('iron-autogrow-textarea');
-    let messageWatcher = (event) => {
-      this.messageTextDynamic = messageInput.value;
+    // Attach an event listener to validate the form when any input field is being updated
+    // so that the Submit button is enabled as soon as the user completes their inputs
+    let validateWatcher = (event) => {
+      this._validateForm();
     };
-    messageInput.addEventListener('focus', (e) => {
-      this.messageEdited = true;
-      messageInput.addEventListener('keyup', messageWatcher);
-    });
-    messageInput.addEventListener('blur', (e) => {
-      messageInput.removeEventListener('keyup', messageWatcher);
-      this.messageText = this.messageTextDynamic;
-    });
+    let messageInput = this.shadowRoot.querySelector('iron-autogrow-textarea');
+    let firstnameInput = this.shadowRoot.querySelector('paper-input[name="firstname"]');
+    let lastnameInput = this.shadowRoot.querySelector('paper-input[name="lastname"]');
+    let emailInput = this.shadowRoot.querySelector('paper-input[name="email"]');
+    let topicOtherInput = this.shadowRoot.querySelector('paper-input[name="topic"]');
+    messageInput.addEventListener('keyup', validateWatcher);
+    firstnameInput.addEventListener('keyup', validateWatcher);
+    lastnameInput.addEventListener('keyup', validateWatcher);
+    emailInput.addEventListener('keyup', validateWatcher);
+    topicOtherInput.addEventListener('keyup', validateWatcher);
 
     // Set onchange listeners for each topic checkbox to update the topic list
     this.shadowRoot.querySelectorAll('paper-checkbox[name="topic"]').forEach((item) => {
@@ -147,9 +147,10 @@ class DESHelpForm extends connect(store)(LitElement) {
       switch (propName) {
         case 'topicOtherChecked':
           this.shadowRoot.querySelector('paper-input[name="topic"]').style.display = this.shadowRoot.querySelector('paper-checkbox[value="Other"]').checked ? 'block' : 'none';
-        default:
-          // Assume that we want to revalidate the form when a property changes
           this._validateForm();
+          break;
+        default:
+          break;
       }
     });
   }
@@ -159,7 +160,8 @@ class DESHelpForm extends connect(store)(LitElement) {
     let criterion = true;
     let el = null;
     // Validate email address
-    criterion = validateEmailAddress(this.email);
+    el = this.shadowRoot.querySelector('paper-input[name="email"]');
+    criterion = validateEmailAddress(el.value);
     this.shadowRoot.querySelector('paper-input[name="email"]').invalid = !criterion;
     validForm = criterion && validForm;
 
@@ -183,15 +185,23 @@ class DESHelpForm extends connect(store)(LitElement) {
     validForm = criterion && validForm;
 
     // Validate message
-    criterion = this.messageText.length > 0;
     el = this.shadowRoot.querySelector('iron-autogrow-textarea');
-    let borderColor = criterion || !this.messageEdited ? 'black' : 'red';
+    
+    // If the message box has text (that is not the initial value), update the property value
+    if (this.messageText === this.initMessageText) {
+      this.messageText = typeof(el.value) === 'string' && el.value.length > 0 ? el.value : this.messageText;
+    } else {
+      this.messageText = typeof(el.value) === 'string' ? el.value : this.messageText;
+    }
+    // A valid message text is not empty and has been edited by the user
+    criterion = this.messageText.length > 0 && this.messageText !== this.initMessageText;
+    // Provide feedback that the message is invalid only after it has been edited by the user
+    let borderColor = criterion || this.messageText === this.initMessageText ? 'black' : 'red';
     el.style['border-color'] = borderColor;
     validForm = criterion && validForm;
-
     // Set invalid form warning
     let warningElement = this.shadowRoot.querySelector('#invalid-form-warning');
-    let warningMessage = validForm || !this.messageEdited ? html`` : html`
+    let warningMessage = validForm || this.messageText === this.initMessageText ? html`` : html`
       <iron-icon icon="vaadin:exclamation-circle" style="margin-right: 1rem;"></iron-icon>
       Please correct the invalid inputs before submitting.
     `;

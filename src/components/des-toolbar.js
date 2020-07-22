@@ -402,6 +402,13 @@ class DESToolBar extends connect(store)(LitElement) {
         if (data.status === "ok") {
           // console.log(JSON.stringify(data.messages, null, 2));
           this.notifications = data.messages;
+          this.notifications.sort(function(a, b) {
+            let keyA = a.id;
+            let keyB = b.id;
+            if (keyA < keyB) return 1;
+            if (keyA > keyB) return -1;
+            return 0;
+          });
           if (newOrAll === 'new' && this.notifications.length > 0) {
             this.newMessages = true;
           }
