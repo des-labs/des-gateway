@@ -118,6 +118,9 @@ export const loadPage = (page,ap,targetPath = '') => (dispatch) => {
     case 'status':
       ap.includes('status') ?   import('../components/des-pages/des-job-status.js') : import('../components/des-pages/des-404.js') ;
       break;
+    case 'jupyter':
+      ap.includes('jupyter') ?   import('../components/des-pages/des-jupyter.js') : import('../components/des-pages/des-404.js') ;
+      break;
     case 'ticket':
       ap.includes('ticket') ?   import('../components/des-pages/des-ticket.js') : import('../components/des-pages/des-404.js') ;
       break;

@@ -50,6 +50,11 @@ class DESHome extends connect(store)(PageViewElement) {
               <des-home-card heading="JOB STATUS" image="images/home-jobs.png" alt="Job Status" desc="List of submitted jobs" name="status" ></des-home-card>
             </a>
           ` : html``}
+          ${this.accessPages.includes('jupyter') ? html`
+            <a style = "text-transform: none; color:black;" href="jupyter" tabindex="-1">
+              <des-home-card heading="JUPYTER LAB" image="images/home-jupyter.jpg" alt="Jupyter Lab" desc="Personal Jupyter server" name="status" ></des-home-card>
+            </a>
+          ` : html``}
           ${this.accessPages.includes('ticket') ? html`
             <a style = "text-transform: none; color:black;" href="ticket" tabindex="-1">
               <des-home-card heading="DES TICKET" image="images/decam.jpg" alt="DES Ticket" desc="DES database account management" name="ticket" ></des-home-card>
