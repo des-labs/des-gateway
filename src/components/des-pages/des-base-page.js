@@ -1,5 +1,5 @@
 import { LitElement } from 'lit-element';
-import { validateEmailAddress } from '../utils.js';
+import { validateEmailAddress, convertToLocalTime } from '../utils.js';
 
 export class PageViewElement extends LitElement {
   // Only render this page if it's actually visible.
@@ -16,6 +16,7 @@ export class PageViewElement extends LitElement {
   constructor(){
     super();
     this.validateEmailAddress = validateEmailAddress;
+    this.convertToLocalTime = convertToLocalTime;
   }
 
 

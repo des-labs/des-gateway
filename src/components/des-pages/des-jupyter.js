@@ -41,17 +41,28 @@ class DESJupyter extends connect(store)(PageViewElement) {
         </div>
         <div>
           <p>This page allows you to deploy a Jupyter Lab server <i>for your use only</i>.</p>
+          <p>
+            <b>Currently there is no persistent storage</b> for your Jupyter notebook files. Any files you 
+            create or upload to Jupyter Lab will be lost when the server is destroyed, so for now you will
+            have to manually download and upload notebooks.
+          </p>
+          <p style="color: red;">
+            Server instances will be automatically deleted after approximately 24 hours.
+          </p>
         </div>
         <paper-button id="deploy-jlab-button" @click="${this._create}" class="des-button" raised disabled
           style="display: none; font-size: 1rem; margin: 1rem; height: 2.2rem; width: auto;">
           <iron-icon icon="vaadin:rocket" style="height: 2rem; margin-right: 1rem;"></iron-icon>
-          Deploy Jupyter Lab
+          Deploy Jupyter Lab server
         </paper-button>
-        <paper-button id="delete-jlab-button" @click="${this._delete}" class="des-button" raised disabled
-          style="display: none; font-size: 1rem; margin: 1rem; height: 2.2rem; width: auto; background-color: darkred;">
-          <iron-icon icon="vaadin:trash" style="height: 2rem; margin-right: 1rem;"></iron-icon>
-          Destroy Jupyter Lab
-        </paper-button>
+        <div id="delete-jlab-button">
+          <paper-button @click="${this._delete}" class="des-button" raised disabled
+            style="display: none; font-size: 1rem; margin: 1rem; height: 2.2rem; width: auto; background-color: darkred;">
+            <iron-icon icon="vaadin:trash" style="height: 2rem; margin-right: 1rem;"></iron-icon>
+            Destroy Jupyter Lab server
+          </paper-button>
+          
+        </div>
         <div id="jlab-link" style="display: none;">
           <a href="${this.jupyter_url}" target="_blank">
             <paper-button class="des-button" raised
@@ -60,6 +71,8 @@ class DESJupyter extends connect(store)(PageViewElement) {
               Open Jupyter Lab
             </paper-button>
           </a>
+          <br>
+          Created: <span></span>
         </div>
       </section>
 
@@ -125,8 +138,8 @@ class DESJupyter extends connect(store)(PageViewElement) {
     .then(data => {
       if (data.status === "ok") {
         console.log(JSON.stringify(data, null, 2));
-        this.shadowRoot.querySelector('#delete-jlab-button').disabled = true;
-        this.shadowRoot.querySelector('#delete-jlab-button').style.display = 'none';
+        this.shadowRoot.querySelector('#delete-jlab-button paper-button').disabled = true;
+        this.shadowRoot.querySelector('#delete-jlab-button paper-button').style.display = 'none';
         this.deleteIntervalId = setInterval(() => {
           this._status();
         }, 3000)
@@ -157,20 +170,21 @@ class DESJupyter extends connect(store)(PageViewElement) {
       } else {
         console.log(JSON.stringify(data, null, 2));
       }
-      if (data.data.ready_replicas === 0) {
-        this.shadowRoot.querySelector('#delete-jlab-button').disabled = true;
-        this.shadowRoot.querySelector('#delete-jlab-button').style.display = 'none';
+      if (data.ready_replicas === 0) {
+        this.shadowRoot.querySelector('#delete-jlab-button paper-button').disabled = true;
+        this.shadowRoot.querySelector('#delete-jlab-button paper-button').style.display = 'none';
         this.shadowRoot.querySelector('#deploy-jlab-button').disabled = false;
         this.shadowRoot.querySelector('#deploy-jlab-button').style.display = 'inline';
         this.shadowRoot.querySelector('#jlab-link').style.display = 'none';
       } else {
-        this.jupyter_token = data.data.token;
+        this.jupyter_token = data.token;
         this.shadowRoot.querySelector('#jlab-link a').setAttribute('href', `${config.frontEndOrigin}/jlab/${this.username}?token=${this.jupyter_token}`);
         this.shadowRoot.querySelector('#jlab-link').style.display = 'block';
-        this.shadowRoot.querySelector('#delete-jlab-button').disabled = false;
-        this.shadowRoot.querySelector('#delete-jlab-button').style.display = 'inline';
+        this.shadowRoot.querySelector('#delete-jlab-button paper-button').disabled = false;
+        this.shadowRoot.querySelector('#delete-jlab-button paper-button').style.display = 'inline';
         this.shadowRoot.querySelector('#deploy-jlab-button').disabled = true;
         this.shadowRoot.querySelector('#deploy-jlab-button').style.display = 'none';
+        this.shadowRoot.querySelector('#jlab-link span').innerHTML = this.convertToLocalTime(data.creation_timestamp.replace(/\+.*$/, ''));
       }
       if (this.createIntervalId) {
         clearInterval(this.createIntervalId);
@@ -183,9 +197,8 @@ class DESJupyter extends connect(store)(PageViewElement) {
         this.shadowRoot.querySelector('paper-spinner').active = false;
       }
     });
-
-    
   }
+
 }
 
 window.customElements.define('des-jupyter', DESJupyter);

@@ -918,15 +918,8 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       job.time_complete = item.job_time_complete;
       job.time_submitted = '0000-00-00 00:00:00';
       if (item.job_time_submitted) {
-        let submitTimeSecondsUTC = Date.parse(item.job_time_submitted);
-        let timeOffsetSecondsUTC = (new Date()).getTimezoneOffset()*60*1000;
-        let displayTime = new Date(submitTimeSecondsUTC-timeOffsetSecondsUTC);
-        job.time_submitted = 
-          displayTime.getFullYear() + "/" + (((displayTime.getMonth()+1) < 10)?"0":"") + (displayTime.getMonth()+1) + "/" + ((displayTime.getDate() < 10)?"0":"") + displayTime.getDate()
-          + ' ' +
-          ((displayTime.getHours() < 10)?"0":"") + displayTime.getHours() +":"+ ((displayTime.getMinutes() < 10)?"0":"") + displayTime.getMinutes() +":"+ ((displayTime.getSeconds() < 10)?"0":"") + displayTime.getSeconds();
+        job.time_submitted = this.convertToLocalTime(item.job_time_submitted);
       } 
-      // job.time_submitted = item.job_time_submitted ? Date.parse(item.job_time_submitted)/1000 || '0000-00-00 00:00:00';
       job.data = typeof(item.data) === 'string' ? JSON.parse(item.data) : null;
       job.query = item.query;
       job.query_files = typeof(item.query_files) === 'string' ? JSON.parse(item.query_files) : null;
