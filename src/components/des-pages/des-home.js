@@ -36,41 +36,41 @@ class DESHome extends connect(store)(PageViewElement) {
       <section>
         <div class="horizontal layout around justified">
           ${this.accessPages.includes('db-access') ? html`
-            <a style = "text-transform: none; color:black;" href="db-access" tabindex="-1">
+            <a style="text-decoration: none; text-transform: none; color:black;" href="db-access" tabindex="-1">
               <des-home-card heading="DB ACCESS" image="images/home-query.png" alt="Query" desc="Oracle SQL web client" name="query" ></des-home-card>
             </a>
           ` : html``}
           ${this.accessPages.includes('cutout') && this.database !== 'desoper' ? html`
-            <a style = "text-transform: none; color:black;" href="cutout" tabindex="-1">
+            <a style="text-decoration: none; text-transform: none; color:black;" href="cutout" tabindex="-1">
               <des-home-card heading="CUTOUT SERVICE" image="images/home-coadd.png" alt="Bulk Cutout Service" desc="Generate cutout images" name="cutout" ></des-home-card>
             </a>
           ` : html``}
           ${this.accessPages.includes('status') ? html`
-            <a style = "text-transform: none; color:black;" href="status" tabindex="-1">
+            <a style="text-decoration: none; text-transform: none; color:black;" href="status" tabindex="-1">
               <des-home-card heading="JOB STATUS" image="images/home-jobs.png" alt="Job Status" desc="List of submitted jobs" name="status" ></des-home-card>
             </a>
           ` : html``}
           ${this.accessPages.includes('jupyter') ? html`
-            <a style = "text-transform: none; color:black;" href="jupyter" tabindex="-1">
+            <a style="text-decoration: none; text-transform: none; color:black;" href="jupyter" tabindex="-1">
               <des-home-card heading="JUPYTER LAB" image="images/home-jupyter.jpg" alt="Jupyter Lab" desc="Personal Jupyter server" name="status" ></des-home-card>
             </a>
           ` : html``}
           ${this.accessPages.includes('ticket') ? html`
-            <a style = "text-transform: none; color:black;" href="ticket" tabindex="-1">
+            <a style="text-decoration: none; text-transform: none; color:black;" href="ticket" tabindex="-1">
               <des-home-card heading="DES TICKET" image="images/decam.jpg" alt="DES Ticket" desc="DES database account management" name="ticket" ></des-home-card>
             </a>
           ` : html``}
           ${this.accessPages.includes('users') ? html`
-            <a style = "text-transform: none; color:black;" href="users" tabindex="-1">
+            <a style="text-decoration: none; text-transform: none; color:black;" href="users" tabindex="-1">
               <des-home-card heading="DES USERS" image="images/users_app_art.png" alt="User Management" desc="DES user management" name="users" ></des-home-card>
             </a>
           ` : html``}
           ${this.accessPages.includes('notifications') ? html`
-            <a style = "text-transform: none; color:black;" href="notifications" tabindex="-1">
+            <a style="text-decoration: none; text-transform: none; color:black;" href="notifications" tabindex="-1">
               <des-home-card heading="DES NOTIFICATIONS" image="images/notifications_app_art.png" alt="Notifications Management" desc="DES notifications" name="notifications" ></des-home-card>
             </a>
           ` : html``}
-          <a style = "text-transform: none; color:black;" href="help" tabindex="-1">
+          <a style="text-decoration: none; text-transform: none; color:black;" href="help" tabindex="-1">
             <des-home-card heading="HELP" image="images/home-help.jpg" alt="Help" desc="View documentation and seek help" name="help" ></des-home-card>
           </a>
         </div>
