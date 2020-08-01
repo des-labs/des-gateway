@@ -265,6 +265,7 @@ class DESJupyter extends connect(store)(PageViewElement) {
         this.shadowRoot.querySelector('#deploy-jlab-button').disabled = true;
         this.statusIntervalId = setInterval(() => {
           this._status();
+          this._updateFolderLinks();
         }, 2000)
       } else {
         console.log(JSON.stringify(data, null, 2));
