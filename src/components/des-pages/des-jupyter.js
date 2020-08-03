@@ -366,7 +366,7 @@ class DESJupyter extends connect(store)(PageViewElement) {
         // Enable and display the Delete button
         this.shadowRoot.querySelector('#please-wait-button').style.display = 'none';
         this.jupyter_token = data.token;
-        this.shadowRoot.querySelector('#jlab-link a').setAttribute('href', `${config.frontEndOrigin}/jlab/${this.username}?token=${this.jupyter_token}`);
+        this.shadowRoot.querySelector('#jlab-link a').setAttribute('href', `${config.frontEndOrigin}/jlab/${this.username}/lab?token=${this.jupyter_token}`);
         this.shadowRoot.querySelector('#jlab-link').style.display = 'block';
         this.shadowRoot.querySelector('#delete-jlab-button paper-button').disabled = false;
         this.shadowRoot.querySelector('#delete-jlab-button').style.display = 'block';
