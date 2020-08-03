@@ -22,6 +22,17 @@ class DESJupyter extends connect(store)(PageViewElement) {
     return [
       SharedStyles,
       css`
+        .grid-system {
+            display: grid;
+            grid-gap: 1rem;
+            padding: 1rem;
+            grid-template-columns: 1fr;
+        }
+        @media all and (min-width: 1171px) {
+          .grid-system {
+            grid-template-columns: 1fr 1fr;
+          }
+        }
         `,
     ];
   }
@@ -39,54 +50,67 @@ class DESJupyter extends connect(store)(PageViewElement) {
     return html`
       <section>
         <div style="font-size: 2rem; font-weight: bold;">
-          DESaccess Jupyter Lab
-          
+          DESaccess JupyterLab
+          <paper-spinner class="big"></paper-spinner>
         </div>
-        <div>
-          <p>This page allows you to deploy a Jupyter Lab server <i>for your use only</i>.</p>
-          <p style="color: red;">
-            Server instances will be automatically deleted after approximately 24 hours.
-          </p>
-        </div>
-        <paper-spinner class="big"></paper-spinner>
-        <paper-button id="please-wait-button" class="des-button" raised disabled
-          style="display: inline; font-size: 1rem; margin: 1rem; height: 2.2rem; width: auto;">
-          <iron-icon icon="vaadin:hourglass" style="height: 2rem; margin-right: 1rem;"></iron-icon>
-          Please wait...
-        </paper-button>
-        <paper-button id="deploy-jlab-button" @click="${this._create}" class="des-button" raised disabled
-          style="display: none; font-size: 1rem; margin: 1rem; height: 2.2rem; width: auto;">
-          <iron-icon icon="vaadin:rocket" style="height: 2rem; margin-right: 1rem;"></iron-icon>
-          Deploy Jupyter Lab server
-        </paper-button>
-        <div id="delete-jlab-button">
-          <paper-button @click="${this._delete}" class="des-button" raised disabled
-            style="display: none; font-size: 1rem; margin: 1rem; height: 2.2rem; width: auto; background-color: darkred;">
-            <iron-icon icon="vaadin:trash" style="height: 2rem; margin-right: 1rem;"></iron-icon>
-            Destroy Jupyter Lab server
-          </paper-button>
-        </div>
-        <div id="jlab-link" style="display: none;">
-          <a href="${this.jupyter_url}" target="_blank">
-            <paper-button class="des-button" raised
-              style="font-size: 1rem; margin: 1rem; height: 2.2rem; width: auto;">
-              <iron-icon icon="vaadin:notebook" style="height: 2rem; margin-right: 1rem;"></iron-icon>
-              Open Jupyter Lab
-            </paper-button>
-          </a>
-          <br>
-          Created: <span></span>
-        </div>
-        <div id="jupyter-file-links" style="display: none; margin-top: 1rem;">
-          <h3>Jupyter Files</h3>
-          <p>
-            The links below provide access to files in the <code>work</code> directory of your
-            your current and former Jupyter Lab server instances. These links can be shared with
-            your collaborators to allow them to download your Jupyter files. Similar your job
-            output files, these directories are protected only by the obscurity of the URL. Data
-            is synced approximately every 30 seconds.
-          </p>
-          ${this.folderLinks}
+        <div class="grid-system">
+          <div>
+            <div>
+              <h3>Manage Server</h3>
+              <p>
+                This page allows you to deploy a JupyterLab server <i>for your use only</i>.
+                <span style="color: red;">
+                  Server instances will be automatically deleted after approximately 24 hours.
+                </span>
+              </p>
+            </div>
+            <div id="please-wait-button" style="display: none;">
+              <paper-button class="des-button" raised disabled
+                style="font-size: 1rem; margin: 1rem; height: 3rem; width: 16rem;">
+                <iron-icon icon="vaadin:hourglass" style="height: 2rem; margin-right: 1rem;"></iron-icon>
+                Please wait...
+              </paper-button>
+            </div>
+            <div id="deploy-jlab-button" style="display: none;">
+              <paper-button @click="${this._create}" class="des-button" raised disabled
+                style="font-size: 1rem; margin: 1rem; height: 3rem; width: 16rem;">
+                <iron-icon icon="vaadin:rocket" style="height: 2rem; margin-right: 1rem;"></iron-icon>
+                Deploy JupyterLab server
+              </paper-button>
+            </div>
+            <div id="delete-jlab-button" style="display: none;">
+              <paper-button @click="${this._delete}" class="des-button" raised disabled
+                style="font-size: 1rem; margin: 1rem; height: 3rem; width: 16rem; background-color: darkred;">
+                <iron-icon icon="vaadin:trash" style="height: 2rem; margin-right: 1rem;"></iron-icon>
+                Destroy JupyterLab server
+              </paper-button>
+            </div>
+            <div id="jlab-link" style="display: none;">
+              <a href="${this.jupyter_url}" target="_blank">
+                <paper-button class="des-button" raised
+                  style="font-size: 1rem; margin: 1rem; height: 3rem; width: 16rem;">
+                  <iron-icon icon="vaadin:notebook" style="height: 2rem; margin-right: 1rem;"></iron-icon>
+                  Open JupyterLab
+                </paper-button>
+              </a>
+              <br>
+              Created: <span></span>
+            </div>
+          </div>
+          <div>
+            <div id="jupyter-file-links" style="display: none; margin-top: 1rem;">
+              <h3>JupyterLab Files</h3>
+              <p>
+                The links below provide access to files in the <code>work</code> directory of your
+                your current and former JupyterLab server instances. These links can be shared with
+                your collaborators to allow them to download your Jupyter files. Similar your job
+                output files, these directories are protected only by the obscurity of the URL. Data
+                is synced approximately every 30 seconds, so to avoid data loss, wait a few minutes 
+                after editing JupyterLab files before destroying your server instance.
+              </p>
+              ${this.folderLinks}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -294,7 +318,7 @@ class DESJupyter extends connect(store)(PageViewElement) {
       if (data.status === "ok") {
         // console.log(JSON.stringify(data, null, 2));
         this.shadowRoot.querySelector('#delete-jlab-button paper-button').disabled = true;
-        this.shadowRoot.querySelector('#delete-jlab-button paper-button').style.display = 'none';
+        this.shadowRoot.querySelector('#delete-jlab-button').style.display = 'none';
         this.shadowRoot.querySelector('#jlab-link').style.display = 'none';
         this.statusIntervalId = setInterval(() => {
           this._status();
@@ -333,9 +357,9 @@ class DESJupyter extends connect(store)(PageViewElement) {
         // Enable and display Deploy button
         this.shadowRoot.querySelector('#please-wait-button').style.display = 'none';
         this.shadowRoot.querySelector('#delete-jlab-button paper-button').disabled = true;
-        this.shadowRoot.querySelector('#delete-jlab-button paper-button').style.display = 'none';
-        this.shadowRoot.querySelector('#deploy-jlab-button').disabled = false;
-        this.shadowRoot.querySelector('#deploy-jlab-button').style.display = 'inline';
+        this.shadowRoot.querySelector('#delete-jlab-button').style.display = 'none';
+        this.shadowRoot.querySelector('#deploy-jlab-button paper-button').disabled = false;
+        this.shadowRoot.querySelector('#deploy-jlab-button').style.display = 'block';
         this.shadowRoot.querySelector('#jlab-link').style.display = 'none';
 
       } else if (data.latest_condition_type === 'Available' && data.ready_replicas > 0) {
@@ -345,18 +369,18 @@ class DESJupyter extends connect(store)(PageViewElement) {
         this.shadowRoot.querySelector('#jlab-link a').setAttribute('href', `${config.frontEndOrigin}/jlab/${this.username}?token=${this.jupyter_token}`);
         this.shadowRoot.querySelector('#jlab-link').style.display = 'block';
         this.shadowRoot.querySelector('#delete-jlab-button paper-button').disabled = false;
-        this.shadowRoot.querySelector('#delete-jlab-button paper-button').style.display = 'inline';
-        this.shadowRoot.querySelector('#deploy-jlab-button').disabled = true;
+        this.shadowRoot.querySelector('#delete-jlab-button').style.display = 'block';
+        this.shadowRoot.querySelector('#deploy-jlab-button paper-button').disabled = true;
         this.shadowRoot.querySelector('#deploy-jlab-button').style.display = 'none';
         this.shadowRoot.querySelector('#jlab-link span').innerHTML = this.convertToLocalTime(data.creation_timestamp.replace(/\+.*$/, ''));
       } else {
         // The deployment is transitioning, either starting or terminating
         this.shadowRoot.querySelector('#jlab-link').style.display = 'none';
         this.shadowRoot.querySelector('#delete-jlab-button paper-button').disabled = true;
-        this.shadowRoot.querySelector('#delete-jlab-button paper-button').style.display = 'none';
-        this.shadowRoot.querySelector('#deploy-jlab-button').disabled = true;
+        this.shadowRoot.querySelector('#delete-jlab-button').style.display = 'none';
+        this.shadowRoot.querySelector('#deploy-jlab-button paper-button').disabled = true;
         this.shadowRoot.querySelector('#deploy-jlab-button').style.display = 'none';
-        this.shadowRoot.querySelector('#please-wait-button').style.display = 'inline';
+        this.shadowRoot.querySelector('#please-wait-button').style.display = 'block';
         stopStatusPolling = false;
       }
       if (stopStatusPolling && this.statusIntervalId) {
