@@ -52,7 +52,7 @@ class DESHome extends connect(store)(PageViewElement) {
           ` : html``}
           ${this.accessPages.includes('jupyter') ? html`
             <a style="text-decoration: none; text-transform: none; color:black;" href="jupyter" tabindex="-1">
-              <des-home-card heading="JUPYTER LAB" image="images/home-jupyter.jpg" alt="Jupyter Lab" desc="Personal Jupyter server" name="status" ></des-home-card>
+              <des-home-card heading="JUPYTER LAB" image="images/home-jupyter.jpg" alt="JupyterLab" desc="Personal Jupyter server" name="status" ></des-home-card>
             </a>
           ` : html``}
           ${this.accessPages.includes('ticket') ? html`

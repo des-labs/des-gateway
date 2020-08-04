@@ -60,7 +60,7 @@ class DESJupyter extends connect(store)(PageViewElement) {
               <p>
                 This page allows you to deploy a JupyterLab server <i>for your use only</i>.
                 <span style="color: red;">
-                  Server instances will be automatically deleted after approximately 24 hours.
+                  Server instances will be automatically deleted after being idle for approximately 24 hours.
                 </span>
               </p>
             </div>
@@ -93,8 +93,9 @@ class DESJupyter extends connect(store)(PageViewElement) {
                   Open JupyterLab
                 </paper-button>
               </a>
-              <br>
-              Created: <span></span>
+              <p style="margin-left: 1rem;">
+                Created: <span></span>
+              </p>
             </div>
           </div>
           <div>
@@ -158,7 +159,6 @@ class DESJupyter extends connect(store)(PageViewElement) {
                 color: black !important;
               };
           }
-
         </style>
         <div>
           <p style="text-align: center;font-size: 1.2rem;">
@@ -178,10 +178,10 @@ class DESJupyter extends connect(store)(PageViewElement) {
     this.shadowRoot.querySelector('paper-spinner').active = true;
     this.statusIntervalId = setInterval(() => {
       this._status();
+      // Update the list of Jupyter file folder links
+      this._updateFolderLinks();
     }, 2000)
 
-    // Update the list of Jupyter file folder links
-    this._updateFolderLinks();
   }
 
   stateChanged(state) {
@@ -219,9 +219,15 @@ class DESJupyter extends connect(store)(PageViewElement) {
           <ul style="list-style-type: none; margin: 0; padding: 1rem; line-height: 2rem;">
           ${data.folders.map(i => html`
             <li>
-            <a style="text-decoration: none;" href="#" onclick="return false;" title="Delete files of instance ${i.directory.substring(0,8)}">
-              <iron-icon @click="${(e) => { this.jupyterInstanceToDelete = i.directory; this.jupyterInstanceToDeleteTime = i.time; this.deleteJupyterFilesDialog.opened = true;}}" icon="vaadin:trash" style="margin-right: 1.5rem; color: darkred;"></iron-icon>
-            </a>
+            ${this.jupyter_token === i.directory ? html`
+              <a style="text-decoration: none;" onclick="return false;">
+                <iron-icon icon="vaadin:trash" style="margin-right: 1.5rem; color: lightgray;"></iron-icon>
+              </a>
+            ` : html`
+              <a style="text-decoration: none;" href="#" onclick="return false;" title="Delete files of instance ${i.directory.substring(0,8)}">
+                <iron-icon @click="${(e) => { this.jupyterInstanceToDelete = i.directory; this.jupyterInstanceToDeleteTime = i.time; this.deleteJupyterFilesDialog.opened = true;}}" icon="vaadin:trash" style="margin-right: 1.5rem; color: darkred;"></iron-icon>
+              </a>
+            `}
             <a style="text-decoration: none;" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/jupyter/${i.directory}" target="_blank">${this.convertToLocalTime(i.time)} &mdash; Instance ${i.directory.substring(0,8)}...</a>
             </li>
           `)}

@@ -188,7 +188,7 @@ class DESMain extends connect(store)(LitElement) {
           ${this.accessPages.includes('db-access') ? this._renderMenuItem('DB Access', 'db-access', 'vaadin:code') : html ``}
           ${this.accessPages.includes('cutout') && this.database !== 'desoper'   ? this._renderMenuItem('Cutout Service', 'cutout', 'vaadin:scissors') : html ``}
           ${this.accessPages.includes('status')    ? this._renderMenuItem('Job Status', 'status', 'vaadin:cogs') : html ``}
-          ${this.accessPages.includes('jupyter')    ? this._renderMenuItem('Jupyter Lab', 'jupyter', 'vaadin:notebook') : html ``}
+          ${this.accessPages.includes('jupyter')    ? this._renderMenuItem('JupyterLab', 'jupyter', 'vaadin:notebook') : html ``}
           ${this.accessPages.includes('ticket')    ? this._renderMenuItem('DES Ticket', 'ticket', 'vaadin:clipboard-user') : html ``}
           ${this.accessPages.includes('users')    ? this._renderMenuItem('User Management', 'users', 'vaadin:users') : html ``}
           ${this.accessPages.includes('notifications')    ? this._renderMenuItem('Notifications', 'notifications', 'vaadin:envelope-open-o') : html ``}
