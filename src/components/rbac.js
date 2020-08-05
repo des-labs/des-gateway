@@ -5,7 +5,7 @@ const pages_collaborator = [...pages_default, 'db-access', 'cutout', 'status']
 const pages_admin = [
 	...pages_collaborator, 
 	...pages_jupyter, 
-	'test-job', 'ticket', 'users', 'notifications'
+	'ticket', 'users', 'notifications'
 ]
 
 export const rbac_bindings = [

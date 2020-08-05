@@ -102,12 +102,11 @@ class DESJupyter extends connect(store)(PageViewElement) {
             <div id="jupyter-file-links" style="display: none; margin-top: 1rem;">
               <h3>JupyterLab Files</h3>
               <p>
-                The links below provide access to files in the <code>work</code> directory of your
-                your current and former JupyterLab server instances. These links can be shared with
-                your collaborators to allow them to download your Jupyter files. Similar your job
-                output files, these directories are protected only by the obscurity of the URL. Data
-                is synced approximately every 30 seconds, so to avoid data loss, wait a few minutes 
-                after editing JupyterLab files before destroying your server instance.
+                The links below show what you are sharing publicly, which includes all files and subfolders in 
+                your <code>/public/</code> folder. These links can be shared with
+                your collaborators to allow them to download your Jupyter files. These files are protected only 
+                by the obscurity of the URL, so you should consider using random directory names for files you
+                wish to share, such as for example <code>/public/d8196cfd1dc2435aab4095abe5d26971</code>.
               </p>
               ${this.folderLinks}
             </div>
@@ -162,9 +161,13 @@ class DESJupyter extends connect(store)(PageViewElement) {
         </style>
         <div>
           <p style="text-align: center;font-size: 1.2rem;">
-            Delete files of Jupyter instance<br>
-            <b>${this.jupyterInstanceToDelete.substring(0,8)}</b><br>
-            ${this.convertToLocalTime(this.jupyterInstanceToDeleteTime)}?
+            Delete shared folder?<br>
+            <span style="font-family: monospace;">
+            <b>${this.jupyterInstanceToDelete}</b><br>
+            </span>
+            <span style="font-size: 0.9rem;">
+            ${this.convertToLocalTime(this.jupyterInstanceToDeleteTime)}
+            </span>
           </p>
           <paper-button @click="${(e) => {dialog.opened = false; this._deleteJupyterFiles(this.jupyterInstanceToDelete);}}" class="des-button" raised>Yes</paper-button>
           <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo" raised>Cancel</paper-button>
@@ -228,7 +231,7 @@ class DESJupyter extends connect(store)(PageViewElement) {
                 <iron-icon @click="${(e) => { this.jupyterInstanceToDelete = i.directory; this.jupyterInstanceToDeleteTime = i.time; this.deleteJupyterFilesDialog.opened = true;}}" icon="vaadin:trash" style="margin-right: 1.5rem; color: darkred;"></iron-icon>
               </a>
             `}
-            <a style="text-decoration: none;" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/jupyter/${i.directory}" target="_blank">${this.convertToLocalTime(i.time)} &mdash; Instance ${i.directory.substring(0,8)}...</a>
+            <a style="text-decoration: none; font-family: monospace;" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/jupyter/public/${i.directory}" target="_blank">${this.convertToLocalTime(i.time)} &mdash; ${i.directory}</a>
             </li>
           `)}
           </ul>

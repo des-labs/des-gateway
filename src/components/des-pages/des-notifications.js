@@ -65,6 +65,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
       </section>
       <vaadin-dialog id="delete-msg-dialog"></vaadin-dialog>
       <vaadin-dialog id="new-msg-dialog"></vaadin-dialog>
+      <vaadin-dialog id="edit-msg-dialog"></vaadin-dialog>
     `;
   }
 
@@ -187,6 +188,65 @@ class DESNotifications extends connect(store)(PageViewElement) {
         container
       );
     }
+    this.editMessageDialog = this.shadowRoot.getElementById('edit-msg-dialog');
+    this.editMessageDialog.renderer = (root, dialog) => {
+      let container = root.firstElementChild;
+      if (!container) {
+        container = root.appendChild(document.createElement('div'));
+      }
+      render(
+        html`
+          <style>
+            paper-button {
+              width: auto;
+              text-transform: none;
+              --paper-button-raised-keyboard-focus: {
+                background-color: var(--paper-indigo-a250) !important;
+                color: white !important;
+              };
+            }
+            paper-button.indigo {
+              background-color: var(--paper-indigo-500);
+              color: white;
+              width: auto;
+              text-transform: none;
+              --paper-button-raised-keyboard-focus: {
+                background-color: var(--paper-indigo-a250) !important;
+                color: white !important;
+              };
+            }
+            paper-button.des-button {
+                background-color: white;
+                color: black;
+                width: auto;
+                text-transform: none;
+                --paper-button-raised-keyboard-focus: {
+                  background-color: white !important;
+                  color: black !important;
+                };
+            }
+          </style>
+          <div style="width: 50vw">
+            <a title="Close" href="#" onclick="return false;">
+              <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
+            </a>
+            <h3>Edit message</h3>
+            <p>Specifying no roles will apply the <b>default</b> role to the notification (everyone will see it).</p>
+            <paper-input id="edit-msg-roles" always-float-label label="Roles" placeholder="collaborator, admin" value="${this.editMessageRoles}" @change="${(e) => this.editMessageRoles = e.target.value}"></paper-input>
+            <paper-input id="edit-msg-title" always-float-label label="Title" placeholder="" value="${this.editMessageTitle}" @change="${(e) => this.editMessageTitle = e.target.value}"></paper-input>
+            <div>
+              <p><b>Notification message</b></p>
+              <textarea id="edit-msg-body" name="question" rows="6"
+                style="width:90%; padding: 1rem;" 
+                placeholder="">${this.editMessageBody}</textarea>
+            </div>
+            <paper-button @click="${(e) => {dialog.editMessageBody = document.querySelector('#edit-msg-body').value; dialog.opened = false; this._editMessage();}}" class="des-button" raised>Edit Message</paper-button>
+            <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo" raised>Cancel</paper-button>
+          </div>
+        `,
+        container
+      );
+    }
 
     this._fetchAllMessages();
   }
@@ -267,8 +327,52 @@ class DESNotifications extends connect(store)(PageViewElement) {
     });
   }
 
-  _editMessageRoles(messageId) {
-    console.log('Editing roles for message...');
+  _editMessage() {
+    // Validate message body
+    this.editMessageBody = this.editMessageDialog.editMessageBody;
+    if (this.editMessageBody === '') {
+      console.log('Empty message ignored.');
+      return;
+    }
+    // TODO: Refactor this common role-string-to-role-array code into a common utility function
+    // Validate roles
+    let roles = [];
+    // Convert input CSV string to array, trimming surrounding whitespace and replacing remaining whitespace with underscores
+    let msgRoles = this.editMessageRoles.split(',');
+    for (let i in msgRoles) {
+      let editRole = msgRoles[i].trim().replace(/\s/g, "_");
+      if (editRole !== '') {
+        roles.push(editRole);
+      }
+    }
+    msgRoles = roles;
+    const Url=config.backEndUrl + "notifications/edit"
+    let body = {
+      'id': this.messageToEdit.id,
+      'title': this.editMessageTitle,
+      'body': this.editMessageBody,
+      'roles': msgRoles
+    };
+    const param = {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem("token")
+      },
+      body: JSON.stringify(body)
+    };
+    fetch(Url, param)
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      if (data.status === "ok") {
+        // console.log(JSON.stringify(data.users, null, 2));
+        this._fetchAllMessages();
+      } else {
+        console.log(JSON.stringify(data, null, 2));
+      }
+    });
   }
 
   _rendererTableIndex(root, column, rowData) {
@@ -292,7 +396,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
     render(
       html`
         <a title="Delete message ${rowData.item.msg.id}" href="#" onclick="return false;"><iron-icon @click="${(e) => { this.messageToDelete = rowData.item.msg.id; this.deleteMessageDialog.opened = true;}}" icon="vaadin:trash" style="color: red;"></iron-icon></a>
-        <a title="Edit roles ${rowData.item.msg.id}" href="#" onclick="return false;"><iron-icon @click="${(e) => {this._editMessageRoles(rowData.item.msg.id);}}" icon="vaadin:pencil" style="color: darkgray;"></iron-icon></a>
+        <a title="Edit roles ${rowData.item.msg.id}" href="#" onclick="return false;"><iron-icon @click="${(e) => {this.messageToEdit = rowData.item.msg; this.editMessageBody = rowData.item.msg.message; this.editMessageRoles = rowData.item.msg.roles.join(','); this.editMessageTitle = rowData.item.msg.title; this.editMessageDialog.opened = true;}}" icon="vaadin:pencil" style="color: inherit;"></iron-icon></a>
       `,
       container
     );
