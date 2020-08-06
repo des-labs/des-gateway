@@ -698,9 +698,9 @@ class DESJobStatus extends connect(store)(PageViewElement) {
           --iron-icon-height: 1rem;
         }
         </style>
-        <a href="#" onclick="return false;" @click="${(e) => {this._jobRenameDialog(rowData.item.job);}}"
+        <a style="text-decoration: none;" href="#" onclick="return false;" @click="${(e) => {this._jobRenameDialog(rowData.item.job);}}"
         title="Rename job">
-          <span  style="font-size: 0.8rem; color: black;"><iron-icon class="edit-icon" icon="vaadin:pencil"></iron-icon></span>
+          <span style="font-size: 0.8rem; color: black;"><iron-icon class="edit-icon" icon="vaadin:pencil"></iron-icon></span>
         </a>&nbsp;
         <a href="#" onclick="return false;" @click="${(e) => {this._showJobInfo(rowData.item.job.id);}}"
         title="View details of job ${rowData.item.job.id.substring(0,8)}...">
