@@ -298,7 +298,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         case 'png':
         case 'jpg':
           return html`
-            <div style="display: grid; grid-template-columns: 1fr; grid-gap: 5px;">
+            <div style="display: grid; grid-template-columns: 1fr; grid-gap: 5px; align-content: start;">
               <div style="width: 23vw; max-width: 300px; word-wrap: break-word; font-size: 0.7rem; font-family: monospace;">${relPath}</div>
               <div>
                 <a style="text-decoration: none;" title="Open image" alt="${relPath}" href="${fileUrl}" target="_blank">
@@ -513,6 +513,16 @@ class DESJobStatus extends connect(store)(PageViewElement) {
           `;
           break;
         case 'cutout':
+          let positionTable = [];
+          if (job.cutout_positions !== null) {
+            var rows = job.cutout_positions.split('\n');
+            for (let r in rows) {
+              var cells = rows[r].split(',')
+              if (cells.length > 0 && cells[0] !== '') {
+                positionTable.push(cells);
+              }
+            }
+          }
           if (job.cutout_files !== null) {
             var numFiles = job.cutout_files.length;
           } else {
@@ -536,7 +546,15 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               overflow: auto;
               box-shadow: inset 0px 5px 5px 2px rgb(200, 200, 200);
               padding: 2rem;
-              height: 45vh;
+              height: 20vh;
+              margin-bottom: 1rem;
+            }
+            table {
+              width: 100%;
+            }
+            th, td {
+              text-align: left;
+              border-bottom: 1px solid #ddd;
             }
           </style>
             <div></div><div></div>
@@ -562,23 +580,44 @@ class DESJobStatus extends connect(store)(PageViewElement) {
                 `
               }
             </div>
-            <div class="file-list-box" style=""><span class="monospace-column">
-            ${job.cutout_files === null ?
-              html``:
-              html`
-                <p><a title="Download archive file" target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/cutout/${job.id}.tar.gz">
-                  Download compressed archive file containing all job files (<code>.tar.gz</code>)
-                </a></p>
-                <ul style="list-style-type: square; margin: 0; padding: 0;">
-                  ${job.cutout_files.map(i => html`
-                    <li>
-                      <a target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/cutout/${i}">${i.split('/').splice(1).join('/')}</a>
-                    </li>
+            <div>
+              <div id="positions" class="file-list-box" style=""><span class="monospace-column">
+              ${job.cutout_positions === null ?
+                html``:
+                html`
+                  <table>
+                  ${positionTable.map(row => html`
+                    <tr>
+                      ${row.map(cell => html`
+                        <td>
+                          ${cell}
+                        </td>
+                      `)}
+                    </tr>
                   `)}
-                </ul>
-              `
-            }
-            </span></div>
+                  </table>
+                `
+              }
+              </span></div>
+              <div class="file-list-box" style=""><span class="monospace-column">
+              ${job.cutout_files === null ?
+                html``:
+                html`
+                  <p><a title="Download archive file" target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/cutout/${job.id}.tar.gz">
+                    Download compressed archive file containing all job files (<code>.tar.gz</code>)
+                  </a></p>
+                  <ul style="list-style-type: square; margin: 0; padding: 0;">
+                    ${job.cutout_files.map(i => html`
+                      <li>
+                        <a target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/cutout/${i}">${i.split('/').splice(1).join('/')}</a>
+                      </li>
+                    `)}
+                  </ul>
+                `
+              }
+              </span></div>
+
+            </div>
           `;
           break;
         default:
@@ -924,6 +963,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       job.query = item.query;
       job.query_files = typeof(item.query_files) === 'string' ? JSON.parse(item.query_files) : null;
       job.cutout_files = typeof(item.cutout_files) === 'string' ? JSON.parse(item.cutout_files) : null;
+      job.cutout_positions = typeof(item.cutout_positions) === 'string' ? item.cutout_positions : null;
       if (job.type !== 'query' || job.data === null) {
         gridItems.push({job: job});
       }
