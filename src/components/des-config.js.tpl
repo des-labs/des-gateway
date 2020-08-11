@@ -5,6 +5,7 @@ let cnf = {
   "fileServerRootPath"  : "{{FILESERVER_ROOT_PATH}}",
   "apiPath"  : "{{API_ROOT_PATH}}",
   "ticketAuth": "{{TICKET_AUTH}}",
+  "desaccessInterface": "{{DESACCESS_INTERFACE}}",
 }
 
 
