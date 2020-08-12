@@ -63,7 +63,7 @@ class DESLogin extends connect(store)(PageViewElement) {
 
   constructor() {
     super();
-    this.database='dessci';
+    this.database='desdr';
     this.username='';
     this._passwd='';
   }
@@ -75,8 +75,7 @@ class DESLogin extends connect(store)(PageViewElement) {
           <div style="cursor:default;" class="box-watermark-logo"></div>
           <h2>DESaccess Login</h2>
           <div class="card-content">
-            <span>Use your Internal DES DB credentials. <br /></span>
-            <span> Fill this <a href='https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/' target="_blank">form</a>
+            <span> Submit <a href='https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/' target="_blank">this form</a>
                  if you have trouble accessing the server</span> <br><br>
             <form id="login-form" name="login-form" onsubmit="${this._checkAndSubmit}">
 
@@ -87,16 +86,17 @@ class DESLogin extends connect(store)(PageViewElement) {
                 }
               </style>
             </custom-style>
-
-            <div>
-              <label id="db-choice" style="font-weight: bold;">Choose database:</label>
+            ${config.desaccessInterface !== 'private' ? html`` : html`
               <div>
-                <paper-radio-group id="database-selection" selected="${this.database}" aria-labelledby="data-release-tag">
-                  <paper-radio-button @change="${e => this.database = e.target.name}" name="dessci">dessci</paper-radio-button>
-                  <paper-radio-button @change="${e => this.database = e.target.name}" name="desoper">desoper</paper-radio-button>
-                </paper-radio-group>
+                <label id="db-choice" style="font-weight: bold;">Choose database:</label>
+                <div>
+                  <paper-radio-group id="database-selection" selected="dessci" aria-labelledby="data-release-tag">
+                    <paper-radio-button @change="${e => this.database = e.target.name}" name="dessci">dessci</paper-radio-button>
+                    <paper-radio-button @change="${e => this.database = e.target.name}" name="desoper">desoper</paper-radio-button>
+                  </paper-radio-group>
+                </div>
               </div>
-            </div>
+            `}
             <paper-input-container always-float-label>
               <label slot="label">Username</label>
               <iron-input slot="input">
@@ -137,7 +137,7 @@ class DESLogin extends connect(store)(PageViewElement) {
   _submit(){
     this.shadowRoot.getElementById("loginButton").disabled=true;
     this.shadowRoot.getElementById("loginSpinner").active=true;
-    this.database = this.shadowRoot.getElementById('database-selection').selected;
+    this.database = this.shadowRoot.getElementById('database-selection') ? this.shadowRoot.getElementById('database-selection').selected : this.database;
     const Url=config.backEndUrl + "login"
     const formData = new FormData();
     formData.append('username', this.username);
