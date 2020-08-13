@@ -262,7 +262,7 @@ export const getProfile = () => {
 
 export const getAccessPages = (roles) => {
   var ap = [];
-  roles.push('default');
+  // roles.push('default');
   for (var i=0; i < rbac_bindings.length; i++) {
     if (roles.indexOf(rbac_bindings[i]["role_name"]) !== -1) {
       var pages = rbac_bindings[i]["pages"]
