@@ -227,6 +227,7 @@ class DESMain extends connect(store)(LitElement) {
           html`<des-notifications class="page" ?active="${this._page === 'notifications'}"></des-notifications>` :
           html`<des-404 class="page" ?active="${this._page === 'notifications'}"></des-404>`}
         <des-help class="page" ?active="${this._page === 'help'}"></des-help>
+        <des-activate class="page" ?active="${this._page === 'activate'}"></des-activate>
 
         <des-404 class="page" ?active="${this._page === 'des404'}"></des-404>
       </main>

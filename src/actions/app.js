@@ -3,6 +3,7 @@ import { store } from '../store.js';
 
 export const UPDATE_PAGE = 'UPDATE_PAGE';
 export const UPDATE_JOB_ID = 'UPDATE_JOB_ID';
+export const UPDATE_ACTIVATION_TOKEN = 'UPDATE_ACTIVATION_TOKEN';
 export const UPDATE_LAST_VALID_PAGE = 'UPDATE_LAST_VALID_PAGE';
 export const UPDATE_DRAWER_STATE = 'UPDATE_DRAWER_STATE';
 export const UPDATE_DRAWER_PERSIST = 'UPDATE_DRAWER_PERSIST';
@@ -56,13 +57,13 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
   var pathParts = path.split('/');
   var basePathParts = basePath.split('/');
   // is the session active, if not verify auth
+  var page = pathParts[0];
   const auth = session ? true : isauth();
-  if (auth === false) {
+  if (auth === false && page !== 'activate') {
     // dispatch(storeTargetPath(path));
     dispatch(loadPage('login', ap, targetPath));
     return;
   }
-  var page = pathParts[0];
   switch (page) {
     case '':
     case 'login':
@@ -74,6 +75,13 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
       if (pathParts.length > 1) {
         let jobId = pathParts[1];
         dispatch(setJobId(jobId));
+      }
+      break;
+    case 'activate':
+      // Get activation code from URL {{location.origin}}/activate/dkdh9s84ty3thj3wehg3
+      if (pathParts.length > 1) {
+        let activationToken = pathParts[1];
+        dispatch(setActivationToken(activationToken));
       }
       break;
     case 'help':
@@ -130,6 +138,9 @@ export const loadPage = (page,ap,targetPath = '') => (dispatch) => {
     case 'notifications':
       ap.includes('notifications') ?   import('../components/des-pages/des-notifications.js') : import('../components/des-pages/des-404.js') ;
       break;
+    case 'activate':
+      import('../components/des-pages/des-activate.js');
+      break;
     case 'help':
       import('../components/des-pages/des-help.js');
       break;
@@ -175,6 +186,13 @@ export const setJobId = (jobId) => {
   return {
     type: UPDATE_JOB_ID,
     jobId
+  };
+};
+
+export const setActivationToken = (activationToken) => {
+  return {
+    type: UPDATE_ACTIVATION_TOKEN,
+    activationToken
   };
 };
 
