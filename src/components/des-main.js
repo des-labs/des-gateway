@@ -183,7 +183,7 @@ class DESMain extends connect(store)(LitElement) {
        >
        <des-sidebar name=${this.name} email=${this.email}></des-sidebar>
         <nav class="drawer-list">
-          <a ?selected="${this._page === 'home'}" href="${config.frontEndUrl + 'home'}"><iron-icon icon="vaadin:home" style="color: black; margin-right: 1rem;"></iron-icon>Home</a>
+          ${this.accessPages.includes('home')  ? this._renderMenuItem('Home', 'home', 'vaadin:home') : html ``}
           ${this.accessPages.includes('test-job')  ? this._renderMenuItem('Submit Test Job', 'test-job', 'vaadin:stopwatch') : html ``}
           ${this.accessPages.includes('db-access') ? this._renderMenuItem('DB Access', 'db-access', 'vaadin:code') : html ``}
           ${this.accessPages.includes('cutout') && this.database !== 'desoper'   ? this._renderMenuItem('Cutout Service', 'cutout', 'vaadin:scissors') : html ``}
@@ -192,7 +192,7 @@ class DESMain extends connect(store)(LitElement) {
           ${this.accessPages.includes('ticket')    ? this._renderMenuItem('DES Ticket', 'ticket', 'vaadin:clipboard-user') : html ``}
           ${this.accessPages.includes('users')    ? this._renderMenuItem('User Management', 'users', 'vaadin:users') : html ``}
           ${this.accessPages.includes('notifications')    ? this._renderMenuItem('Notifications', 'notifications', 'vaadin:envelope-open-o') : html ``}
-          ${this._renderMenuItem('Help', 'help', 'vaadin:question-circle-o')}
+          ${this.accessPages.includes('help')  ? this._renderMenuItem('Help', 'help', 'vaadin:question-circle-o') : html ``}
           <iron-image src="images/ncsa-logo.jpg" sizing="cover" style="width: 100px;height: 18px;position: absolute; bottom: 10%;left: 10%;"></iron-image>
         </nav>
 
@@ -200,8 +200,21 @@ class DESMain extends connect(store)(LitElement) {
 
       <!-- Main content -->
       <main role="main" class="main-content">
+        
+        <!-- Public content -->
+
         <des-login class="page" ?active="${this._page === 'login'}" ></des-login>
-        <des-home class="page" ?active="${this._page === 'home'}"></des-home>
+        <des-activate class="page" ?active="${this._page === 'activate'}"></des-activate>
+        <des-404 class="page" ?active="${this._page === 'des404'}"></des-404>
+
+        <!-- Access controlled content -->
+        
+        ${this.accessPages.includes('home') ?
+          html`<des-home class="page" ?active="${this._page === 'home'}"></des-home>` :
+          html`<des-access-denied class="page" ?active="${this._page === 'home'}"></des-access-denied>`}
+        ${this.accessPages.includes('help') ?
+          html`<des-help class="page" ?active="${this._page === 'help'}"></des-help>` :
+          html`<des-access-denied class="page" ?active="${this._page === 'help'}"></des-access-denied>`}
         ${this.accessPages.includes('test-job') ?
           html`<des-test-job class="page" ?active="${this._page === 'test-job'}"></des-test-job>` :
           html`<des-404 class="page" ?active="${this._page === 'test-job'}"></des-404>`}
@@ -226,10 +239,7 @@ class DESMain extends connect(store)(LitElement) {
         ${this.accessPages.includes('notifications') ?
           html`<des-notifications class="page" ?active="${this._page === 'notifications'}"></des-notifications>` :
           html`<des-404 class="page" ?active="${this._page === 'notifications'}"></des-404>`}
-        <des-help class="page" ?active="${this._page === 'help'}"></des-help>
-        <des-activate class="page" ?active="${this._page === 'activate'}"></des-activate>
 
-        <des-404 class="page" ?active="${this._page === 'des404'}"></des-404>
       </main>
 
 

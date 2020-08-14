@@ -112,7 +112,7 @@ export const loadPage = (page,ap,targetPath = '') => (dispatch) => {
         window.location.href = config.frontEndUrl + 'login';
       break;
     case 'home':
-      import('../components/des-pages/des-home.js');
+      ap.includes('home') ?   import('../components/des-pages/des-home.js') : import('../components/des-pages/des-access-denied.js') ;
       break;
     case 'test-job':
       ap.includes('test-job') ?   import('../components/des-pages/des-test-job.js') : import('../components/des-pages/des-404.js') ;
@@ -142,7 +142,7 @@ export const loadPage = (page,ap,targetPath = '') => (dispatch) => {
       import('../components/des-pages/des-activate.js');
       break;
     case 'help':
-      import('../components/des-pages/des-help.js');
+      ap.includes('help') ?   import('../components/des-pages/des-help.js') : import('../components/des-pages/des-access-denied.js') ;
       break;
     default:
       page = 'des404';
