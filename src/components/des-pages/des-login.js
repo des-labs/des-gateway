@@ -3,6 +3,8 @@ import { PageViewElement } from './des-base-page.js';
 import { SharedStyles } from '../styles/shared-styles.js';
 import { connect } from 'pwa-helpers/connect-mixin.js';
 import { store } from '../../store.js';
+import { render } from 'lit-html';
+import '../des-register-form.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-card/paper-card.js';
@@ -17,6 +19,8 @@ import { loginUser,
          updateDrawerState,
          getAccessPages } from '../../actions/app.js';
 import {config, rbac_bindings} from '../des-config.js';
+import '@polymer/paper-toast/paper-toast.js';
+import '@vaadin/vaadin-dialog/vaadin-dialog.js'
 
 
 class DESLogin extends connect(store)(PageViewElement) {
@@ -75,8 +79,15 @@ class DESLogin extends connect(store)(PageViewElement) {
           <div style="cursor:default;" class="box-watermark-logo"></div>
           <h2>DESaccess Login</h2>
           <div class="card-content">
-            <span> Submit <a href='https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/' target="_blank">this form</a>
-                 if you have trouble accessing the server</span> <br><br>
+            <p> Submit <a href='https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/' target="_blank">this form</a>
+                 if you have trouble accessing the server.</p> 
+            ${config.desaccessInterface === 'private' ? html`` : html`
+              <p>If you do not have an account, 
+                <a href="#" onclick="return false;" @click="${(e) => {this.registerFormDialog.opened = true; }}">
+                  click here to complete a registration form.
+                </a>
+              </p>
+            `}
             <form id="login-form" name="login-form" onsubmit="${this._checkAndSubmit}">
 
             <custom-style>
@@ -124,6 +135,8 @@ class DESLogin extends connect(store)(PageViewElement) {
           </div>
         </paper-card>
       </section>
+      <vaadin-dialog id="register-form-dialog"></vaadin-dialog>
+      <paper-toast class="toast-position toast-success" text="Your registration form was received. Check your email for an activation link." duration="600000"></paper-toast>
     `;
   }
 
@@ -203,6 +216,27 @@ class DESLogin extends connect(store)(PageViewElement) {
         this._checkAndSubmit(e) ;
       }
     };
+    this.registerFormDialog = this.shadowRoot.getElementById('register-form-dialog');
+    this.registerFormDialog.renderer = (root, dialog) => {
+      let container = root.firstElementChild;
+      if (!container) {
+        container = root.appendChild(document.createElement('div'));
+      }
+      render(
+        html`
+          <div style="width: 85vw; max-width: 700px; height: 85vh; max-height: 850px;">
+            <a title="Close" href="#" onclick="return false;">
+              <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
+            </a>
+            <des-register-form
+              @closeRegisterDialog="${(e) => {dialog.opened = false;}}"
+              @showRegisterSuccessMessage="${(e) => {this.shadowRoot.querySelector('paper-toast').show();}}">
+            </des-register-form>
+          </div>
+        `,
+        container
+      );
+    }
   }
 }
 
