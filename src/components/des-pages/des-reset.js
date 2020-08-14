@@ -30,6 +30,7 @@ class DESReset extends connect(store)(PageViewElement) {
     super();
     this.resetPasswordToken = '';
     this.resetComplete = false;
+    this.resetSuccess = false;
     this.errorMsg = '';
   }
 
@@ -42,7 +43,12 @@ class DESReset extends connect(store)(PageViewElement) {
           <paper-spinner class="big"></paper-spinner>
         </div>
         ${this.resetComplete ? html`
-          <p>Your password has been reset. You may proceed to the <a href="${config.frontEndUrl + "login"}">login page</a>.</p>
+          ${this.resetSuccess ? html`
+            <p>Your password has been reset. You may proceed to the <a href="${config.frontEndUrl + "login"}">login page</a>.</p>
+            ` : html`
+            <p>There was an error resetting your password. Reload the page to try again.</p>
+            `
+          }
           ` : html`
           <div style="margin: 1rem; color: red; height: 2rem;">
             <span id="invalid-form-warning"></span>
@@ -130,8 +136,9 @@ class DESReset extends connect(store)(PageViewElement) {
     })
     .then(data => {
       this.shadowRoot.querySelector('paper-spinner').active = false;
-      if (data.status === "ok") {
-        this.resetComplete = true;
+      this.resetComplete = true;
+      if (data.status === "ok" && data.reset) {
+        this.resetSuccess = true;
         // console.log(JSON.stringify(data.users, null, 2));
       } else {
         this.errorMsg = data.msg;
