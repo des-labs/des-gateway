@@ -12,6 +12,7 @@ import {
   UPDATE_PAGE,
   UPDATE_JOB_ID,
   UPDATE_ACTIVATION_TOKEN,
+  UPDATE_RESET_PASSWORD_TOKEN,
   UPDATE_LAST_VALID_PAGE,
   UPDATE_DRAWER_STATE,
   UPDATE_DRAWER_PERSIST,
@@ -31,6 +32,7 @@ const INITIAL_STATE = {
   lastname: '',
   jobId: '',
   activationToken: '',
+  resetPasswordToken: '',
   query: '',
   roles: [],
   accessPages: [],
@@ -83,6 +85,11 @@ const app = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         activationToken: action.activationToken
+      };
+    case UPDATE_RESET_PASSWORD_TOKEN:
+      return {
+        ...state,
+        resetPasswordToken: action.resetPasswordToken
       };
     case TRIGGER_HELP_FORM:
       return {

@@ -57,10 +57,6 @@ class DESLogin extends connect(store)(PageViewElement) {
           background: url('images/DESDM_logo.png');
           background-size: cover;
         }
-
-
-
-
       `
     ];
   }
@@ -125,18 +121,30 @@ class DESLogin extends connect(store)(PageViewElement) {
               <div class="container">
                 <input type="submit" id="hidden-submit" @click="${this._checkAndSubmit}" value="Dummy submit button" style="display: none;"></input>
                 <paper-button class="des-button" id="loginButton" raised @click="${this._checkAndSubmit}" type="submit" disabled>Login</paper-button>
-                <paper-spinner id=loginSpinner></paper-spinner>
+                <paper-spinner id="loginSpinner"></paper-spinner>
               </div>
             </form>
             <div class="errormessage"> <b>${this.msg}</b></div>
           </div>
           <div class="card-content">
-            <a href="https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/" style="font-size: 11px; margin-left: 5px;" target="_blank"> Forgot Password? </a>
+            ${config.desaccessInterface === 'private' ? html`
+              <a href="https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/" style="font-size: 11px; margin-left: 5px;" target="_blank"> Forgot Password? </a>
+            ` : html`
+              <p>Forgot your password? 
+                <a href="#" onclick="return false;" @click="${this._requestPasswordReset}">
+                  Click here to receive a password reset link by email.
+                </a>
+              </p>
+            `}
+            
           </div>
         </paper-card>
       </section>
       <vaadin-dialog id="register-form-dialog"></vaadin-dialog>
-      <paper-toast class="toast-position toast-success" text="Your registration form was received. Check your email for an activation link." duration="600000"></paper-toast>
+      <paper-toast name="register" class="toast-position toast-success" text="Your registration form was received. Check your email for an activation link." duration="600000"></paper-toast>
+      <paper-toast name="reset" class="toast-position toast-success" text="Password reset request received. Check your email." duration="20000"></paper-toast>
+      <paper-toast name="reset-fail-username" class="toast-position toast-error" text="Please provide your username." duration="20000"></paper-toast>
+      <paper-toast name="reset-fail-response" class="toast-position toast-error" text="There was an error processing your request. Try again later." duration="10000"></paper-toast>
     `;
   }
 
@@ -196,6 +204,47 @@ class DESLogin extends connect(store)(PageViewElement) {
     return false;
   }
 
+  _requestPasswordReset(e) {
+    this.shadowRoot.querySelector('paper-spinner').active = true;
+    // Submit form to backend API endpoint
+    const Url=config.backEndUrl + "user/reset/request"
+    if (this.username.length === 0) {
+      this.shadowRoot.querySelector('paper-toast[name="reset-fail-username"]').show();
+      this.shadowRoot.querySelector('paper-spinner').active = false;
+      return;
+    }
+    let body = {
+      'username': this.username,
+    };
+    const param = {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body)
+    };
+    fetch(Url, param)
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      // Stop spinner to inform that the server has responded
+      this.shadowRoot.querySelector('paper-spinner').active = false;
+      if (data.status === "ok") {
+        this.shadowRoot.querySelector('paper-toast[name="reset"]').show();
+        // console.log(JSON.stringify(data.users, null, 2));
+      } else {
+        this.shadowRoot.querySelector('paper-toast[name="reset-fail-response"]').show();
+        console.log(JSON.stringify(data, null, 2));
+      }
+    })
+    .catch(error => {
+      // Stop spinner to inform that the server has responded
+      this.shadowRoot.querySelector('paper-spinner').active = false;
+      this.shadowRoot.querySelector('paper-toast[name="reset-fail-response"]').show();
+    });
+  }
+
   updated(changedProps) {
     changedProps.forEach((oldValue, propName) => {
       // console.log(`${propName} changed. oldValue: ${oldValue}`);
@@ -230,7 +279,7 @@ class DESLogin extends connect(store)(PageViewElement) {
             </a>
             <des-register-form
               @closeRegisterDialog="${(e) => {dialog.opened = false;}}"
-              @showRegisterSuccessMessage="${(e) => {this.shadowRoot.querySelector('paper-toast').show();}}">
+              @showRegisterSuccessMessage="${(e) => {this.shadowRoot.querySelector('paper-toast[name="register"]').show();}}">
             </des-register-form>
           </div>
         `,

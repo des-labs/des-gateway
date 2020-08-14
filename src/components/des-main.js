@@ -205,6 +205,7 @@ class DESMain extends connect(store)(LitElement) {
 
         <des-login class="page" ?active="${this._page === 'login'}" ></des-login>
         <des-activate class="page" ?active="${this._page === 'activate'}"></des-activate>
+        <des-reset class="page" ?active="${this._page === 'reset'}"></des-reset>
         <des-404 class="page" ?active="${this._page === 'des404'}"></des-404>
 
         <!-- Access controlled content -->

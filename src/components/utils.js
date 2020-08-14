@@ -4,6 +4,11 @@ export const validateEmailAddress = function(emailStr) {
   return re.test(String(emailStr).toLowerCase());
 }
 
+export const validatePassword = function(password) {
+  const re = /^[a-zA-Z]+[a-zA-Z0-9]{9,29}$/;
+  return re.test(password);
+}
+
 export const convertToLocalTime = function(datetimeString) {
 
   let inputDateTime = Date.parse(datetimeString);

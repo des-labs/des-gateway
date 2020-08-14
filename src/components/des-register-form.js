@@ -5,7 +5,7 @@ import { SharedStyles } from './styles/shared-styles.js';
 import { connect } from 'pwa-helpers/connect-mixin.js';
 import { store } from '../store.js';
 import { config } from './des-config.js';
-import { validateEmailAddress } from './utils.js';
+import { validateEmailAddress, validatePassword } from './utils.js';
 import '@polymer/paper-checkbox/paper-checkbox.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/paper-button/paper-button.js';
@@ -39,20 +39,6 @@ class DESRegisterForm extends connect(store)(LitElement) {
 
   render() {
     return html`
-      <style>
-        .topic-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr 1fr;
-        }
-        @media (max-width: 1001px) {
-          .topic-grid {
-            grid-template-columns: 1fr 1fr;
-        }
-        @media (max-width: 501px) {
-          .topic-grid {
-            grid-template-columns: 1fr;
-        }
-      </style>
       <h3><iron-icon icon="vaadin:clipboard-text" style="margin-right: 1rem;"></iron-icon>New User Registration</h3>
       <p>By submitting this form you are agreeing to our 
         <a href="https://des.ncsa.illinois.edu/terms" 
@@ -67,7 +53,7 @@ class DESRegisterForm extends connect(store)(LitElement) {
         <paper-input name="firstname" label="Given name" required value="${this.firstname}" @change="${e => this.firstname = e.target.value}"></paper-input>
         <paper-input name="lastname"  label="Family name"  required value="${this.lastname}"  @change="${e => this.lastname = e.target.value}"></paper-input>
         <paper-input name="email"     label="Email" required value="${this.email}"     @change="${e => this.email = e.target.value}"></paper-input>
-        <p>Username must be between 3 and 16 characters long, containing only digits and lowercase letters, starting with a letter.</p>
+        <p>Username must be between 3 and 30 characters long, containing only digits and lowercase letters, starting with a letter.</p>
         <paper-input name="username"     label="Username" required value="${this.username}"     @change="${e => this.username = e.target.value}"></paper-input>
         <p>Password must be between 10 and 30 characters long, containing only digits and uppercase and lowercase letters, starting with a letter.</p>
         <paper-input name="password"  label="Password" required type="password" value=""     @change="${e => this.password = e.target.value}"></paper-input>
@@ -108,20 +94,6 @@ class DESRegisterForm extends connect(store)(LitElement) {
     this.lastname = this.lastname === '' ? state.app.lastname : this.lastname;
   }
 
-  // updated(changedProps) {
-  //   changedProps.forEach((oldValue, propName) => {
-  //     // console.log(`${propName} changed. oldValue: ${oldValue}`);
-  //     switch (propName) {
-  //       case 'topicOtherChecked':
-  //         this.shadowRoot.querySelector('paper-input[name="topic"]').style.display = this.shadowRoot.querySelector('paper-checkbox[value="Other"]').checked ? 'block' : 'none';
-  //         this._validateForm();
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //   });
-  // }
-
   _validateForm() {
     let validForm = true;
     let criterion = true;
@@ -154,7 +126,7 @@ class DESRegisterForm extends connect(store)(LitElement) {
     // Validate password
     el = this.shadowRoot.querySelector('paper-input[name="password"]');
     el2 = this.shadowRoot.querySelector('paper-input[name="password-confirm"]');
-    criterion = this._validatePassword(el.value);
+    criterion = validatePassword(el.value);
     el.invalid = !criterion;
     validForm = criterion && validForm;
     criterion = el.value === el2.value;
@@ -248,7 +220,6 @@ class DESRegisterForm extends connect(store)(LitElement) {
       `;
       render(warningMessage, warningElement);
       this.shadowRoot.querySelector('paper-button[name="submit-button"]').disabled = false;
-
     });
   }
 

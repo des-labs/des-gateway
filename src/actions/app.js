@@ -4,6 +4,7 @@ import { store } from '../store.js';
 export const UPDATE_PAGE = 'UPDATE_PAGE';
 export const UPDATE_JOB_ID = 'UPDATE_JOB_ID';
 export const UPDATE_ACTIVATION_TOKEN = 'UPDATE_ACTIVATION_TOKEN';
+export const UPDATE_RESET_PASSWORD_TOKEN = 'UPDATE_RESET_PASSWORD_TOKEN';
 export const UPDATE_LAST_VALID_PAGE = 'UPDATE_LAST_VALID_PAGE';
 export const UPDATE_DRAWER_STATE = 'UPDATE_DRAWER_STATE';
 export const UPDATE_DRAWER_PERSIST = 'UPDATE_DRAWER_PERSIST';
@@ -59,7 +60,7 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
   // is the session active, if not verify auth
   var page = pathParts[0];
   const auth = session ? true : isauth();
-  if (auth === false && page !== 'activate') {
+  if (auth === false && ['reset', 'activate'].indexOf(page) === -1) {
     // dispatch(storeTargetPath(path));
     dispatch(loadPage('login', ap, targetPath));
     return;
@@ -82,6 +83,13 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
       if (pathParts.length > 1) {
         let activationToken = pathParts[1];
         dispatch(setActivationToken(activationToken));
+      }
+      break;
+    case 'reset':
+      // Get reset code from URL {{location.origin}}/reset/dkdh9s84ty3thj3wehg3
+      if (pathParts.length > 1) {
+        let resetPasswordToken = pathParts[1];
+        dispatch(setResetPasswordToken(resetPasswordToken));
       }
       break;
     case 'help':
@@ -141,6 +149,9 @@ export const loadPage = (page,ap,targetPath = '') => (dispatch) => {
     case 'activate':
       import('../components/des-pages/des-activate.js');
       break;
+    case 'reset':
+      import('../components/des-pages/des-reset.js');
+      break;
     case 'help':
       ap.includes('help') ?   import('../components/des-pages/des-help.js') : import('../components/des-pages/des-access-denied.js') ;
       break;
@@ -193,6 +204,13 @@ export const setActivationToken = (activationToken) => {
   return {
     type: UPDATE_ACTIVATION_TOKEN,
     activationToken
+  };
+};
+
+export const setResetPasswordToken = (resetPasswordToken) => {
+  return {
+    type: UPDATE_RESET_PASSWORD_TOKEN,
+    resetPasswordToken
   };
 };
 
