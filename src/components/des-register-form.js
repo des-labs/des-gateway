@@ -231,7 +231,7 @@ class DESRegisterForm extends connect(store)(LitElement) {
         // Set error message
         warningMessage = html`
           <iron-icon icon="vaadin:exclamation-circle" style="margin-right: 1rem;"></iron-icon>
-          Error submitting the registration form: ${data.msg}
+          Error: ${data.msg}
         `;
         render(warningMessage, warningElement);
         this.shadowRoot.querySelector('paper-button[name="submit-button"]').disabled = false;
