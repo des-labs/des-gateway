@@ -77,14 +77,12 @@ class DESHelpForm extends connect(store)(LitElement) {
         <p><b>Select all relevant topics:</b></p>
         <div class="topic-grid">
           <div>
-            <paper-checkbox name="topic" value="DR1 Release"> DR1 Release</paper-checkbox>
+            <paper-checkbox name="topic" value="Data Release"> Data Release</paper-checkbox>
             <br><paper-checkbox name="topic" value="Interfaces"> User Interfaces </paper-checkbox>
-            <br><paper-checkbox name="topic" value="LIneA Portal"> LIneA Science Server </paper-checkbox>
           </div>
           <div>
             <paper-checkbox name="topic" value="User Accounts"> User Accounts </paper-checkbox>
             <br><paper-checkbox name="topic" value="Files format/access"> File formats / File access </paper-checkbox>
-            <br><paper-checkbox name="topic" value="SVA1 Gold"> SVA1 Gold</paper-checkbox>
           </div>
           <div>
             <paper-checkbox name="topic" value="General Questions"> General questions </paper-checkbox>
