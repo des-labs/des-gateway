@@ -500,7 +500,7 @@ class DESCutout extends connect(store)(PageViewElement) {
     if (this.rgb_types_stiff || this.rgb_types_lupton) {
       body.colors_rgb = this._getSelectedBands(this.rgb_bands).join(',');
     }
-    if (this.make_fits) {
+    if (body.make_fits) {
       body.colors_fits = this._getSelectedBands(this.fits_bands).join(',');
     }
     const param = {
