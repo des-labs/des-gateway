@@ -291,11 +291,11 @@ class DESToolBar extends connect(store)(LitElement) {
               .change-icon {
                 display: inline-block;
               }
-              .change-icon > .toggle-icon + .toggle-icon,
-              .change-icon:hover > .toggle-icon {
+              .change-icon > a > .toggle-icon + .toggle-icon,
+              .change-icon:hover > a > .toggle-icon {
                 display: none;
               }
-              .change-icon:hover > .toggle-icon + .toggle-icon {
+              .change-icon:hover > a > .toggle-icon + .toggle-icon {
                 display: inline-block;
               }
             </style>
@@ -324,13 +324,13 @@ class DESToolBar extends connect(store)(LitElement) {
                         ${this.hideDismissButton ? html`
                             <iron-icon style="margin-right: 2rem; color: black;" icon="vaadin:envelope-open-o"></iron-icon>
                           ` : html`
-                            <a title="Dismiss" href="#" onclick="return false;"
-                              @click="${(e) => {e.target.parentNode.parentNode.parentNode.parentNode.style.textDecoration = 'line-through'; this._dismissNotification(i.id);}}">
-                              <div class="change-icon">
-                              <iron-icon class="toggle-icon" style="margin-right: 2rem; color: black;" icon="vaadin:envelope-o"></iron-icon>
-                              <iron-icon class="toggle-icon" style="margin-right: 2rem; color: black;" icon="vaadin:envelope-open-o"></iron-icon>
-                              </div>
-                            </a>
+                            <div class="change-icon">
+                              <a title="Dismiss" href="#" onclick="return false;"
+                                @click="${(e) => {this._dismissNotification(i.id);}}">
+                                <iron-icon class="toggle-icon" style="margin-right: 2rem; color: black;" icon="vaadin:envelope-o"></iron-icon>
+                                <iron-icon class="toggle-icon" style="margin-right: 2rem; color: black;" icon="vaadin:envelope-open-o"></iron-icon>
+                              </a>
+                            </div>
                         `}
                       </div>
                       <div style="">
@@ -439,6 +439,7 @@ class DESToolBar extends connect(store)(LitElement) {
       .then(data => {
         if (data.status === "ok") {
           console.log(JSON.stringify(data, null, 2));
+          this._showNotifications();
         } else {
           console.log(JSON.stringify(data, null, 2));
         }
