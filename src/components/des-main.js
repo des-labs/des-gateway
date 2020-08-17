@@ -245,7 +245,11 @@ class DESMain extends connect(store)(LitElement) {
 
 
       <footer>
-        <p style="font-size: 0.8rem; color: darkgray;"> &copy; 2020 DESDM Team<br> <a href="https://des.ncsa.illinois.edu/terms" style="font-size: 0.7rem; text-decoration: none; font-weight: bold; color: darkgray;">Terms and Conditions</a></p>
+        <p style="font-size: 0.8rem; color: darkgray;"> &copy; 2020 DESDM Team<br>
+          <a href="https://des.ncsa.illinois.edu/terms" target="_blank" style="font-size: 0.7rem; text-decoration: none; font-weight: bold; color: darkgray;">
+            Terms and Conditions
+          </a>
+        </p>
       </footer>
 
     `;
