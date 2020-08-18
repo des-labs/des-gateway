@@ -60,10 +60,7 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
   // is the session active, if not verify auth
   var page = pathParts[0];
   const auth = session ? true : isauth();
-  if (
-    (auth === false && config.desaccessInterface === 'public' && ['reset', 'activate'].indexOf(page) === -1) ||
-    (auth === false && config.desaccessInterface !== 'public')
-  ) {
+  if (auth === false && ['reset', 'activate'].indexOf(page) === -1) {
     // dispatch(storeTargetPath(path));
     dispatch(loadPage('login', ap, targetPath));
     return;
@@ -153,7 +150,7 @@ export const loadPage = (page,ap,targetPath = '') => (dispatch) => {
       config.desaccessInterface === 'public' ? import('../components/des-pages/des-activate.js') : import('../components/des-pages/des-404.js') ;
       break;
     case 'reset':
-      config.desaccessInterface === 'public' ? import('../components/des-pages/des-reset.js') : import('../components/des-pages/des-404.js') ;
+      true ? import('../components/des-pages/des-reset.js') : import('../components/des-pages/des-404.js') ;
       break;
     case 'help':
       ap.includes('help') ?   import('../components/des-pages/des-help.js') : import('../components/des-pages/des-access-denied.js') ;

@@ -21,6 +21,7 @@ import { loginUser,
 import {config, rbac_bindings} from '../des-config.js';
 import '@polymer/paper-toast/paper-toast.js';
 import '@vaadin/vaadin-dialog/vaadin-dialog.js'
+import { validateEmailAddress } from '../utils.js';
 
 
 class DESLogin extends connect(store)(PageViewElement) {
@@ -105,7 +106,7 @@ class DESLogin extends connect(store)(PageViewElement) {
               </div>
             `}
             <paper-input-container always-float-label>
-              <label slot="label">Username</label>
+              <label slot="label">Username or Email</label>
               <iron-input slot="input">
                 <input class="my-input" type="text" autocomplete="username" name="username" @input="${e => this.username = e.target.value}"></input>
               </iron-input>
@@ -127,6 +128,7 @@ class DESLogin extends connect(store)(PageViewElement) {
             <div class="errormessage"> <b>${this.msg}</b></div>
           </div>
           <div class="card-content">
+          <!-- TODO: Enable password reset for private interface when database table and credentials are in place -->
             ${config.desaccessInterface === 'private' ? html`
               <a href="https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/" style="font-size: 11px; margin-left: 5px;" target="_blank"> Forgot Password? </a>
             ` : html`
@@ -143,7 +145,7 @@ class DESLogin extends connect(store)(PageViewElement) {
       <vaadin-dialog id="register-form-dialog"></vaadin-dialog>
       <paper-toast name="register" class="toast-position toast-success" text="Your registration form was received. Check your email for an activation link." duration="600000"></paper-toast>
       <paper-toast name="reset" class="toast-position toast-success" text="Password reset request received. Check your email." duration="20000"></paper-toast>
-      <paper-toast name="reset-fail-username" class="toast-position toast-error" text="Please provide your username." duration="20000"></paper-toast>
+      <paper-toast name="reset-fail-username" class="toast-position toast-error" text="Please provide your username or email." duration="20000"></paper-toast>
       <paper-toast name="reset-fail-response" class="toast-position toast-error" text="There was an error processing your request. Try again later." duration="10000"></paper-toast>
     `;
   }
@@ -161,7 +163,13 @@ class DESLogin extends connect(store)(PageViewElement) {
     this.database = this.shadowRoot.getElementById('database-selection') ? this.shadowRoot.getElementById('database-selection').selected : this.database;
     const Url=config.backEndUrl + "login"
     const formData = new FormData();
-    formData.append('username', this.username);
+    // If an email address was entered instead of username, log in with the email address
+    if (validateEmailAddress(this.username)) {
+      this.email = this.username;
+      formData.append('email', this.email);
+    } else {
+      formData.append('username', this.username);
+    }
     formData.append('password', this._passwd);
     formData.append('database', this.database);
     const data = new URLSearchParams(formData);
@@ -213,9 +221,14 @@ class DESLogin extends connect(store)(PageViewElement) {
       this.shadowRoot.querySelector('paper-spinner').active = false;
       return;
     }
-    let body = {
-      'username': this.username,
-    };
+    let body = {};
+    // If an email address was entered instead of username, request a password reset using the email address
+    if (validateEmailAddress(this.username)) {
+      this.email = this.username;
+      body.email = this.email;
+    } else {
+      body.username = this.username;
+    }
     const param = {
       method: "POST",
       headers: {
