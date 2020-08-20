@@ -186,6 +186,7 @@ class DESMain extends connect(store)(LitElement) {
           ${this.accessPages.includes('home')  ? this._renderMenuItem('Home', 'home', 'vaadin:home') : html ``}
           ${this.accessPages.includes('test-job')  ? this._renderMenuItem('Submit Test Job', 'test-job', 'vaadin:stopwatch') : html ``}
           ${this.accessPages.includes('db-access') ? this._renderMenuItem('DB Access', 'db-access', 'vaadin:code') : html ``}
+          ${this.accessPages.includes('footprint') ? this._renderMenuItem('DES Footprint', 'footprint', 'vaadin:globe') : html ``}
           ${this.accessPages.includes('cutout') && this.database !== 'desoper'   ? this._renderMenuItem('Cutout Service', 'cutout', 'vaadin:scissors') : html ``}
           ${this.accessPages.includes('status')    ? this._renderMenuItem('Job Status', 'status', 'vaadin:cogs') : html ``}
           ${this.accessPages.includes('jupyter')    ? this._renderMenuItem('JupyterLab', 'jupyter', 'vaadin:notebook') : html ``}
@@ -221,6 +222,9 @@ class DESMain extends connect(store)(LitElement) {
           html`<des-404 class="page" ?active="${this._page === 'test-job'}"></des-404>`}
         ${this.accessPages.includes('db-access') ?
           html`<des-db-access class="page" ?active="${this._page === 'db-access'}"></des-db-access>` :
+          html`<des-404 class="page" ?active="${this._page === 'db-access'}"></des-404>`}
+        ${this.accessPages.includes('footprint') ?
+          html`<des-footprint class="page" ?active="${this._page === 'footprint'}"></des-footprint>` :
           html`<des-404 class="page" ?active="${this._page === 'db-access'}"></des-404>`}
         ${this.accessPages.includes('cutout') && this.database !== 'desoper' ?
           html`<des-cutout class="page" ?active="${this._page === 'cutout'}"></des-cutout>` :
