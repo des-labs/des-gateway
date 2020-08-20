@@ -361,6 +361,7 @@ class DESFootprint extends connect(store)(PageViewElement) {
       this.shadowRoot.getElementById('getTiles').open();
     }
     
+    let columnElements = [];
     for (var key in this.data) {
       columnElements.push(html`
       
