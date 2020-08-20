@@ -128,8 +128,8 @@ export const loadPage = (page,ap,targetPath = '') => (dispatch) => {
     case 'db-access':
       ap.includes('db-access') ?   import('../components/des-pages/des-db-access.js') : import('../components/des-pages/des-404.js') ;
       break;
-    case 'footprint':
-      ap.includes('footprint') ?   import('../components/des-pages/des-footprint.js') : import('../components/des-pages/des-404.js') ;
+    case 'tilefinder':
+      ap.includes('tilefinder') ?   import('../components/des-pages/des-tilefinder.js') : import('../components/des-pages/des-404.js') ;
       break;
     case 'cutout':
       ap.includes('cutout') ?   import('../components/des-pages/des-cutout.js') : import('../components/des-pages/des-404.js') ;

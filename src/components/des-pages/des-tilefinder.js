@@ -21,7 +21,7 @@ import { SharedStyles } from '../styles/shared-styles.js';
 import {config} from '../des-config.js';
 import { store } from '../../store.js';
 
-class DESFootprint extends connect(store)(PageViewElement) {
+class DESTileFinder extends connect(store)(PageViewElement) {
 
   static get styles() {
     return [
@@ -280,7 +280,7 @@ class DESFootprint extends connect(store)(PageViewElement) {
     <div>
       <section>
         <div style="font-size: 2rem; font-weight: bold;">
-          DES Footprint
+          DES TileFinder
           <paper-spinner class="big"></paper-spinner>
         </div>
             <div class="flex" style="display: inline-block;">
@@ -515,4 +515,4 @@ class DESFootprint extends connect(store)(PageViewElement) {
   
 }
 
-window.customElements.define('des-footprint', DESFootprint);
+window.customElements.define('des-tilefinder', DESTileFinder);
