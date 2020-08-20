@@ -17,9 +17,6 @@ import '@polymer/paper-radio-button/paper-radio-button.js';
 import '@polymer/paper-slider/paper-slider.js';
 import '@polymer/paper-toast/paper-toast.js';
 import '@polymer/paper-spinner/paper-spinner.js';
-//import '@vaadin/vaadin-dialog/vaadin-dialog.js'
-//import '@vaadin/vaadin-grid';
-//import '@vaadin/vaadin-grid/vaadin-grid-sort-column.js';
 import { SharedStyles } from '../styles/shared-styles.js';
 import {config} from '../des-config.js';
 import { store } from '../../store.js';
@@ -282,6 +279,10 @@ class DESFootprint extends connect(store)(PageViewElement) {
     return html`
     <div>
       <section>
+        <div style="font-size: 2rem; font-weight: bold;">
+          DES Footprint
+          <paper-spinner class="big"></paper-spinner>
+        </div>
             <div class="flex" style="display: inline-block;">
               <p style="margin-top: 0;">Search a tile by position or name. </p>
               <paper-input 
@@ -289,18 +290,16 @@ class DESFootprint extends connect(store)(PageViewElement) {
                 placeholder="Position (ra,dec)"
                 @change="${(e) => {this.customCoords = e.target.value}}"
                 id="custom-coords" name="custom-coords" class="custom-coords">
-                <paper-icon-button slot="suffix" icon="search" @click="${(e) => this._submit(e)}"></paper-icon-button>
-                <paper-spinner id="submit-spinner" class="big"></paper-spinner>
-
-              </paper-input>
-              <paper-input
+                <paper-icon-button slot="suffix" icon="search" @click="${(e) => this._submit('coords')}"></paper-icon-button>
+                
+                </paper-input>
+                <paper-input
                 style="margin-top: -30px; float: left; max-width: 50%; padding-left:2rem;"
                 placeholder="Tilename"
                 @change="${(e) => {this.tileName = e.target.value}}"
                 id="custom-tile" name="custom-tile" class="custom-tile">
-                <paper-icon-button slot="suffix" icon="search" @click="${(e) => this._submit(e)}"></paper-icon-button>
-                <paper-spinner id="submit-spinner" class="big"></paper-spinner>
-
+                <paper-icon-button slot="suffix" icon="search" @click="${(e) => this._submit('name')}"></paper-icon-button>
+                
               </paper-input>
             </div>
       </section>
@@ -319,10 +318,9 @@ class DESFootprint extends connect(store)(PageViewElement) {
         <paper-button disabled raised class="y3a2" @click="${(e) => this._getFiles(e,'Y3A2')}">Y3A2</paper-button>
         <paper-button disabled raised class="y1a1" @click="${(e) => this._getFiles(e,'Y1A1')}">Y1A1</paper-button>
         <paper-button disabled raised class="sva1" @click="${(e) => this._getFiles(e,'SVA1')}">SVA1</paper-button><br><br>
-        Click <a href="https://desar2.cosmology.illinois.edu/DESFiles/desarchive/OPS/multiepoch/"> here</a> to get access to all campaign tiles<a href></a>
+        <!-- Click <a href="https://desar2.cosmology.illinois.edu/DESFiles/desarchive/OPS/multiepoch/"> here</a> to get access to all campaign tiles<a href></a> -->
       </section>
       <div>
-        <paper-toast class="toast-position toast-success" id="toast-job-success" text="Job has been submitted!" duration="7000"> </paper-toast>
         <paper-toast class="toast-position toast-error" id="toast-job-failure" text="ERROR! There was an error. Please try again" duration="7000"> </paper-toast>
       </div>
     </div>
@@ -363,12 +361,15 @@ class DESFootprint extends connect(store)(PageViewElement) {
       this.shadowRoot.getElementById('getTiles').open();
     }
     
-    let columnElements = [];
     for (var key in this.data) {
       columnElements.push(html`
-        <paper-button class="download" raised >
-        <a style="color:black; display: inline-block; width: 100%; height: 10%; text-align:center; text-decoration:none" href="${this.data[key]}" target="_blank">${key}</a>  
+      
+      <div>
+        <paper-button class="download" raised
+        @click="${(e) => {window.open(this.data[key],'_blank')}}"> 
+        ${key}
         </paper-button>
+        </div>
       `);
     }
     this.columnElements = columnElements;
@@ -381,41 +382,12 @@ class DESFootprint extends connect(store)(PageViewElement) {
     this.email = this.email === '' ? state.app.email : this.email;
 
   }
-  _constructJobSubmitBody(query) {
-    let body = {
-      job: 'query',
-      username: this.username,
-      query: query,
-      filename: "quick.csv",
-      quick: "true"
 
-    };
-    return body;
+  _submit(type) {
+    this._getTileInfo(type);
   }
-
-  _toggleSpinner(active, callback) {
-    this.shadowRoot.getElementById('submit-spinner').active = active;
-    callback();
-  }
-
-  _submit(event) {
-        this._submitJob(() => {
-          this._toggleSpinner(true, () => {});
-        });
-
-  }
-
-  _submitJob(callback) {
-    const Url=config.backEndUrl + "job/submit";
-    var coords_split = this.customCoords.split(",");
-    this.ra = coords_split[0];
-    this.dec = coords_split[1];
-    if (this.ra > 180){
-      this.raAdjusted = 360-this.ra;
-    }
-    else{
-      this.raAdjusted = this.ra;
-    }
+  _getTileInfo(type) {
+    this.shadowRoot.querySelector('paper-spinner').active = true;
   
     // unsetting display values
     this.raCorners = '';
@@ -428,50 +400,20 @@ class DESFootprint extends connect(store)(PageViewElement) {
     this.shadowRoot.querySelectorAll("paper-button.y3a2")[0].disabled = true;
     this.shadowRoot.querySelectorAll("paper-button.y6a1")[0].disabled = true;
 
-    var query_with_tilename = `select o.tilename,RACMIN,RACMAX,DECCMIN,DECCMAX,RA_CENT,DEC_CENT,'sva1' as release,fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y, count(o.tilename) as nobjects from sva1_coadd_objects o,mcarras2.sva1_tile_info m,y3a2_coaddtile_geom g where m.tilename=o.tilename and g.tilename=o.tilename and m.tilename='${this.tileName}' and m.tilename=g.tilename group by o.tilename,racmin,racmax,deccmin,deccmax,ra_cent,dec_cent,'sva1',fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y UNION ALL select o.tilename,RACMIN,RACMAX,DECCMIN,DECCMAX,RA_CENT,DEC_CENT,'y1a1' as release,fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y,count(o.tilename) as nobjects from y1a1_coadd_objects o, mcarras2.y1a1_tile_info m,y3a2_coaddtile_geom g where m.tilename=o.tilename and g.tilename=o.tilename and m.tilename='${this.tileName}' and m.tilename=g.tilename group by o.tilename,racmin,racmax,deccmin,deccmax,ra_cent,dec_cent,'y1a1',fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y UNION ALL select o.tilename,RACMIN,RACMAX,DECCMIN,DECCMAX,RA_CENT,DEC_CENT,'y3a2' as release,fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y,count(o.tilename) as nobjects from y3a2_coadd_object_summary o,mcarras2.y3a2_tile_info m,y3a2_coaddtile_geom g where m.tilename=o.tilename and g.tilename=o.tilename and m.tilename='${this.tileName}' and m.tilename=g.tilename group by o.tilename,racmin,racmax,deccmin,deccmax,ra_cent,dec_cent,'y3a2',fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y UNION ALL select o.tilename,RACMIN,RACMAX,DECCMIN,DECCMAX,RA_CENT,DEC_CENT,'y6a1' as release,fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y,count(o.tilename) as nobjects from y6a1_coadd_object_summary o,mcarras2.y6a1_tile_info m,y3a2_coaddtile_geom g where m.tilename=o.tilename and g.tilename=o.tilename and m.tilename='${this.tileName}' and m.tilename=g.tilename group by o.tilename,racmin,racmax,deccmin,deccmax,ra_cent,dec_cent,'y6a1',fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y`;
-
-    var query_with_coords = `select o.tilename,RACMIN,RACMAX,DECCMIN,DECCMAX,RA_CENT,DEC_CENT,'sva1' as release,fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y,count(o.tilename) as nobjects from sva1_coadd_objects o, mcarras2.sva1_tile_info m,y3a2_coaddtile_geom g where m.tilename=g.tilename and o.tilename=g.tilename and o.tilename=m.tilename and (${this.dec} between g.UDECMIN and g.UDECMAX) and ((g.CROSSRA0='N' and (${this.ra} between g.URAMIN and g.URAMAX)) or (g.CROSSRA0='Y' and (${this.raAdjusted} between g.URAMIN-360 and g.URAMAX))) group by o.tilename,racmin,racmax,deccmin,deccmax,ra_cent,dec_cent,'sva1',fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y UNION ALL select o.tilename,RACMIN,RACMAX,DECCMIN,DECCMAX,RA_CENT,DEC_CENT,'y1a1' as release,fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y, count(o.tilename) as nobjects from y1a1_coadd_objects o, mcarras2.y1a1_tile_info m,y3a2_coaddtile_geom g where m.tilename=g.tilename and o.tilename=g.tilename and o.tilename=m.tilename and (${this.dec} between g.UDECMIN and g.UDECMAX) and ((g.CROSSRA0='N' and (${this.ra} between g.URAMIN and g.URAMAX)) or (g.CROSSRA0='Y' and (${this.raAdjusted} between g.URAMIN-360 and g.URAMAX))) group by o.tilename,racmin,racmax,deccmin,deccmax,ra_cent,dec_cent,'y1a1',fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y UNION ALL select o.tilename,RACMIN,RACMAX,DECCMIN,DECCMAX,RA_CENT,DEC_CENT,'y3a2' as release,fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y,count(o.tilename) as nobjects from y3a2_coadd_object_summary o,mcarras2.y3a2_tile_info m,y3a2_coaddtile_geom g where  m.tilename=g.tilename and o.tilename=g.tilename and o.tilename=m.tilename and (${this.dec} between g.UDECMIN and g.UDECMAX) and ((g.CROSSRA0='N' and (${this.ra} between g.URAMIN and g.URAMAX)) or (g.CROSSRA0='Y' and (${this.raAdjusted} between g.URAMIN-360 and g.URAMAX))) group by o.tilename,racmin,racmax,deccmin,deccmax,ra_cent,dec_cent,'y3a2',fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y UNION ALL select o.tilename,RACMIN,RACMAX,DECCMIN,DECCMAX,RA_CENT,DEC_CENT,'y6a1' as release,fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y,count(o.tilename) as nobjects from y6a1_coadd_object_summary o,mcarras2.y6a1_tile_info m,y3a2_coaddtile_geom g where m.tilename=g.tilename and o.tilename=g.tilename and o.tilename=m.tilename and (${this.dec} between g.UDECMIN and g.UDECMAX) and ((g.CROSSRA0='N' and (${this.ra} between g.URAMIN and g.URAMAX)) or (g.CROSSRA0='Y' and (${this.raAdjusted} between g.URAMIN-360 and g.URAMAX))) group by o.tilename,racmin,racmax,deccmin,deccmax,ra_cent,dec_cent,'y6a1',fits_image_g,fits_catalog_g,fits_image_r,fits_catalog_r,fits_image_i,fits_catalog_i,fits_image_z,fits_catalog_z,fits_image_y,fits_catalog_y`;
-
-    if (this.customCoords){
-      var query = query_with_coords;
+    let body = {}
+    let Url=config.backEndUrl + "tiles/info/";
+    if (type === 'coords'){
+      Url += 'coords';
+      body = {
+        'coords': this.customCoords
+      }
     }
     else {
-      var query = query_with_tilename;
-    }
-    let body = this._constructJobSubmitBody(query);
-    const param = {
-      method: "PUT",
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + localStorage.getItem("token")
-      },
-      body: JSON.stringify(body)
-    };
-    fetch(Url, param)
-    .then(response => {
-      return response.json()
-    })
-    .then(data => {
-      if (data.status === "ok") {
-        this.shadowRoot.getElementById('toast-job-success').text = 'Searching for files...';
-        this.shadowRoot.getElementById('toast-job-success').show();
-        this._pollQuickQueryResult(data.jobid);
-      } else {
-        console.log("data status no okay")
-        this.shadowRoot.getElementById('toast-job-failure').text = 'Error searching for files: ' + data.message;
-        this.shadowRoot.getElementById('toast-job-failure').show();
-        console.log(JSON.stringify(data));
+      Url += 'name';
+      body = {
+        'name': this.tileName
       }
-      callback();
-    });
-
-  }
-
-  _getJobStatus(jobId) {
-    const Url=config.backEndUrl + "job/status"
-    let body = {
-      'job-id': jobId,
-    };
+    }
     const param = {
       method: "POST",
       headers: {
@@ -485,44 +427,24 @@ class DESFootprint extends connect(store)(PageViewElement) {
       return response.json()
     })
     .then(data => {
+      this.shadowRoot.querySelector('paper-spinner').active = false;
       if (data.status === "ok") {
-        if (data.jobs[0].job_status == 'success' || data.jobs[0].job_status == 'failure') {
-          window.clearInterval(this.refreshStatusIntervalId);
-          this.refreshStatusIntervalId = 0;
-          this._toggleSpinner(false, () => {});
-          if (data.jobs[0].job_status == 'success') {
-            let results = JSON.parse(data.jobs[0].data);
-            this.results = JSON.stringify(results);
-            this._setValuesFromQuickQueryResults(results);
-          } else {
-            this.results = '';
-            this.shadowRoot.getElementById('toast-job-failure').text = 'Quick query failed: ' + data.jobs[0].job_status_message;
-            this.shadowRoot.getElementById('toast-job-failure').show();
-          }
+        let results = data.results;
+        this.results = results;
+        this._setValuesFromQuickQueryResults(data);
+        for (let i in data.links) {
+          console.log(data.links[i]);
         }
       } else {
+        this.shadowRoot.getElementById('toast-job-failure').text = 'Error searching for files: ' + data.message;
+        this.shadowRoot.getElementById('toast-job-failure').show();
         console.log(JSON.stringify(data));
       }
     });
-  }
-  _pollQuickQueryResult(jobId) {
-    if (this.refreshStatusIntervalId === 0) {
-      let pollStartTime = Date.now();
-      this.refreshStatusIntervalId = window.setInterval(() => {
-        if (Date.now() - pollStartTime < 40*1000) {
-          this._getJobStatus(jobId);
-        } else {
-          window.clearInterval(this.refreshStatusIntervalId);
-          this.refreshStatusIntervalId = 0;
-          this._toggleSpinner(false, () => {});
-          this.shadowRoot.getElementById('toast-job-failure').text = 'Quick query timeout.';
-          this.shadowRoot.getElementById('toast-job-failure').show();
-        }
-      }, 3000);
-    }
+
   }
 
-  _setValuesFromQuickQueryResults(results){
+  _setValuesFromQuickQueryResults(response){
 
     // clearing out file data 
     this.Y1A1Files = {}
@@ -530,60 +452,61 @@ class DESFootprint extends connect(store)(PageViewElement) {
     this.Y3A2Files = {}
     this.Y6A1Files = {}
 
-    if (results.length == 0){
+    if (response.releases.length == 0){
       this.shadowRoot.getElementById('toast-job-failure').text = 'No files found!';
       this.shadowRoot.getElementById('toast-job-failure').show();
     }
     else{
-      this.tileName = results[0]["TILENAME"];
+      this.tileName = response.tilename;
       this.displayTile = this.tileName;
 
-      this.tileCenter = results[0]["RA_CENT"] + ", " + results[0]["DEC_CENT"];
-      this.raCorners = results[0]["RACMIN"] + ", " + results[0]["RACMAX"];
-      this.decCorners = results[0]["DECCMIN"] + ", " + results[0]["DECCMAX"];
+      this.tileCenter = response.ra_cent + ", " + response.dec_cent;
+      this.raCorners = response.racmin + ", " + response.racmax;
+      this.decCorners = response.deccmin + ", " + response.deccmax;
 
-      var i;
-      for (i = 0; i < results.length; i++){
-        if (results[i]["RELEASE"] == 'y6a1'){
-          this.nObjects = results[i]["NOBJECTS"]
+      for (let i = 0; i < response.releases.length; i++){
+        if (response.releases[i]["release"] === 'y6a1'){
+          this.nObjects = response.releases[i]["num_objects"];
         }
-        var bands = ["G","R","I","Z","Y"];
-        for (var k=0; k < bands.length ; k++){
-          var imName = "FITS_IMAGE_" + bands[k];
-          var caName = "FITS_CATALOG_" + bands[k];
-          if (results[i]=='sva1' || results[i]['RELEASE']=='y1a1'){
-            var imPath = "/alpha-desaccess/api/data/" + results[i][imName].split("OPS/")[1]+ "?token=" + localStorage.getItem("token");
-            var caPath = "/alpha-desaccess/api/data/" + results[i][caName].split("OPS/")[1]+ "?token=" + localStorage.getItem("token");
+        for (let band in response.releases[i].bands) {
+
+          let imName = "FITS_IMAGE_" + band;
+          let caName = "FITS_CATALOG_" + band;
+          if (response.releases[i]["release"] === 'sva1' || response.releases[i]["release"] === 'y1a1'){
+            var imPath = config.backEndUrl + "data/" + response.releases[i].bands[band].image   + "?token=" + localStorage.getItem("token");
+            var caPath = config.backEndUrl + "data/" + response.releases[i].bands[band].catalog + "?token=" + localStorage.getItem("token");
           }
           else{
-            var imPath = "/alpha-desaccess/api/data/desarchive/" + results[i][imName].split("OPS/")[1]+ "?token=" + localStorage.getItem("token");
-            var caPath = "/alpha-desaccess/api/data/desarchive/" + results[i][caName].split("OPS/")[1]+ "?token=" + localStorage.getItem("token");
+            var imPath = config.backEndUrl + "data/desarchive/" + response.releases[i].bands[band].image    + "?token=" + localStorage.getItem("token");
+            var caPath = config.backEndUrl + "data/desarchive/" + response.releases[i].bands[band].catalog  + "?token=" + localStorage.getItem("token");
           }
-        
-          if (results[i]['RELEASE'] == 'sva1'){
-            this.shadowRoot.querySelectorAll("paper-button.sva1")[0].disabled = false;
-            this.SVA1Files[imName] = imPath;
-            this.SVA1Files[caName] = caPath;
+          switch (response.releases[i]["release"]) {
+            case 'sva1':
+              this.shadowRoot.querySelectorAll("paper-button.sva1")[0].disabled = false;
+              this.SVA1Files[imName] = imPath;
+              this.SVA1Files[caName] = caPath;
+              break;
+            case 'y1a1':
+              this.shadowRoot.querySelectorAll("paper-button.y1a1")[0].disabled = false;
+              this.Y1A1Files[imName] = imPath;
+              this.Y1A1Files[caName] = caPath;
+              break;
+            case 'y3a2':
+              this.shadowRoot.querySelectorAll("paper-button.y3a2")[0].disabled = false;
+              this.Y3A2Files[imName] = imPath;
+              this.Y3A2Files[caName] = caPath;
+              break;
+            case 'y6a1':
+              this.shadowRoot.querySelectorAll("paper-button.y6a1")[0].disabled = false;
+              this.Y6A1Files[imName] = imPath;
+              this.Y6A1Files[caName] = caPath;
+              break;
+          
+            default:
+              break;
           }
-      
-          if (results[i]['RELEASE'] =='y1a1'){
-            this.shadowRoot.querySelectorAll("paper-button.y1a1")[0].disabled = false;
-            this.Y1A1Files[imName] = imPath;
-            this.Y1A1Files[caName] = caPath;
-          }
-    
-          if (results[i]['RELEASE'] == 'y3a2'){
-            this.shadowRoot.querySelectorAll("paper-button.y3a2")[0].disabled = false;
-            this.Y3A2Files[imName] = imPath;
-            this.Y3A2Files[caName] = caPath;
         }
-    
-          if (results[i]['RELEASE'] == 'y6a1'){
-            this.shadowRoot.querySelectorAll("paper-button.y6a1")[0].disabled = false;
-            this.Y6A1Files[imName] = imPath;
-            this.Y6A1Files[caName] = caPath;
-          }
-        }
+
       }
     }
 
