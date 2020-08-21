@@ -205,6 +205,11 @@ class DESTileFinder extends connect(store)(PageViewElement) {
               color: white;
 
           }
+          paper-button.dr1 {
+              background-color: black;
+              color: white;
+
+          }
           paper-button.sva1 {
               background-color: var(--paper-red-500);
               color: white;
@@ -240,10 +245,12 @@ class DESTileFinder extends connect(store)(PageViewElement) {
       ra: {type: String},
       raAdjusted: {type: String},
       dec: {type: String},
+      files: {type: Object},
       Y1A1Files: {type: Object},
       SVA1Files: {type: Object},
       Y3A2Files: {type: Object},
       Y6A1Files: {type: Object},
+      DR1Files: {type: Object},
       refreshStatusIntervalId: {type: Number},
       release: {type: String},
       data: {type: Object},
@@ -266,10 +273,12 @@ class DESTileFinder extends connect(store)(PageViewElement) {
     this.ra = '';
     this.raAdjusted = '';
     this.dec = '';
+    this.files = {};
     this.SVA1Files = {};
     this.Y1A1Files = {};
     this.Y3A2Files = {};
     this.Y6A1Files = {};
+    this.DR1Files = {};
     this.release = '';
     this.data = null;
     this.columnElements = null;
@@ -314,10 +323,15 @@ class DESTileFinder extends connect(store)(PageViewElement) {
         </div>
 
         Download Files for this tile:<br>
+        ${config.desaccessInterface === 'public' ? html`
+        <paper-button disabled raised class="dr1"  @click="${(e) => this._getFiles(e,'DR1')}">DR1</paper-button>
+        ` : html`
         <paper-button disabled raised class="y6a1" @click="${(e) => this._getFiles(e,'Y6A1')}">Y6A1</paper-button>
         <paper-button disabled raised class="y3a2" @click="${(e) => this._getFiles(e,'Y3A2')}">Y3A2</paper-button>
         <paper-button disabled raised class="y1a1" @click="${(e) => this._getFiles(e,'Y1A1')}">Y1A1</paper-button>
-        <paper-button disabled raised class="sva1" @click="${(e) => this._getFiles(e,'SVA1')}">SVA1</paper-button><br><br>
+        <paper-button disabled raised class="sva1" @click="${(e) => this._getFiles(e,'SVA1')}">SVA1</paper-button>
+        `}
+        <br><br>
         <!-- Click <a href="https://desar2.cosmology.illinois.edu/DESFiles/desarchive/OPS/multiepoch/"> here</a> to get access to all campaign tiles<a href></a> -->
       </section>
       <div>
@@ -325,7 +339,7 @@ class DESTileFinder extends connect(store)(PageViewElement) {
       </div>
     </div>
     <paper-dialog class="dialog-position" id="getTiles" with-backdrop on-iron-overlay-opened="patchOverlay">
-      <h2>Files for ${this.tileName} in ${this.release}</h2>
+      <h2>Files for ${this.tileName} in ${this.release.toUpperCase()}</h2>
       <div id="insideDialog">
         ${this.columnElements}
       </div>
@@ -338,42 +352,24 @@ class DESTileFinder extends connect(store)(PageViewElement) {
   }
 
   _getFiles(event,release){
-
-    this.data = null;
-    if (release == 'Y6A1'){
-      this.data = this.Y6A1Files;
-      this.release = release;
-      this.shadowRoot.getElementById('getTiles').open();
-    }
-    if (release == 'Y3A2'){
-      this.data = this.Y3A2Files;
-      this.release = release;
-      this.shadowRoot.getElementById('getTiles').open();
-    }
-    if (release == 'Y1A1'){
-      this.data = this.Y1A1Files;
-      this.release = release;
-      this.shadowRoot.getElementById('getTiles').open();
-    }
-    if (release == 'SVA1'){
-      this.data = this.SVA1Files;
-      this.release = release;
-      this.shadowRoot.getElementById('getTiles').open();
-    }
+    this.release = release.toLowerCase();
+    this.data = this.files[this.release];
     
+    console.log(this.data);
     let columnElements = [];
     for (var key in this.data) {
       columnElements.push(html`
-      
       <div>
-        <paper-button class="download" raised
-        @click="${(e) => {window.open(this.data[key],'_blank')}}"> 
+        <a href="${this.data[key]}" target="_blank" style="text-decoration: none; color: inherit;">
+        <paper-button class="download" raised>
         ${key}
         </paper-button>
+        </a>
         </div>
       `);
     }
     this.columnElements = columnElements;
+    this.shadowRoot.getElementById('getTiles').open();
     
   } 
 
@@ -390,16 +386,19 @@ class DESTileFinder extends connect(store)(PageViewElement) {
   _getTileInfo(type) {
     this.shadowRoot.querySelector('paper-spinner').active = true;
   
-    // unsetting display values
     this.raCorners = '';
     this.decCorners = '';
     this.tileCenter = '';
     this.nObjects = '';
     this.displayTile = '';
-    this.shadowRoot.querySelectorAll("paper-button.sva1")[0].disabled = true;
-    this.shadowRoot.querySelectorAll("paper-button.y1a1")[0].disabled = true;
-    this.shadowRoot.querySelectorAll("paper-button.y3a2")[0].disabled = true;
-    this.shadowRoot.querySelectorAll("paper-button.y6a1")[0].disabled = true;
+    if (config.desaccessInterface !== 'public') {
+      this.shadowRoot.querySelectorAll("paper-button.sva1")[0].disabled = true;
+      this.shadowRoot.querySelectorAll("paper-button.y1a1")[0].disabled = true;
+      this.shadowRoot.querySelectorAll("paper-button.y3a2")[0].disabled = true;
+      this.shadowRoot.querySelectorAll("paper-button.y6a1")[0].disabled = true;
+    } else {
+      this.shadowRoot.querySelectorAll("paper-button.dr1")[0].disabled = true;
+    }
 
     let body = {}
     let Url=config.backEndUrl + "tiles/info/";
@@ -433,9 +432,9 @@ class DESTileFinder extends connect(store)(PageViewElement) {
         let results = data.results;
         this.results = results;
         this._setValuesFromQuickQueryResults(data);
-        for (let i in data.links) {
-          console.log(data.links[i]);
-        }
+        // for (let i in data.links) {
+        //   console.log(data.links[i]);
+        // }
       } else {
         this.shadowRoot.getElementById('toast-job-failure').text = 'Error searching for files: ' + data.message;
         this.shadowRoot.getElementById('toast-job-failure').show();
@@ -447,17 +446,13 @@ class DESTileFinder extends connect(store)(PageViewElement) {
 
   _setValuesFromQuickQueryResults(response){
 
-    // clearing out file data 
-    this.Y1A1Files = {}
-    this.SVA1Files = {}
-    this.Y3A2Files = {}
-    this.Y6A1Files = {}
+    this.files = {}
 
     if (response.releases.length == 0){
       this.shadowRoot.getElementById('toast-job-failure').text = 'No files found!';
       this.shadowRoot.getElementById('toast-job-failure').show();
     }
-    else{
+    else {
       this.tileName = response.tilename;
       this.displayTile = this.tileName;
 
@@ -465,47 +460,40 @@ class DESTileFinder extends connect(store)(PageViewElement) {
       this.raCorners = response.racmin + ", " + response.racmax;
       this.decCorners = response.deccmin + ", " + response.deccmax;
 
+      // console.log(response.releases);
       for (let i = 0; i < response.releases.length; i++){
-        if (response.releases[i]["release"] === 'y6a1'){
+        let release = response.releases[i]["release"].toLowerCase();
+        this.files[release] = {}
+        if (release === 'y6a1' || release === 'dr1'){
           this.nObjects = response.releases[i]["num_objects"];
         }
         for (let band in response.releases[i].bands) {
 
           let imName = "FITS_IMAGE_" + band;
           let caName = "FITS_CATALOG_" + band;
-          if (response.releases[i]["release"] === 'sva1' || response.releases[i]["release"] === 'y1a1'){
-            var imPath = config.backEndUrl + "data/" + response.releases[i].bands[band].image   + "?token=" + localStorage.getItem("token");
-            var caPath = config.backEndUrl + "data/" + response.releases[i].bands[band].catalog + "?token=" + localStorage.getItem("token");
-          }
-          else{
-            var imPath = config.backEndUrl + "data/desarchive/" + response.releases[i].bands[band].image    + "?token=" + localStorage.getItem("token");
-            var caPath = config.backEndUrl + "data/desarchive/" + response.releases[i].bands[band].catalog  + "?token=" + localStorage.getItem("token");
-          }
-          switch (response.releases[i]["release"]) {
+
+          let basePath =  '';
+          switch (release) {
             case 'sva1':
-              this.shadowRoot.querySelectorAll("paper-button.sva1")[0].disabled = false;
-              this.SVA1Files[imName] = imPath;
-              this.SVA1Files[caName] = caPath;
-              break;
             case 'y1a1':
-              this.shadowRoot.querySelectorAll("paper-button.y1a1")[0].disabled = false;
-              this.Y1A1Files[imName] = imPath;
-              this.Y1A1Files[caName] = caPath;
+              basePath = "data/";
               break;
-            case 'y3a2':
-              this.shadowRoot.querySelectorAll("paper-button.y3a2")[0].disabled = false;
-              this.Y3A2Files[imName] = imPath;
-              this.Y3A2Files[caName] = caPath;
+            case 'dr1':
+              basePath = "data/dr1/";
               break;
-            case 'y6a1':
-              this.shadowRoot.querySelectorAll("paper-button.y6a1")[0].disabled = false;
-              this.Y6A1Files[imName] = imPath;
-              this.Y6A1Files[caName] = caPath;
-              break;
-          
             default:
+              basePath =  "data/desarchive/";
               break;
           }
+
+          if (response.releases[i].bands[band].image !== '') {
+            this.files[release][imName] = config.backEndUrl + basePath + response.releases[i].bands[band].image   + "?token=" + localStorage.getItem("token");
+          }
+          if (response.releases[i].bands[band].catalog !== '') {
+            this.files[release][caName] = config.backEndUrl + basePath + response.releases[i].bands[band].catalog   + "?token=" + localStorage.getItem("token");
+          }
+          // console.log(this.files);
+          this.shadowRoot.querySelectorAll(`paper-button.${release}`)[0].disabled = false;
         }
 
       }
