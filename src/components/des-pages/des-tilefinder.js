@@ -27,6 +27,25 @@ class DESTileFinder extends connect(store)(PageViewElement) {
     return [
       SharedStyles,
       css`
+        .monospace-column {
+          font-family: monospace;
+          font-size: 1.0rem;
+        }
+        .results-container {
+          display: grid;
+          grid-gap: 1rem;
+          padding: 1rem;
+          grid-template-columns: 20% 80%;
+          grid-template-rows: min-content min-content min-content min-content min-content min-content 1fr;
+          grid-row-gap: 5px;
+          font-size: 1.2rem;
+        }
+        iron-icon.download-icon {
+          --iron-icon-width:  0.8rem;
+          --iron-icon-height: 0.8rem;
+          color: darkgray;
+          margin-right: 1rem;
+        } 
           h2 {
             text-align: left;
             font-size: 1.5rem;
@@ -223,7 +242,6 @@ class DESTileFinder extends connect(store)(PageViewElement) {
         }
 
         }
-          
         `,
 
     ];
@@ -246,15 +264,11 @@ class DESTileFinder extends connect(store)(PageViewElement) {
       raAdjusted: {type: String},
       dec: {type: String},
       files: {type: Object},
-      Y1A1Files: {type: Object},
-      SVA1Files: {type: Object},
-      Y3A2Files: {type: Object},
-      Y6A1Files: {type: Object},
-      DR1Files: {type: Object},
       refreshStatusIntervalId: {type: Number},
       release: {type: String},
       data: {type: Object},
-      columnElements: {type: Object},
+      // columnElements: {type: Object},
+      allLinks: {type: Object},
     };
   }
 
@@ -274,14 +288,10 @@ class DESTileFinder extends connect(store)(PageViewElement) {
     this.raAdjusted = '';
     this.dec = '';
     this.files = {};
-    this.SVA1Files = {};
-    this.Y1A1Files = {};
-    this.Y3A2Files = {};
-    this.Y6A1Files = {};
-    this.DR1Files = {};
+    this.allLinks = html``;
     this.release = '';
     this.data = null;
-    this.columnElements = null;
+    // this.columnElements = null;
   }
 
   render() {
@@ -314,15 +324,14 @@ class DESTileFinder extends connect(store)(PageViewElement) {
       </section>
       <section>
         <h2>Tile Properties</h2>
-        <div>
-        Name: ${this.displayTile}<br>
-        Tile Center: ${this.tileCenter}<br>
-        No. Objects (Y6): ${this.nObjects}<br>
-        RA Corners: ${this.raCorners}<br>
-        DEC Corners: ${this.decCorners}<br><br>
+        <div class="results-container">
+          <div>Name</div><div><span class="monospace-column">${this.displayTile}</span></div>
+          <div>Tile Center</div><div><span class="monospace-column">${this.tileCenter}  </span></div>
+          <div>No. Objects</div><div><span class="monospace-column">${this.nObjects}</span></div>
+          <div>RA Corners</div><div><span class="monospace-column">${this.raCorners}</span></div>
+          <div>DEC Corners</div><div><span class="monospace-column">${this.decCorners}</span></div>
         </div>
 
-        Download Files for this tile:<br>
         ${config.desaccessInterface === 'public' ? html`
         <paper-button disabled raised class="dr1"  @click="${(e) => this._getFiles(e,'DR1')}">DR1</paper-button>
         ` : html`
@@ -334,42 +343,57 @@ class DESTileFinder extends connect(store)(PageViewElement) {
         <br><br>
         <!-- Click <a href="https://desar2.cosmology.illinois.edu/DESFiles/desarchive/OPS/multiepoch/"> here</a> to get access to all campaign tiles<a href></a> -->
       </section>
+      <section>
+        ${this.allLinks}
+      </section>
       <div>
         <paper-toast class="toast-position toast-error" id="toast-job-failure" text="ERROR! There was an error. Please try again" duration="7000"> </paper-toast>
       </div>
     </div>
-    <paper-dialog class="dialog-position" id="getTiles" with-backdrop on-iron-overlay-opened="patchOverlay">
-      <h2>Files for ${this.tileName} in ${this.release.toUpperCase()}</h2>
-      <div id="insideDialog">
-        ${this.columnElements}
-      </div>
-  
-      <div class="buttons">
-        <paper-button class="indigo" raised dialog-confirm>Ok</paper-button><br />
-      </div>
-    </paper-dialog>
     `;
   }
 
+//   <!--
+//   <paper-dialog class="dialog-position" id="getTiles" with-backdrop on-iron-overlay-opened="patchOverlay">
+//     <h2>Files for ${this.tileName} in ${this.release.toUpperCase()}</h2>
+//     <div id="insideDialog">
+//       ${this.columnElements}
+//     </div>
+
+//     <div class="buttons">
+//       <paper-button class="indigo" raised dialog-confirm>Ok</paper-button><br />
+//     </div>
+//   </paper-dialog>
+// -->
+
   _getFiles(event,release){
     this.release = release.toLowerCase();
-    this.data = this.files[this.release];
     
-    console.log(this.data);
-    let columnElements = [];
-    for (var key in this.data) {
-      columnElements.push(html`
-      <div>
-        <a href="${this.data[key]}" target="_blank" style="text-decoration: none; color: inherit;">
-        <paper-button class="download" raised>
-        ${key}
-        </paper-button>
-        </a>
-        </div>
-      `);
-    }
-    this.columnElements = columnElements;
-    this.shadowRoot.getElementById('getTiles').open();
+    let el = this.shadowRoot.getElementById(`${this.release}-links`);
+    window.scrollTo({
+      top: el.getBoundingClientRect().top - 60,
+      behavior: 'smooth'
+    })
+    
+    return;
+    
+    // this.data = this.files[this.release];
+    
+    // console.log(this.data);
+    // let columnElements = [];
+    // for (var key in this.data) {
+    //   columnElements.push(html`
+    //   <div>
+    //     <a href="${this.data[key]}" target="_blank" style="text-decoration: none; color: inherit;">
+    //     <paper-button class="download" raised>
+    //     ${key}
+    //     </paper-button>
+    //     </a>
+    //     </div>
+    //   `);
+    // }
+    // this.columnElements = columnElements;
+    // this.shadowRoot.getElementById('getTiles').open();
     
   } 
 
@@ -384,6 +408,7 @@ class DESTileFinder extends connect(store)(PageViewElement) {
     this._getTileInfo(type);
   }
   _getTileInfo(type) {
+    this.allLinks = html``;
     this.shadowRoot.querySelector('paper-spinner').active = true;
   
     this.raCorners = '';
@@ -453,6 +478,9 @@ class DESTileFinder extends connect(store)(PageViewElement) {
       this.shadowRoot.getElementById('toast-job-failure').show();
     }
     else {
+      this.allLinks = html`
+        <h2>Tile Data Downloads</h2>
+      `;
       this.tileName = response.tilename;
       this.displayTile = this.tileName;
 
@@ -461,7 +489,7 @@ class DESTileFinder extends connect(store)(PageViewElement) {
       this.decCorners = response.deccmin + ", " + response.deccmax;
 
       // console.log(response.releases);
-      for (let i = 0; i < response.releases.length; i++){
+      for (let i = 0; i < response.releases.length; i++) {
         let release = response.releases[i]["release"].toLowerCase();
         this.files[release] = {}
         if (release === 'y6a1' || release === 'dr1'){
@@ -473,34 +501,68 @@ class DESTileFinder extends connect(store)(PageViewElement) {
           let caName = "FITS_CATALOG_" + band;
 
           let basePath =  '';
-          switch (release) {
-            case 'sva1':
-            case 'y1a1':
-              basePath = "data/";
-              break;
-            case 'dr1':
-              basePath = "data/dr1/";
-              break;
-            default:
-              basePath =  "data/desarchive/";
-              break;
-          }
+          // switch (release) {
+          //   case 'sva1':
+          //   case 'y1a1':
+          //     basePath = "data/";
+          //     break;
+          //   case 'dr1':
+          //     basePath = "data/dr1/";
+          //     break;
+          //   default:
+          //     basePath =  "data/desarchive/";
+          //     break;
+          // }
 
           if (response.releases[i].bands[band].image !== '') {
-            this.files[release][imName] = config.backEndUrl + basePath + response.releases[i].bands[band].image   + "?token=" + localStorage.getItem("token");
+            this.files[release][`"${band}"-band Image`] = response.releases[i].bands[band].image   + "?token=" + localStorage.getItem("token");
+            // this.files[release][imName] = config.backEndUrl + basePath + response.releases[i].bands[band].image   + "?token=" + localStorage.getItem("token");
           }
           if (response.releases[i].bands[band].catalog !== '') {
-            this.files[release][caName] = config.backEndUrl + basePath + response.releases[i].bands[band].catalog   + "?token=" + localStorage.getItem("token");
+            this.files[release][`"${band}"-band Catalog`] = response.releases[i].bands[band].catalog   + "?token=" + localStorage.getItem("token");
+            // this.files[release][caName] = config.backEndUrl + basePath + response.releases[i].bands[band].catalog   + "?token=" + localStorage.getItem("token");
+          }
+          if (response.releases[i].detection !== '') {
+            // Color combination of bands R,I,Z typically, used to detect source objects
+            this.files[release]['Detection Image'] = response.releases[i].detection   + "?token=" + localStorage.getItem("token");
+          }
+          if (response.releases[i].main !== '') {
+            this.files[release]['Main Catalog'] = response.releases[i].main   + "?token=" + localStorage.getItem("token");
+          }
+          if (response.releases[i].magnitude !== '') {
+            this.files[release]['Magnitude Catalog'] = response.releases[i].magnitude   + "?token=" + localStorage.getItem("token");
+          }
+          if (response.releases[i].flux !== '') {
+            this.files[release]['Flux Catalog'] = response.releases[i].flux   + "?token=" + localStorage.getItem("token");
           }
           // console.log(this.files);
           this.shadowRoot.querySelectorAll(`paper-button.${release}`)[0].disabled = false;
         }
-
+        let links = [];
+        for (let link in this.files[release]) {
+          links.push(html`
+            <li>
+            <a href="${this.files[release][link]}" target="_blank"  style="text-decoration: none; color: inherit;">
+            <iron-icon icon="vaadin:download" class="download-icon"></iron-icon>
+            ${link}
+            </a></li>
+          `);
+        }
+        this.allLinks = html`${this.allLinks}
+        <a href="#" onclick="return false;" title="Back to top" style="text-decoration: none; color: inherit;">
+        <h3 id="${release}-links" @click="${(e) => {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });}}">
+          ${release.toUpperCase()}
+          <iron-icon icon="vaadin:angle-double-up"></iron-icon>
+          </h3></a>
+        <ul style="list-style-type: none; margin: 0; padding: 1rem; line-height: 2rem;">${links}</ul>
+        `
       }
     }
-
   }
-  
 }
 
 window.customElements.define('des-tilefinder', DESTileFinder);
