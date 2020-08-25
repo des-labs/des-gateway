@@ -67,6 +67,7 @@ class DESLogin extends connect(store)(PageViewElement) {
     this.database='desdr';
     this.username='';
     this._passwd='';
+    this.requestThrottleId = 0;
   }
 
   render() {
@@ -128,17 +129,11 @@ class DESLogin extends connect(store)(PageViewElement) {
             <div class="errormessage"> <b>${this.msg}</b></div>
           </div>
           <div class="card-content">
-          <!-- TODO: Enable password reset for private interface when database table and credentials are in place -->
-            ${config.desaccessInterface === 'private' ? html`
-              <a href="https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/" style="font-size: 11px; margin-left: 5px;" target="_blank"> Forgot Password? </a>
-            ` : html`
-              <p>Forgot your password? 
-                <a href="#" onclick="return false;" @click="${this._requestPasswordReset}">
-                  Click here to receive a password reset link by email.
-                </a>
-              </p>
-            `}
-            
+            <p>Forgot your password? 
+              <a href="#" onclick="return false;" @click="${this._requestPasswordReset}">
+                Click here to receive a password reset link by email.
+              </a>
+            </p>
           </div>
         </paper-card>
       </section>
@@ -147,6 +142,7 @@ class DESLogin extends connect(store)(PageViewElement) {
       <paper-toast name="reset" class="toast-position toast-success" text="Password reset request received. Check your email." duration="20000"></paper-toast>
       <paper-toast name="reset-fail-username" class="toast-position toast-error" text="Please provide your username or email." duration="20000"></paper-toast>
       <paper-toast name="reset-fail-response" class="toast-position toast-error" text="There was an error processing your request. Try again later." duration="10000"></paper-toast>
+      <paper-toast name="reset-in-progress-response" class="toast-position toast-error" text="Please wait to make another request." duration="5000"></paper-toast>
     `;
   }
 
@@ -213,6 +209,12 @@ class DESLogin extends connect(store)(PageViewElement) {
   }
 
   _requestPasswordReset(e) {
+    // Do not allow request if one was recently submitted
+    if (this.requestThrottleId > 0) {
+      console.log('Reset request already in progess.');
+      this.shadowRoot.querySelector('paper-toast[name="reset-in-progress-response"]').show();
+      return;
+    }
     this.shadowRoot.querySelector('paper-spinner').active = true;
     // Submit form to backend API endpoint
     const Url=config.backEndUrl + "user/reset/request"
@@ -245,6 +247,10 @@ class DESLogin extends connect(store)(PageViewElement) {
       this.shadowRoot.querySelector('paper-spinner').active = false;
       if (data.status === "ok") {
         this.shadowRoot.querySelector('paper-toast[name="reset"]').show();
+        // Limit time between reset requests to 20 seconds to prevent accidental redundant requests
+        this.requestThrottleId = window.setTimeout(() => {
+          this.requestThrottleId = 0;
+        }, 20000);
         // console.log(JSON.stringify(data.users, null, 2));
       } else {
         this.shadowRoot.querySelector('paper-toast[name="reset-fail-response"]').show();

@@ -5,8 +5,8 @@ export const validateEmailAddress = function(emailStr) {
 }
 
 export const validatePassword = function(password) {
-  const re = /^[a-zA-Z]+[a-zA-Z0-9]{9,29}$/;
-  return re.test(password);
+  const re = /^[a-zA-Z]+[a-zA-Z0-9]+$/;
+  return re.test(password) && password.length <= 40 && password.length >= 10;
 }
 
 export const convertToLocalTime = function(datetimeString) {
