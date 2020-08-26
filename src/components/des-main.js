@@ -194,9 +194,20 @@ class DESMain extends connect(store)(LitElement) {
           ${this.accessPages.includes('users')    ? this._renderMenuItem('User Management', 'users', 'vaadin:users') : html ``}
           ${this.accessPages.includes('notifications')    ? this._renderMenuItem('Notifications', 'notifications', 'vaadin:envelope-open-o') : html ``}
           ${this.accessPages.includes('help')  ? this._renderMenuItem('Help', 'help', 'vaadin:question-circle-o') : html ``}
-          <iron-image src="images/ncsa-logo.jpg" sizing="cover" style="width: 100px;height: 18px;position: absolute; bottom: 10%;left: 10%;"></iron-image>
-        </nav>
-
+          <div style="display: grid; grid-template-columns: 25% 1fr; position: absolute; bottom: 50px;left: 10px;">
+            <div>
+              <a href="https://www.nsf.gov/" target="_blank" alt="NSF Logo" title="National Science Foundation">
+                <iron-image src="images/NSF_4-Color_bitmap_Logo_100px.png" sizing="contain" style="width: 60px; height: 100px;"></iron-image>
+              </a>
+            </div>
+            <div>
+              <a href="http://www.ncsa.illinois.edu/" target="_blank" alt="NCSA Logo" title="National Center for Supercomputing Applications">
+              <iron-image src="images/NCSA_FullColor_RGB.png" sizing="contain" style="width: 180px; height: 100px;"></iron-image>
+              </a>
+            </div>
+          </div>
+          </nav>
+          
       </app-drawer>
 
       <!-- Main content -->
@@ -249,7 +260,10 @@ class DESMain extends connect(store)(LitElement) {
 
 
       <footer>
-        <p style="font-size: 0.8rem; color: darkgray;"> &copy; 2020 DESDM Team<br>
+        <p style="font-size: 0.8rem; color: darkgray;">
+          <a href="https://des.ncsa.illinois.edu/about" target="_blank" style="text-decoration: none; color: inherit;">
+          DESDM Team</a>
+          <br>
           <a href="https://des.ncsa.illinois.edu/terms" target="_blank" style="font-size: 0.7rem; text-decoration: none; font-weight: bold; color: darkgray;">
             Terms and Conditions
           </a>

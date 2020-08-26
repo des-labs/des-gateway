@@ -77,8 +77,6 @@ class DESLogin extends connect(store)(PageViewElement) {
           <div style="cursor:default;" class="box-watermark-logo"></div>
           <h2>DESaccess Login</h2>
           <div class="card-content">
-            <p> Submit <a href='https://deslogin.wufoo.com/forms/help-me-with-my-desdm-account/' target="_blank">this form</a>
-                 if you have trouble accessing the server.</p> 
             ${config.desaccessInterface === 'private' ? html`` : html`
               <p>If you do not have an account, 
                 <a href="#" onclick="return false;" @click="${(e) => {this.registerFormDialog.opened = true; }}">
@@ -131,9 +129,12 @@ class DESLogin extends connect(store)(PageViewElement) {
           <div class="card-content">
             <p>Forgot your password? 
               <a href="#" onclick="return false;" @click="${this._requestPasswordReset}">
-                Click here to receive a password reset link by email.
-              </a>
+                Click here
+              </a> to request a password reset link by email.
             </p>
+            <p>Need help? Contact us using the <a href="${config.frontEndUrl}help/form" target="_blank">help form</a> (login required). 
+            If you are unable to login, use the help form <a href="https://des.ncsa.illinois.edu/" target="_blank">here instead</a>.
+            </p> 
           </div>
         </paper-card>
       </section>
