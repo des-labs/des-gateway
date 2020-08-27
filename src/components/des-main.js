@@ -186,6 +186,7 @@ class DESMain extends connect(store)(LitElement) {
           ${this.accessPages.includes('home')  ? this._renderMenuItem('Home', 'home', 'vaadin:home') : html ``}
           ${this.accessPages.includes('test-job')  ? this._renderMenuItem('Submit Test Job', 'test-job', 'vaadin:stopwatch') : html ``}
           ${this.accessPages.includes('db-access') ? this._renderMenuItem('DB Access', 'db-access', 'vaadin:code') : html ``}
+          ${this.accessPages.includes('tables') ? this._renderMenuItem('DB Tables', 'tables', 'vaadin:table') : html ``}
           ${this.accessPages.includes('tilefinder') ? this._renderMenuItem('DES TileFinder', 'tilefinder', 'vaadin:globe-wire') : html ``}
           ${this.accessPages.includes('cutout') && this.database !== 'desoper'   ? this._renderMenuItem('Cutout Service', 'cutout', 'vaadin:scissors') : html ``}
           ${this.accessPages.includes('status')    ? this._renderMenuItem('Job Status', 'status', 'vaadin:cogs') : html ``}
@@ -233,6 +234,9 @@ class DESMain extends connect(store)(LitElement) {
           html`<des-404 class="page" ?active="${this._page === 'test-job'}"></des-404>`}
         ${this.accessPages.includes('db-access') ?
           html`<des-db-access class="page" ?active="${this._page === 'db-access'}"></des-db-access>` :
+          html`<des-404 class="page" ?active="${this._page === 'db-access'}"></des-404>`}
+        ${this.accessPages.includes('tables') ?
+          html`<des-tables class="page" ?active="${this._page === 'tables'}"></des-tables>` :
           html`<des-404 class="page" ?active="${this._page === 'db-access'}"></des-404>`}
         ${this.accessPages.includes('tilefinder') ?
           html`<des-tilefinder class="page" ?active="${this._page === 'tilefinder'}"></des-tilefinder>` :

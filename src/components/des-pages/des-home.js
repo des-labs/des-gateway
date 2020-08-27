@@ -40,6 +40,11 @@ class DESHome extends connect(store)(PageViewElement) {
               <des-home-card heading="DB ACCESS" image="images/home-query.png" alt="Query" desc="Oracle SQL web client" name="query" ></des-home-card>
             </a>
           ` : html``}
+          ${this.accessPages.includes('tables') ? html`
+            <a style="text-decoration: none; text-transform: none; color:black;" href="tables" tabindex="-1">
+              <des-home-card heading="DES TABLES" image="images/home-tables-tobias-fischer-on-unsplash.jpg" alt="DB Tables" desc="DB Table Explorer" name="tables" ></des-home-card>
+            </a>
+          ` : html``}
           ${this.accessPages.includes('tilefinder') && this.database !== 'desoper' ? html`
             <a style="text-decoration: none; text-transform: none; color:black;" href="tilefinder" tabindex="-1">
               <des-home-card heading="DES TILEFINDER" image="images/home-footprint.png" alt="TileFinder" desc="Tile Search and File Finder" name="tilefinder" ></des-home-card>

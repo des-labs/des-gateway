@@ -131,6 +131,9 @@ export const loadPage = (page,ap,targetPath = '') => (dispatch) => {
     case 'tilefinder':
       ap.includes('tilefinder') ?   import('../components/des-pages/des-tilefinder.js') : import('../components/des-pages/des-404.js') ;
       break;
+    case 'tables':
+      ap.includes('tables') ?   import('../components/des-pages/des-tables.js') : import('../components/des-pages/des-404.js') ;
+      break;
     case 'cutout':
       ap.includes('cutout') ?   import('../components/des-pages/des-cutout.js') : import('../components/des-pages/des-404.js') ;
       break;
