@@ -6,6 +6,9 @@ import {navigate} from '../actions/app.js';
 import {config} from './des-config.js';
 import './des-help-cutout.js';
 import './des-help-status.js';
+import './des-help-tilefinder.js';
+import './des-help-jupyter.js';
+import './des-help-tables.js';
 import './des-help-db-access.js';
 import '@polymer/iron-icon/iron-icon.js';
 import '@vaadin/vaadin-dialog/vaadin-dialog.js'
@@ -42,7 +45,7 @@ class DESHelpButton extends connect(store)(LitElement) {
     }
 
     _openDialog(event) {
-      if (['cutout', 'db-access', 'status'].indexOf(this.page) > -1) {
+      if (['cutout', 'db-access', 'status', 'tilefinder', 'jupyter', 'tables'].indexOf(this.page) > -1) {
         this.dialog.opened = true;
       } else {
         store.dispatch(navigate(`${config.rootPath.replace(/\/+$/, '')}/help`, true, this.accessPages, true));
@@ -108,11 +111,20 @@ class DESHelpButton extends connect(store)(LitElement) {
               ${this.page === 'db-access' ? html`
                 <des-help-db-access></des-help-db-access>
               ` : html``}
+              ${this.page === 'tables' ? html`
+                <des-help-tables></des-help-tables>
+              ` : html``}
               ${this.page === 'cutout' ? html`
                 <des-help-cutout></des-help-cutout>
               ` : html``}
               ${this.page === 'status' ? html`
                 <des-help-status></des-help-status>
+              ` : html``}
+              ${this.page === 'tilefinder' ? html`
+                <des-help-tilefinder></des-help-tilefinder>
+              ` : html``}
+              ${this.page === 'jupyter' ? html`
+                <des-help-jupyter></des-help-jupyter>
               ` : html``}
               ${this.page === 'ticket' ? html`
                 <h3>DES Ticket Help</h3>

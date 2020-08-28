@@ -6,6 +6,7 @@ import { SharedStyles } from '../styles/shared-styles.js';
 import { store } from '../../store.js';
 import { config } from '../des-config.js';
 import '@polymer/paper-spinner/paper-spinner.js';
+import '@polymer/paper-checkbox/paper-checkbox.js';
 
 
 class DESJupyter extends connect(store)(PageViewElement) {
@@ -15,6 +16,8 @@ class DESJupyter extends connect(store)(PageViewElement) {
       jupyter_url: {type: String},
       jupyter_token: {type: String},
       folderLinks: {type: String},
+      gpu: {type: Boolean},
+      roles: {type: Array},
     };
   }
 
@@ -44,6 +47,8 @@ class DESJupyter extends connect(store)(PageViewElement) {
     this.jupyter_token = '';
     this.statusIntervalId = null;
     this.folderLinks ='';
+    this.gpu = false;
+    this.roles = [];
   }
 
   render() {
@@ -77,6 +82,11 @@ class DESJupyter extends connect(store)(PageViewElement) {
                 <iron-icon icon="vaadin:rocket" style="height: 2rem; margin-right: 1rem;"></iron-icon>
                 Deploy JupyterLab server
               </paper-button>
+              <div style="margin: 1rem;">
+              ${config.desaccessInterface === 'public' || (this.roles.indexOf('gpu') === -1 && this.roles.indexOf('admin') === -1) ? html`` : html`
+                <paper-checkbox @change="${(e) => {this.gpu = e.target.checked;}}" ?checked="${this.gpu}">Use GPUs</paper-checkbox>
+              `}
+              </div>
             </div>
             <div id="delete-jlab-button" style="display: none;">
               <paper-button @click="${this._delete}" class="des-button" raised disabled
@@ -116,6 +126,11 @@ class DESJupyter extends connect(store)(PageViewElement) {
 
       <vaadin-dialog id="delete-jupyter-files-dialog" no-close-on-esc no-close-on-outside-click></vaadin-dialog>
     `;
+  }
+
+  stateChanged(state) {
+    this.username = state.app.username;
+    this.roles = state.app.roles;
   }
 
   firstUpdated() {
@@ -185,10 +200,6 @@ class DESJupyter extends connect(store)(PageViewElement) {
       this._updateFolderLinks();
     }, 2000)
 
-  }
-
-  stateChanged(state) {
-    this.username = state.app.username;
   }
 
   _updateFolderLinks() {
@@ -277,7 +288,9 @@ class DESJupyter extends connect(store)(PageViewElement) {
   _create(event) {
     this.shadowRoot.querySelector('paper-spinner').active = true;
     const Url=config.backEndUrl + "jlab/create"
-    let body = {};
+    let body = {
+      'gpu': this.gpu
+    };
     const param = {
       method: "POST",
       headers: {
@@ -357,7 +370,7 @@ class DESJupyter extends connect(store)(PageViewElement) {
       if (data.status === "ok") {
         // console.log(JSON.stringify(data, null, 2));
       } else {
-        console.log(JSON.stringify(data, null, 2));
+        // console.log(JSON.stringify(data, null, 2));
       }
       let stopStatusPolling = true;
       // If the ready_replicas is -1 then the deployment status returned a 404 "not found" error.

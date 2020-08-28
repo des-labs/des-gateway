@@ -4,6 +4,9 @@ import { PageViewElement } from './des-base-page.js';
 import { SharedStyles } from '../styles/shared-styles.js';
 import '../des-home-card.js';
 import '../des-help-cutout.js';
+import '../des-help-jupyter.js';
+import '../des-help-tilefinder.js';
+import '../des-help-tables.js';
 import '../des-help-status.js';
 import '../des-help-db-access.js';
 import '../des-help-form.js';
@@ -79,9 +82,12 @@ class DESHelp extends connect(store)(PageViewElement) {
             </div>
             <p>
             Follow the links below to learn more about the available apps:</p>
-            <ul style="list-style-type: none;">
+            <ul style="list-style-type: none; line-height: 2rem;">
             ${this.accessPages.includes('db-access') ? html`
               <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:code"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('db-access-section').scrollIntoView();}}">DB Access</a></li>
+            ` : html``}
+            ${this.accessPages.includes('tables') ? html`
+              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:table"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('tables-section').scrollIntoView();}}">DB Tables</a></li>
             ` : html``}
             ${this.accessPages.includes('cutout') && this.database !== 'desoper' ? html`
               <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:scissors"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('cutout-section').scrollIntoView();}}">Cutout Service</a></li>
@@ -89,12 +95,23 @@ class DESHelp extends connect(store)(PageViewElement) {
             ${this.accessPages.includes('status') ? html`
               <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:clipboard-user"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('status-section').scrollIntoView();}}">Job Status</a></li>
             ` : html``}
+            ${this.accessPages.includes('tilefinder') ? html`
+              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:globe-wire"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('tilefinder-section').scrollIntoView();}}">TileFinder</a></li>
+            ` : html``}
+            ${this.accessPages.includes('jupyter') ? html`
+              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:notebook"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('jupyter-section').scrollIntoView();}}">Jupyter</a></li>
+            ` : html``}
             </ul>
           </section>
 
           ${this.accessPages.includes('db-access') ? html`
           <section id="db-access-section">
             <des-help-db-access></des-help-db-access>
+          </section>
+          ` : html``}
+          ${this.accessPages.includes('tables') ? html`
+          <section id="tables-section">
+            <des-help-tables></des-help-tables>
           </section>
           ` : html``}
           ${this.accessPages.includes('cutout') && this.database !== 'desoper' ? html`
@@ -105,6 +122,16 @@ class DESHelp extends connect(store)(PageViewElement) {
           ${this.accessPages.includes('status') ? html`
           <section id="status-section">
             <des-help-status></des-help-status>
+          </section>
+          ` : html``}
+          ${this.accessPages.includes('tilefinder') ? html`
+          <section id="tilefinder-section">
+            <des-help-tilefinder></des-help-tilefinder>
+          </section>
+          ` : html``}
+          ${this.accessPages.includes('jupyter') ? html`
+          <section id="jupyter-section">
+            <des-help-jupyter></des-help-jupyter>
           </section>
           ` : html``}
           ${this.accessPages.includes('ticket') ? html`
