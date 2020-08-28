@@ -353,6 +353,20 @@ class DESTileFinder extends connect(store)(PageViewElement) {
     `;
   }
 
+  firstUpdated() {
+    this.shadowRoot.querySelector('#custom-coords').onkeydown = (e) => {
+      if (e.keyCode == 13) {
+        this.customCoords = this.shadowRoot.querySelector('#custom-coords').value;
+        this._submit('coords');
+      }
+    };
+    this.shadowRoot.querySelector('#custom-tile').onkeydown = (e) => {
+      if (e.keyCode == 13) {
+        this.tileName = this.shadowRoot.querySelector('#custom-tile').value;
+        this._submit('name');
+      }
+    };
+  }
 //   <!--
 //   <paper-dialog class="dialog-position" id="getTiles" with-backdrop on-iron-overlay-opened="patchOverlay">
 //     <h2>Files for ${this.tileName} in ${this.release.toUpperCase()}</h2>
