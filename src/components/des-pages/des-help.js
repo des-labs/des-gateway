@@ -13,6 +13,7 @@ import '../des-help-form.js';
 import { connect } from 'pwa-helpers/connect-mixin.js';
 import { store } from '../../store.js';
 import { triggerHelpForm } from '../../actions/app.js';
+import { config } from '../des-config.js';
 import '@polymer/paper-checkbox/paper-checkbox.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/paper-button/paper-button.js';
@@ -81,8 +82,9 @@ class DESHelp extends connect(store)(PageViewElement) {
               <paper-button @click="${(e) => {this.helpFormDialog.opened = true; }}" raised style="font-size: 1rem; margin: 1rem; padding-left: 2rem; padding-right: 2rem;"><iron-icon icon="vaadin:comments-o" style="height: 3rem; margin-right: 1rem;"></iron-icon>Contact us for help</paper-button>
             </div>
             <p>
-            Follow the links below to learn more about the available apps:</p>
+            Follow the links below to learn more about the available apps and features:</p>
             <ul style="list-style-type: none; line-height: 2rem;">
+            <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:external-browser"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('api-section').scrollIntoView();}}">API Documentation</a></li>
             ${this.accessPages.includes('db-access') ? html`
               <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:code"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('db-access-section').scrollIntoView();}}">DB Access</a></li>
             ` : html``}
@@ -104,6 +106,12 @@ class DESHelp extends connect(store)(PageViewElement) {
             </ul>
           </section>
 
+          <section id="api-section">
+            <div>
+              <h3>API Documentation</h3>
+              <p>Everything you can do on this website can also be done by an external client app using the DESaccess Application Programming Interface (API). See the <a href="${config.frontEndUrl}docs/" target="_blank">API Documentation</a> for more details.</p>
+            </div>
+          </section>
           ${this.accessPages.includes('db-access') ? html`
           <section id="db-access-section">
             <des-help-db-access></des-help-db-access>
