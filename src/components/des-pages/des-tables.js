@@ -48,6 +48,8 @@ class DESTables extends connect(store)(PageViewElement) {
         }
         iron-icon {
           color: darkgray;
+          --iron-icon-width:  18px;
+          --iron-icon-height: 18px;
         }
       `
     ];
@@ -64,6 +66,10 @@ class DESTables extends connect(store)(PageViewElement) {
     this.description = {};
     this.detailRenderIntervalId = {};
     this.schema = null;
+    this.rendererTableDescriptionAll = this.rendererTableDescriptionAll.bind(this); // need this to invoke class methods in renderers
+    this.rendererTableDescriptionMy = this.rendererTableDescriptionMy.bind(this); // need this to invoke class methods in renderers
+    this.rendererTableNameAll = this.rendererTableNameAll.bind(this); // need this to invoke class methods in renderers
+    this.rendererTableNameMy = this.rendererTableNameMy.bind(this); // need this to invoke class methods in renderers
   }
 
   render() {
@@ -74,15 +80,15 @@ class DESTables extends connect(store)(PageViewElement) {
         <paper-spinner class="big"></paper-spinner>
       </div>
       <div>
-        <p>Explore the tables available in the DES database.</p>
+        <p>Explore the tables available in the DES database. Click a table name to view its description.</p>
         <ul>
           <li><a title="Scroll to table" href="#" onclick="return false;" @click="${(e) => {this._scrollToTable('all-tables')}}">
+          <iron-icon icon="vaadin:angle-double-down"></iron-icon>&nbsp;&nbsp;
             All Tables
-            <iron-icon icon="vaadin:angle-double-down"></iron-icon>
           </a></li>
           <li><a title="Scroll to table" href="#" onclick="return false;" @click="${(e) => {this._scrollToTable('my-tables')}}">
+          <iron-icon icon="vaadin:angle-double-down"></iron-icon>&nbsp;&nbsp;
             My Tables
-            <iron-icon icon="vaadin:angle-double-down"></iron-icon>
           </a></li>
         </ul>
       </div>
@@ -101,7 +107,7 @@ class DESTables extends connect(store)(PageViewElement) {
         <vaadin-grid id="all-tables" .multiSort="${true}">
           <vaadin-grid-filter-column path="table.name" header="Table Name"></vaadin-grid-filter-column>
           <vaadin-grid-sort-column   path="table.rows" header="Number of Rows"></vaadin-grid-sort-column>
-          <vaadin-grid-column class="details"></vaadin-grid-column>
+          <vaadin-grid-sort-column .renderer="${this.rendererTableNameAll}" header="Description"></vaadin-grid-sort-column>
         </vaadin-grid>
       </div>
       <div>
@@ -119,10 +125,11 @@ class DESTables extends connect(store)(PageViewElement) {
         <vaadin-grid id="my-tables" .multiSort="${true}">
           <vaadin-grid-filter-column path="table.name" header="Table Name"></vaadin-grid-filter-column>
           <vaadin-grid-sort-column   path="table.rows" header="Number of Rows"></vaadin-grid-sort-column>
-          <vaadin-grid-column class="details"></vaadin-grid-column>
+          <vaadin-grid-sort-column .renderer="${this.rendererTableNameMy}" header="Description"></vaadin-grid-sort-column>
         </vaadin-grid>
       </div>
     </section>
+    <vaadin-dialog id="table-description-dialog"></vaadin-dialog>
     <dom-module id="my-grid-styles" theme-for="vaadin-grid">
       <template>
         <style>
@@ -136,6 +143,56 @@ class DESTables extends connect(store)(PageViewElement) {
     `;
   }
 
+  rendererTableDescriptionAll(root, column, rowData) {
+    this.rendererTableDescription(root, column, rowData, 'all');
+  }
+
+  rendererTableDescriptionMy(root, column, rowData) {
+    this.rendererTableDescription(root, column, rowData, 'my');
+  }
+
+  rendererTableNameAll(root, column, rowData) {
+    this.rendererTableName(root, column, rowData, 'all');
+  }
+
+  rendererTableNameMy(root, column, rowData) {
+    this.rendererTableName(root, column, rowData, 'my');
+  }
+
+  rendererTableDescription(root, column, rowData, whichGrid) {
+    let container = root.firstElementChild;
+    if (!container) {
+      container = root.appendChild(document.createElement('div'));
+    }
+    render(
+      html`
+        <a href="#" onclick="return false;" @click="${(e) => {this._fetchTableDescription(whichGrid, rowData.item.table.name);}}">Show schema...</a>
+      `,
+      container
+    );
+
+  }
+
+  rendererTableName(root, column, rowData, whichGrid) {
+    let container = root.firstElementChild;
+    if (!container) {
+      container = root.appendChild(document.createElement('div'));
+    }
+    render(
+      html`
+        <a style="font-family: monospace;"
+          title="Display description of ${rowData.item.table.name}"
+          href="#" onclick="return false;" 
+          @click="${(e) => {this._fetchTableDescription(whichGrid, rowData.item.table.name);}}">
+          View description
+        </a>
+      `,
+      container
+    );
+
+  }
+
+
   _scrollToTable(tableId) {
     let el = this.shadowRoot.getElementById(tableId);
     window.scrollTo({
@@ -145,13 +202,6 @@ class DESTables extends connect(store)(PageViewElement) {
   }
 
   firstUpdated() {
-    // this.gridAllTables = this.shadowRoot.querySelector('#all-tables');
-    // this.gridMyTables = this.shadowRoot.querySelector('#my-tables');
-    // this.bothGrids = [this.gridAllTables, this.gridMyTables];
-    // this.bothGridsDetails = [
-    //   this.shadowRoot.querySelector('#all-tables .details'),
-    //   this.shadowRoot.querySelector('#my-tables .details')
-    // ];
     this.grids = {
       'all': {
         'gridElement': this.shadowRoot.querySelector('#all-tables'),
@@ -174,56 +224,111 @@ class DESTables extends connect(store)(PageViewElement) {
       };
     }
 
-    for (let grid in this.grids) {
-      this.grids[grid].gridElement.rowDetailsRenderer = (root, grid, rowData) => {
-        if (!root.firstElementChild) {
-          if (this.schema !== null) {
-            render(
-              html`
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; border-top: darkgray solid thin; margin: 1rem;">
-                <div class="schema-header-row">Column Name</div>
-                <div class="schema-header-row">Data Type</div>
-                <div class="schema-header-row">Data Format</div>
-                <div class="schema-header-row">Comments</div>
-                ${this.schema.map(field => html`
-                  <div class="schema-field-row">${field['COLUMN_NAME']}</div>
-                  <div class="schema-field-row">${field['DATA_TYPE']}</div>
-                  <div class="schema-field-row">${field['DATA_FORMAT']}</div>
-                  <div class="schema-field-row">${field['COMMENTS']}</div>
-                `)}
-                </div>
-              `, root);
-          }
-        }
-
-      };
-      this.grids[grid].gridElement.rowDetailsRenderer = this.grids[grid].gridElement.rowDetailsRenderer.bind(this);
-    }
-
-    for (let grid in this.grids) {
-      this.grids[grid].detailsElement.renderer = (root, column, rowData) => {
-        if (!root.firstElementChild) {
-          root.innerHTML = '<vaadin-checkbox>Show schema...</vaadin-checkbox>';
-          root.firstElementChild.addEventListener('checked-changed', (e) => {
-            if (e.detail.value) {
-              this._fetchTableDescription(grid, rowData.item.table.name, root.item);
-            } else {
-              this.grids[grid].gridElement.closeItemDetails(root.item);
-            }
-          });
-        }
-        root.item = rowData.item;
-        root.firstElementChild.checked = this.grids[grid].gridElement.detailsOpenedItems.indexOf(root.item) > -1;
-      };
-      this.grids[grid].detailsElement.renderer = this.grids[grid].detailsElement.renderer.bind(this);
-    }
+    //
+    // TODO: The details renderer gets confused about which table is on which row. Not sure how to debug.
+    //
+    // for (let grid in this.grids) {
+    //   this.grids[grid].gridElement.rowDetailsRenderer = (root, grid, rowData) => {
+    //     if (!root.firstElementChild) {
+    //       if (this.schema !== null) {
+    //         console.log(`this.schema: ${JSON.stringify(this.schema)}`);
+    //         render(
+    //           html`
+    //             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; border-top: darkgray solid thin; margin: 1rem;">
+    //             <div class="schema-header-row">Column Name</div>
+    //             <div class="schema-header-row">Data Type</div>
+    //             <div class="schema-header-row">Data Format</div>
+    //             <div class="schema-header-row">Comments</div>
+    //             ${this.schema.map(field => html`
+    //               <div class="schema-field-row">${field['COLUMN_NAME']}</div>
+    //               <div class="schema-field-row">${field['DATA_TYPE']}</div>
+    //               <div class="schema-field-row">${field['DATA_FORMAT']}</div>
+    //               <div class="schema-field-row">${field['COMMENTS']}</div>
+    //             `)}
+    //             </div>
+    //           `, root);
+    //           // Clear the schema value
+    //           this.schema = null;
+    //       }
+    //     }
+    //   };
+    //   // this.grids[grid].gridElement.rowDetailsRenderer = this.grids[grid].gridElement.rowDetailsRenderer.bind(this);
+    // }
+    // for (let grid in this.grids) {
+    //   this.grids[grid].detailsElement.renderer = (root, column, rowData) => {
+    //     if (!root.firstElementChild) {
+    //       root.innerHTML = `<vaadin-checkbox name="${rowData.item.table.name}">Show schema...</vaadin-checkbox>`;
+    //       root.firstElementChild.addEventListener('checked-changed', (e) => {
+    //         console.log(`rowData: ${JSON.stringify(rowData)}`);
+    //         console.log(`details for table: ${rowData.item.table.name}`);
+    //         console.log(`target name attr: ${e.target.getAttribute("name")}`);
+    //         if (e.detail.value) {
+    //           this._fetchTableDescription(grid, rowData.item.table.name, root.item);
+    //         } else {
+    //           this.grids[grid].gridElement.closeItemDetails(root.item);
+    //         }
+    //       });
+    //     }
+    //     root.item = rowData.item;
+    //     root.firstElementChild.checked = this.grids[grid].gridElement.detailsOpenedItems.indexOf(root.item) > -1;
+    //   };
+    //   this.grids[grid].detailsElement.renderer = this.grids[grid].detailsElement.renderer.bind(this);
+    // }
 
     for (let grid in this.grids) {
       this._fetchAllTables(grid);
     }
   }
 
-  _fetchTableDescription(whichGrid, tableName, gridItem) {
+  _showTableDescription(tableName, schema) {
+    const tableDescriptionDialog = this.shadowRoot.getElementById('table-description-dialog');
+    
+    tableDescriptionDialog.renderer = (root, dialog) => {
+      let container = root.firstElementChild;
+      if (!container) {
+        container = root.appendChild(document.createElement('div'));
+      }
+      let description = html`
+        <style>
+          .schema-header-row {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+          }
+          .schema-field-row {
+            font-family: monospace;
+            border-top: lightgray solid thin;
+          }
+        </style>
+        <div class="schema-header-row">Column Name</div>
+        <div class="schema-header-row">Data Type</div>
+        <div class="schema-header-row">Data Format</div>
+        <div class="schema-header-row">Comments</div>
+        ${schema.map(field => html`
+          <div class="schema-field-row">${field['COLUMN_NAME']}</div>
+          <div class="schema-field-row">${field['DATA_TYPE']}</div>
+          <div class="schema-field-row">${field['DATA_FORMAT']}</div>
+          <div class="schema-field-row">${field['COMMENTS']}</div>
+        `)}
+      `;
+      render(
+        html`
+          <h3>Table:&nbsp;&nbsp;<span style="font-family: monospace;">${tableName}</span></h3>
+          <div style="overflow: auto; width: 85vw; max-width: 1000px; height: 85vh;">
+            <a title="Close" href="#" onclick="return false;">
+              <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
+            </a>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; margin: 1rem;">
+              ${description}
+            </div>
+          </div>
+        `,
+        container
+      );
+    }
+    tableDescriptionDialog.opened = true;
+  }
+
+  _fetchTableDescription(whichGrid, tableName) {
     this.shadowRoot.querySelector('paper-spinner').active = true;
     const Url=config.backEndUrl + "tables/describe"
     let body = {
@@ -246,9 +351,11 @@ class DESTables extends connect(store)(PageViewElement) {
       this.shadowRoot.querySelector('paper-spinner').active = false;
       if (data.status === "ok") {
         this.schema = data.schema;
-        this.grids[whichGrid].gridElement.openItemDetails(gridItem);
+        this._showTableDescription(tableName, this.schema);
       } else {
         console.log(JSON.stringify(data, null, 2));
+        // Clear the schema value
+        this.schema = null;
       }
     });
   }
@@ -296,19 +403,6 @@ class DESTables extends connect(store)(PageViewElement) {
       ctr++;
       if (ctr === array.length) {
         grid.items = gridItems;
-        let dedupSelItems = [];
-        for (var i in grid.selectedItems) {
-          if (dedupSelItems.map((e) => {return e.table.name}).indexOf(grid.selectedItems[i].table.name) < 0) {
-            dedupSelItems.push(grid.selectedItems[i]);
-          }
-        }
-        grid.selectedItems = [];
-        for (var i in grid.items) {
-          if (dedupSelItems.map((e) => {return e.table.name}).indexOf(grid.items[i].table.name) > -1) {
-            grid.selectItem(grid.items[i]);
-          }
-        }
-        grid.recalculateColumnWidths();
         this.shadowRoot.querySelector('paper-spinner').active = false;
       }
     })
