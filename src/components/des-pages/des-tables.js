@@ -74,6 +74,14 @@ class DESTables extends connect(store)(PageViewElement) {
 
   render() {
     return html`
+    <style>
+      .public-hide {
+        ${ config.desaccessInterface === 'public' ? html`
+          display: none;
+          ` : html``
+        }
+      }
+    </style>
     <section>
       <div style="font-size: 2rem; font-weight: bold;">
         DES Database Tables
@@ -86,7 +94,7 @@ class DESTables extends connect(store)(PageViewElement) {
           <iron-icon icon="vaadin:angle-double-down"></iron-icon>&nbsp;&nbsp;
             All Tables
           </a></li>
-          <li><a title="Scroll to table" href="#" onclick="return false;" @click="${(e) => {this._scrollToTable('my-tables')}}">
+          <li class="public-hide"><a title="Scroll to table" href="#" onclick="return false;" @click="${(e) => {this._scrollToTable('my-tables')}}">
           <iron-icon icon="vaadin:angle-double-down"></iron-icon>&nbsp;&nbsp;
             My Tables
           </a></li>
@@ -110,7 +118,7 @@ class DESTables extends connect(store)(PageViewElement) {
           <vaadin-grid-column .renderer="${this.rendererTableNameAll}" header="Description"></vaadin-grid-column>
         </vaadin-grid>
       </div>
-      <div>
+      <div class="public-hide">
         <a href="#" onclick="return false;" title="Back to top">
           <div class="table-heading"
             @click="${(e) => {
