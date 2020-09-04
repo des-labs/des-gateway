@@ -333,7 +333,7 @@ class DESTables extends connect(store)(PageViewElement) {
     const Url=config.backEndUrl + "tables/describe"
     let body = {
       'table': tableName,
-      'owner': "nobody"
+      'owner': whichGrid === 'all' ? 'nobody' : ''
     };
     const param = {
       method: "POST",
