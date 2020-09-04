@@ -80,7 +80,7 @@ class DESTables extends connect(store)(PageViewElement) {
         <paper-spinner class="big"></paper-spinner>
       </div>
       <div>
-        <p>Explore the tables available in the DES database. Click a table name to view its description.</p>
+        <p>Explore the tables available in the DES database.</p>
         <ul>
           <li><a title="Scroll to table" href="#" onclick="return false;" @click="${(e) => {this._scrollToTable('all-tables')}}">
           <iron-icon icon="vaadin:angle-double-down"></iron-icon>&nbsp;&nbsp;
@@ -107,7 +107,7 @@ class DESTables extends connect(store)(PageViewElement) {
         <vaadin-grid id="all-tables" .multiSort="${true}">
           <vaadin-grid-filter-column path="table.name" header="Table Name"></vaadin-grid-filter-column>
           <vaadin-grid-sort-column   path="table.rows" header="Number of Rows"></vaadin-grid-sort-column>
-          <vaadin-grid-sort-column .renderer="${this.rendererTableNameAll}" header="Description"></vaadin-grid-sort-column>
+          <vaadin-grid-column .renderer="${this.rendererTableNameAll}" header="Description"></vaadin-grid-column>
         </vaadin-grid>
       </div>
       <div>
@@ -125,7 +125,7 @@ class DESTables extends connect(store)(PageViewElement) {
         <vaadin-grid id="my-tables" .multiSort="${true}">
           <vaadin-grid-filter-column path="table.name" header="Table Name"></vaadin-grid-filter-column>
           <vaadin-grid-sort-column   path="table.rows" header="Number of Rows"></vaadin-grid-sort-column>
-          <vaadin-grid-sort-column .renderer="${this.rendererTableNameMy}" header="Description"></vaadin-grid-sort-column>
+          <vaadin-grid-column .renderer="${this.rendererTableNameMy}" header="Description"></vaadin-grid-column>
         </vaadin-grid>
       </div>
     </section>
