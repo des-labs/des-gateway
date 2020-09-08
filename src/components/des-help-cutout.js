@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit-element';
 import { HelpStyles } from './styles/shared-styles.js';
+import { scrollToTop } from './utils.js';
 
 class DESHelpCutout extends LitElement {
   static get styles() {
@@ -10,7 +11,11 @@ class DESHelpCutout extends LitElement {
 
   render() {
     return html`
-      <h3>Cutout Service Help</h3>
+      <a href="#" onclick="return false;" title="Back to top" style="text-decoration: none; color: inherit;">
+      <h3 @click="${scrollToTop}">
+        Cutout Service Help
+        <iron-icon icon="vaadin:angle-double-up"></iron-icon>
+      </h3></a>
       <p>The Cutout Service allows you to download raw or color image data based on input coordinates and areal dimensions.</p>
       <div class="help-content-grid">
         <div>

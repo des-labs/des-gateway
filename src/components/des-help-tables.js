@@ -1,5 +1,7 @@
 import { LitElement, html, css } from 'lit-element';
 import { HelpStyles } from './styles/shared-styles.js';
+import { scrollToTop } from './utils.js';
+import { config } from './des-config.js';
 
 class DESHelpTables extends LitElement {
   static get styles() {
@@ -10,11 +12,17 @@ class DESHelpTables extends LitElement {
 
   render() {
     return html`
-      <h3>DB Tables Help</h3>
+      <a href="#" onclick="return false;" title="Back to top" style="text-decoration: none; color: inherit;">
+      <h3 @click="${scrollToTop}">
+        DB Tables Help
+        <iron-icon icon="vaadin:angle-double-up"></iron-icon>
+      </h3></a>
       <p>The DES Tables browser shows you all the DES database tables you have permission to view. For each table in the list, you can view a description of the table's schema by toggling the checkbox on that table's row.</p>
-      <p>
-        All of your personal tables are displayed in the My Tables viewer.
-      </p>
+      ${config.desaccessInterface === 'public' ? html`` : html`
+        <p>
+          All of your personal tables are displayed in the My Tables viewer.
+        </p>
+      `}
     `;
   }
 }

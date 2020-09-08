@@ -29,6 +29,12 @@ export const HelpStyles = css`
       grid-template-columns: 100%;
     }
   }
+  iron-icon {
+    text-decoration: none; 
+    color: darkgray;
+    --iron-icon-width:  18px;
+    --iron-icon-height: 18px;
+  }
 
 `;
 export const SharedStyles = css`

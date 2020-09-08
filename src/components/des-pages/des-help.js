@@ -1,7 +1,7 @@
 import { html,css } from 'lit-element';
 import { render } from 'lit-html';
 import { PageViewElement } from './des-base-page.js';
-import { SharedStyles } from '../styles/shared-styles.js';
+import { SharedStyles, HelpStyles } from '../styles/shared-styles.js';
 import '../des-home-card.js';
 import '../des-help-cutout.js';
 import '../des-help-jupyter.js';
@@ -19,11 +19,13 @@ import '@polymer/paper-input/paper-input.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/iron-autogrow-textarea/iron-autogrow-textarea.js';
 import '@polymer/paper-toast/paper-toast.js';
+import { scrollToElement } from '../utils.js';
 
 class DESHelp extends connect(store)(PageViewElement) {
   static get styles() {
     return [
       SharedStyles,
+      HelpStyles,
       css`
         a {
           text-decoration: none;
@@ -69,6 +71,13 @@ class DESHelp extends connect(store)(PageViewElement) {
 
   render() {
     return html`
+      <style>
+        ul > li > a {
+          text-decoration: none; 
+          color: inherit;
+        }
+      </style>
+
       <section>
         <div style="font-size: 2rem; font-weight: bold;">DESaccess Help</div>
         <div class="horizontal layout around justified">
@@ -84,24 +93,35 @@ class DESHelp extends connect(store)(PageViewElement) {
             <p>
             Follow the links below to learn more about the available apps and features:</p>
             <ul style="list-style-type: none; line-height: 2rem;">
-            <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:external-browser"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('api-section').scrollIntoView();}}">API Documentation</a></li>
+            <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:external-browser"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('api-section'),100);}}">API Documentation
+            </a></li>
             ${this.accessPages.includes('db-access') ? html`
-              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:code"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('db-access-section').scrollIntoView();}}">DB Access</a></li>
+              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:code"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('db-access-section'),100);}}">DB Access
+            </a></li>
             ` : html``}
             ${this.accessPages.includes('tables') ? html`
-              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:table"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('tables-section').scrollIntoView();}}">DB Tables</a></li>
+              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:table"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('tables-section'),100);}}">DB Tables
+            </a></li>
             ` : html``}
             ${this.accessPages.includes('cutout') && this.database !== 'desoper' ? html`
-              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:scissors"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('cutout-section').scrollIntoView();}}">Cutout Service</a></li>
+              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:scissors"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('cutout-section'),100);}}">Cutout Service
+            </a></li>
             ` : html``}
             ${this.accessPages.includes('status') ? html`
-              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:clipboard-user"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('status-section').scrollIntoView();}}">Job Status</a></li>
+              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:clipboard-user"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('status-section'),100);}}">Job Status
+            </a></li>
             ` : html``}
             ${this.accessPages.includes('tilefinder') ? html`
-              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:globe-wire"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('tilefinder-section').scrollIntoView();}}">TileFinder</a></li>
+              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:globe-wire"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('tilefinder-section'),100);}}">TileFinder
+            </a></li>
             ` : html``}
             ${this.accessPages.includes('jupyter') ? html`
-              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:notebook"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {this.shadowRoot.getElementById('jupyter-section').scrollIntoView();}}">Jupyter</a></li>
+              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:notebook"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('jupyter-section'),100);}}">Jupyter
+            </a></li>
+            ` : html``}
+            ${this.accessPages.includes('ticket') ? html`
+              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:clipboard-user"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('ticket-section'),100);}}">DES Ticket
+            </a></li>
             ` : html``}
             </ul>
           </section>
@@ -139,12 +159,14 @@ class DESHelp extends connect(store)(PageViewElement) {
           ` : html``}
           ${this.accessPages.includes('jupyter') ? html`
           <section id="jupyter-section">
-            <des-help-jupyter></des-help-jupyter>
+          <des-help-jupyter></des-help-jupyter>
           </section>
           ` : html``}
           ${this.accessPages.includes('ticket') ? html`
+          <section id="ticket-section">
             <h3>DES Ticket</h3>
             <p>DESDM team members with admin privileges can use the DES Ticket app to resolve common user problems like password resets.</p>
+          </section>
           ` : html``}
         </div>
       </section>

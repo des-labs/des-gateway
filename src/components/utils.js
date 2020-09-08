@@ -20,3 +20,17 @@ export const convertToLocalTime = function(datetimeString) {
     ((displayTime.getHours() < 10)?"0":"") + displayTime.getHours() +":"+ ((displayTime.getMinutes() < 10)?"0":"") + displayTime.getMinutes() +":"+ ((displayTime.getSeconds() < 10)?"0":"") + displayTime.getSeconds();
   return convertedDateTime;
 }
+
+export const scrollToTop = function(e) {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
+
+export const scrollToElement = function(el, offset = 60) {
+  window.scrollTo({
+    top: el.getBoundingClientRect().top - offset,
+    behavior: 'smooth'
+  });
+}

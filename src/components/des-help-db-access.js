@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit-element';
 import { HelpStyles } from './styles/shared-styles.js';
+import { scrollToTop } from './utils.js';
 
 class DESHelpDbAccess extends LitElement {
   static get styles() {
@@ -10,7 +11,11 @@ class DESHelpDbAccess extends LitElement {
 
   render() {
     return html`
-      <h3>DB Access Help</h3>
+      <a href="#" onclick="return false;" title="Back to top" style="text-decoration: none; color: inherit;">
+      <h3 @click="${scrollToTop}">
+        DB Access Help
+        <iron-icon icon="vaadin:angle-double-up"></iron-icon>
+      </h3></a>
       <p>The database access page allows you to submit your own OracleDB queries directly to the database.</p>
       <div class="help-content-grid">
         <div>

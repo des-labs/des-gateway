@@ -3,6 +3,7 @@ import { HelpStyles } from './styles/shared-styles.js';
 import {config} from './des-config.js';
 import '@polymer/iron-icon/iron-icon.js';
 import '@polymer/iron-icons/iron-icons.js';
+import { scrollToTop } from './utils.js';
 
 class DESHelpStatus extends LitElement {
   static get styles() {
@@ -13,7 +14,11 @@ class DESHelpStatus extends LitElement {
 
   render() {
     return html`
-      <h3>Job Status Help</h3>
+      <a href="#" onclick="return false;" title="Back to top" style="text-decoration: none; color: inherit;">
+      <h3 @click="${scrollToTop}">
+      Job Status Help
+        <iron-icon icon="vaadin:angle-double-up"></iron-icon>
+      </h3></a>
       <p>
         The job status page provides an interface to manage your jobs and view the results of
         completed jobs.
