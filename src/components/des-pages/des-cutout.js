@@ -327,7 +327,7 @@ class DESCutout extends connect(store)(PageViewElement) {
             </div>
 
             <div>
-            <p style="margin-top: 0;">Enter positions using RA/DEC coordinates or coadd object ID numbers. Values can be entered manually or by uploading a CSV-formatted text file.</p>
+            <p style="margin-top: 0;">Enter positions using RA/DEC coordinates or coadd object ID numbers. Values can be entered manually or by uploading a CSV-formatted text file.</p><p style="color:red;">Limit 10 concurrent jobs per user, 5000 objects per job</p>
               <iron-autogrow-textarea style="font-family: monospace; width: 90%; margin-left: 0; margin-right: 2rem;" id="position-textarea" max-rows="10" rows=7 placeholder="RA,DEC\n21.5,3.48\n36.6,-15.68\n--- or ---\nCOADD_OBJECT_ID\n61407318\n61407582\n" value=""></iron-autogrow-textarea>
               <paper-button raised class="indigo" id="bc_uploadFile">
                 <span style="overflow-x: auto; overflow-wrap: break-word;">Upload CSV file</span>
