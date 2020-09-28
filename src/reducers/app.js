@@ -13,6 +13,7 @@ import {
   UPDATE_JOB_ID,
   UPDATE_ACTIVATION_TOKEN,
   UPDATE_RESET_PASSWORD_TOKEN,
+  UPDATE_RENEW_JOB_TOKEN,
   UPDATE_LAST_VALID_PAGE,
   UPDATE_DRAWER_STATE,
   UPDATE_DRAWER_PERSIST,
@@ -90,6 +91,11 @@ const app = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         resetPasswordToken: action.resetPasswordToken
+      };
+    case UPDATE_RENEW_JOB_TOKEN:
+      return {
+        ...state,
+        renewJobToken: action.renewJobToken
       };
     case TRIGGER_HELP_FORM:
       return {

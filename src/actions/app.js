@@ -5,6 +5,7 @@ export const UPDATE_PAGE = 'UPDATE_PAGE';
 export const UPDATE_JOB_ID = 'UPDATE_JOB_ID';
 export const UPDATE_ACTIVATION_TOKEN = 'UPDATE_ACTIVATION_TOKEN';
 export const UPDATE_RESET_PASSWORD_TOKEN = 'UPDATE_RESET_PASSWORD_TOKEN';
+export const UPDATE_RENEW_JOB_TOKEN = 'UPDATE_RENEW_JOB_TOKEN';
 export const UPDATE_LAST_VALID_PAGE = 'UPDATE_LAST_VALID_PAGE';
 export const UPDATE_DRAWER_STATE = 'UPDATE_DRAWER_STATE';
 export const UPDATE_DRAWER_PERSIST = 'UPDATE_DRAWER_PERSIST';
@@ -60,7 +61,7 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
   // is the session active, if not verify auth
   var page = pathParts[0];
   const auth = session ? true : isauth();
-  if (auth === false && ['reset', 'activate'].indexOf(page) === -1) {
+  if (auth === false && ['reset', 'activate', 'renew'].indexOf(page) === -1) {
     // dispatch(storeTargetPath(path));
     dispatch(loadPage('login', ap, targetPath));
     return;
@@ -90,6 +91,13 @@ export const navigate = (path,persist,ap,session) => (dispatch) => {
       if (pathParts.length > 1) {
         let resetPasswordToken = pathParts[1];
         dispatch(setResetPasswordToken(resetPasswordToken));
+      }
+      break;
+    case 'renew':
+      // Get job renewal code from URL {{location.origin}}/renew/dkdh9s84ty3thj3wehg3
+      if (pathParts.length > 1) {
+        let renewJobToken = pathParts[1];
+        dispatch(setRenewJobToken(renewJobToken));
       }
       break;
     case 'help':
@@ -158,6 +166,9 @@ export const loadPage = (page,ap,targetPath = '') => (dispatch) => {
     case 'reset':
       true ? import('../components/des-pages/des-reset.js') : import('../components/des-pages/des-404.js') ;
       break;
+    case 'renew':
+      true ? import('../components/des-pages/des-renew.js') : import('../components/des-pages/des-404.js') ;
+      break;
     case 'help':
       ap.includes('help') ?   import('../components/des-pages/des-help.js') : import('../components/des-pages/des-access-denied.js') ;
       break;
@@ -217,6 +228,13 @@ export const setResetPasswordToken = (resetPasswordToken) => {
   return {
     type: UPDATE_RESET_PASSWORD_TOKEN,
     resetPasswordToken
+  };
+};
+
+export const setRenewJobToken = (renewJobToken) => {
+  return {
+    type: UPDATE_RENEW_JOB_TOKEN,
+    renewJobToken
   };
 };
 
