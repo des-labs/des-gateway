@@ -642,7 +642,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               grid-gap: 1rem;
               padding: 1rem;
               grid-template-columns: 20% 80%;
-              grid-template-rows: min-content min-content min-content min-content min-content min-content 1fr;
+              grid-template-rows: min-content min-content min-content min-content min-content min-content min-content 1fr;
               grid-row-gap: 5px;
             }
           </style>
@@ -657,6 +657,12 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               <div>Status</div><div>${job.status}</div>
               <div>Type</div><div>${job.type}</div>
               <div>Duration</div><div>${this._displayDuration(job.time_start, job.time_complete)} (${job.time_start} &mdash; ${job.time_complete})</div>
+              <div>Job File Storage</div><div>Files are scheduled for automatic deletion on <b>${job.expiration_date} (UTC)</b>.
+              ${typeof(job.renewal_token) === 'string' && job.renewal_token !== '' ? html`
+                  <a target="_blank" href="${config.frontEndUrl}renew/${job.renewal_token}">Click here to extend the job file storage.</a></div>
+                ` : html``
+              }
+              </div>
               ${taskSpecificInfo}
             </div>
           </div>
@@ -964,6 +970,8 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       job.query_files = typeof(item.query_files) === 'string' ? JSON.parse(item.query_files) : null;
       job.cutout_files = typeof(item.cutout_files) === 'string' ? JSON.parse(item.cutout_files) : null;
       job.cutout_positions = typeof(item.cutout_positions) === 'string' ? item.cutout_positions : null;
+      job.renewal_token = typeof(item.renewal_token) === 'string' ? item.renewal_token : null;
+      job.expiration_date = typeof(item.expiration_date) === 'string' ? item.expiration_date : null;
       if (job.type !== 'query' || job.data === null) {
         gridItems.push({job: job});
       }
