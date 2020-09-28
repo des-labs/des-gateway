@@ -91,7 +91,7 @@ class DESRenew extends connect(store)(PageViewElement) {
         }
         console.log(JSON.stringify(data, null, 2));
       } else {
-        this.errorMessageDisplay = 'There was an error validating the renewal token. Reload the page to try again.';
+        this.errorMessageDisplay = data.msg;
         this.errorMsg = data.msg;
         this.shadowRoot.querySelector('paper-toast[name="renew-fail"]').show();
         console.log(JSON.stringify(data, null, 2));

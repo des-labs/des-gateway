@@ -657,12 +657,19 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               <div>Status</div><div>${job.status}</div>
               <div>Type</div><div>${job.type}</div>
               <div>Duration</div><div>${this._displayDuration(job.time_start, job.time_complete)} (${job.time_start} &mdash; ${job.time_complete})</div>
-              <div>Job File Storage</div><div>Files are scheduled for automatic deletion on <b>${job.expiration_date} (UTC)</b>.
-              ${typeof(job.renewal_token) === 'string' && job.renewal_token !== '' ? html`
-                  <a target="_blank" href="${config.frontEndUrl}renew/${job.renewal_token}">Click here to extend the job file storage.</a></div>
-                ` : html``
+              ${typeof(job.expiration_date) === 'string' && job.expiration_date !== '' ? html`
+                <div>Job File Storage</div><div>Files are scheduled for automatic deletion on <b>${job.expiration_date} (UTC)</b>.
+                ${typeof(job.renewal_token) === 'string' && job.renewal_token !== '' ? html`
+                    <a target="_blank" href="${config.frontEndUrl}renew/${job.renewal_token}">Click here to extend the job file storage.</a>
+                  ` : html`
+                    There are no more time extensions available.
+                  `
+                }
+                </div>
+                ` : html`
+                <div></div><div></div>
+                `
               }
-              </div>
               ${taskSpecificInfo}
             </div>
           </div>
