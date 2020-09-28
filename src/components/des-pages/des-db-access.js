@@ -232,6 +232,13 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   }
 
   render() {
+
+    if (config.desaccessInterface =='public'){
+      var queryExample = 'example-query-0-public.sql';
+    }
+    else{
+      var queryExample = 'example-query-0.sql';
+    }
     return html`
       <section>
       <div class="query-container">
@@ -309,7 +316,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
         <div class="query-input-container">
           <p>Insert your query in the box below. Data results for "Quick" Jobs (30 sec.) will be displayed at the bottom.</p>
           <div id="queryBox" class="query-input-box">
-              <wc-codemirror id="query-input-editor" mode="sql" src="images/example-query-0.sql"></wc-codemirror>
+              <wc-codemirror id="query-input-editor" mode="sql" src="images/${queryExample}"></wc-codemirror>
           </div>
           <div class="query-input-controls">
               <div style="vertical-align: middle;">
@@ -698,48 +705,119 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       root.removeChild(root.childNodes[0]);
     }
     container = root.appendChild(document.createElement('div'));
-    render(
-      html`
-      <style>
-        .CodeMirror {
-          height: 24rem;
-          font-size: 0.8rem;
+    if (config.desaccessInterface == 'public'){
+      render(
+        html`
+        <style>
+          .CodeMirror {
+            height: 24rem;
+            font-size: 0.8rem;
+          }
+        </style>
+        <div style="overflow: auto; width: 85vw; max-width: 1000px; height: 85vh;">
+          <a title="Close" href="#" onclick="return false;">
+            <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
+          </a>
+          <div class="examples-container" style="overflow: auto; height: 75vh; margin-top: 3rem; padding: 1rem; border: 1px lightgray solid;">
+            <h3>Sample Basic information
+            <a title="Copy query to editor" href="#" onclick="return false;">
+              <iron-icon id="copy-example-0" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+            </a></h3>
+            <div id="query-example-0" class="query-input-box" style="border: 1px solid #CCCCCC;">
+              <wc-codemirror id="query-example-editor-0" mode="sql" src="images/example-query-0-public.sql"></wc-codemirror>
+            </div>
+            <h3>Limit Basic information by region and number of rows
+            <a title="Copy query to editor" href="#" onclick="return false;">
+              <iron-icon id="copy-example-1" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+            </a></h3>
+            <div id="query-example-1" class="query-input-box" style="border: 1px solid #CCCCCC;">
+              <wc-codemirror id="query-example-editor-1" mode="sql" src="images/example-query-1-public.sql"></wc-codemirror>
+            </div>
+            <h3>Select stars from M2 Globular Cluster
+            <a title="Copy query to editor" href="#" onclick="return false;"> 
+              <iron-icon id="copy-example-2" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+            </a></h3>
+            <div id="query-example-2" class="query-input-box" style="border: 1px solid #CCCCCC;">
+              <wc-codemirror id="query-example-editor-2" mode="sql" src="images/example-query-2-public.sql"></wc-codemirror>
+            </div>
+            <h3>Create stellar density healpix map
+            <a title="Copy query to editor" href="#" onclick="return false;"> 
+              <iron-icon id="copy-example-3" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+            </a></h3>
+            <div id="query-example-3" class="query-input-box" style="border: 1px solid #CCCCCC;">
+              <wc-codemirror id="query-example-editor-3" mode="sql" src="images/example-query-3-public.sql"></wc-codemirror>
+            </div>
+            <h3>Create galaxy density healpix map
+            <a title="Copy query to editor" href="#" onclick="return false;"> 
+              <iron-icon id="copy-example-4" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+            </a></h3>
+            <div id="query-example-4" class="query-input-box" style="border: 1px solid #CCCCCC;">
+              <wc-codemirror id="query-example-editor-4" mode="sql" src="images/example-query-4-public.sql"></wc-codemirror>
+            </div>
+            <h3>Sample of bright galaxies
+            <a title="Copy query to editor" href="#" onclick="return false;"> 
+              <iron-icon id="copy-example-5" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+            </a></h3>
+            <div id="query-example-5" class="query-input-box" style="border: 1px solid #CCCCCC;">
+              <wc-codemirror id="query-example-editor-5" mode="sql" src="images/example-query-5-public.sql"></wc-codemirror>
+            </div>
+        </div>
+        `,
+        container
+      );
         }
-      </style>
-      <div style="overflow: auto; width: 85vw; max-width: 1000px; height: 85vh;">
-        <a title="Close" href="#" onclick="return false;">
-          <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
-        </a>
-        <div class="examples-container" style="overflow: auto; height: 75vh; margin-top: 3rem; padding: 1rem; border: 1px lightgray solid;">
-          <h3>Sample Basic information
-          <a title="Copy query to editor" href="#" onclick="return false;">
-            <iron-icon id="copy-example-0" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
-          </a></h3>
-          <div id="query-example-0" class="query-input-box" style="border: 1px solid #CCCCCC;">
-            <wc-codemirror id="query-example-editor-0" mode="sql" src="images/example-query-0.sql"></wc-codemirror>
-          </div>
-          <h3>Limit Basic information by region and number of rows
-          <a title="Copy query to editor" href="#" onclick="return false;">
-            <iron-icon id="copy-example-1" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
-          </a></h3>
-          <div id="query-example-1" class="query-input-box" style="border: 1px solid #CCCCCC;">
-            <wc-codemirror id="query-example-editor-1" mode="sql" src="images/example-query-1.sql"></wc-codemirror>
-          </div>
-          <h3>Select stars from M2 Globular Cluster
-          <a title="Copy query to editor" href="#" onclick="return false;">
-            <iron-icon id="copy-example-2" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
-          </a></h3>
-          <div id="query-example-2" class="query-input-box" style="border: 1px solid #CCCCCC;">
-            <wc-codemirror id="query-example-editor-2" mode="sql" src="images/example-query-2.sql"></wc-codemirror>
+    else {
+      render(
+        html`
+        <style>
+          .CodeMirror {
+            height: 24rem;
+            font-size: 0.8rem;
+          }
+        </style>
+        <div style="overflow: auto; width: 85vw; max-width: 1000px; height: 85vh;">
+          <a title="Close" href="#" onclick="return false;">
+            <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
+          </a>
+          <div class="examples-container" style="overflow: auto; height: 75vh; margin-top: 3rem; padding: 1rem; border: 1px lightgray solid;">
+            <h3>Sample Basic information
+            <a title="Copy query to editor" href="#" onclick="return false;">
+              <iron-icon id="copy-example-0" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+            </a></h3>
+            <div id="query-example-0" class="query-input-box" style="border: 1px solid #CCCCCC;">
+              <wc-codemirror id="query-example-editor-0" mode="sql" src="images/example-query-0.sql"></wc-codemirror>
+            </div>
+            <h3>Limit Basic information by region and number of rows
+            <a title="Copy query to editor" href="#" onclick="return false;">
+              <iron-icon id="copy-example-1" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+            </a></h3>
+            <div id="query-example-1" class="query-input-box" style="border: 1px solid #CCCCCC;">
+              <wc-codemirror id="query-example-editor-1" mode="sql" src="images/example-query-1.sql"></wc-codemirror>
+            </div>
+            <h3>Select stars from M2 Globular Cluster
+            <a title="Copy query to editor" href="#" onclick="return false;"> 
+              <iron-icon id="copy-example-2" icon="vaadin:copy-o" style="color: darkblue; padding-left: 2rem;"></iron-icon>
+            </a></h3>
+            <div id="query-example-2" class="query-input-box" style="border: 1px solid #CCCCCC;">
+              <wc-codemirror id="query-example-editor-2" mode="sql" src="images/example-query-2.sql"></wc-codemirror>
+            </div>
           </div>
         </div>
-      </div>
-      `,
-      container
-    );
+        `,
+        container
+      );
+    }
 
-    var ivlIds = [0,0,0];
-    for (let editorId in [0, 1, 2]) {
+    if (config.desaccessInterface == 'public'){
+      var ivlIds = [0, 0, 0, 0, 0, 0];
+      var edIds = [0, 1, 2, 3, 4, 5];
+    }
+    else{
+      var ivlIds = [0, 0, 0]
+      var edIds = [0, 1, 2];
+    }
+    
+    for (let editorId in edIds ) {
       ivlIds[editorId] = window.setInterval(() => {
         var editorElement = document.getElementById(`query-example-editor-${editorId}`).querySelector('.CodeMirror');
         if (editorElement !== null) {
@@ -757,7 +835,117 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   }
 
   _copyQueryToDbAccessPage(event) {
-    switch (event.target.id) {
+    if (config.desaccessInterface == 'public'){
+      switch (event.target.id) {
+      case "copy-example-0":
+        var query = `--
+-- Example Query --
+-- This query selects 0.001% of the data and returns only five rows
+SELECT RA, DEC, MAG_AUTO_G, TILENAME
+FROM DR1_MAIN sample(0.001)
+FETCH FIRST 5 ROWS ONLY
+`
+        break;
+      case "copy-example-1":
+        var query = `--
+-- Example Query --
+-- This query selects the first 1000 rows from a RA/DEC region
+SELECT ALPHAWIN_J2000 RAP,DELTAWIN_J2000 DECP, MAG_AUTO_G, TILENAME
+FROM DR1_MAIN
+WHERE
+RA BETWEEN 40.0 and 41.0 and
+DEC BETWEEN -41 and -40 and
+ROWNUM < 1001
+`
+        break;
+      case "copy-example-2":
+        var query= `--
+-- Example Query --
+-- This query selects stars around the center of glubular cluster M2
+SELECT
+COADD_OBJECT_ID,RA,DEC,
+MAG_AUTO_G G,
+MAG_AUTO_R R,
+WAVG_MAG_PSF_G G_PSF,
+WAVG_MAG_PSF_R R_PSF
+FROM DR1_MAIN
+WHERE
+RA between 323.36-0.12 and 323.36+0.12 and
+DEC between -0.82-0.12 and -0.82+0.12 and
+WAVG_SPREAD_MODEL_I + 3.0*WAVG_SPREADERR_MODEL_I < 0.005 and
+WAVG_SPREAD_MODEL_I > -1 and
+IMAFLAGS_ISO_G = 0 and
+IMAFLAGS_ISO_R = 0 and
+FLAGS_G < 4 and
+FLAGS_R < 4
+`
+          break;
+        case "copy-example-3":
+          var query = `--
+-- Example Query --
+-- This query creates a Helpix map of number of stars
+-- and their mean magnitude on a resolution of NSIDE = 1024
+-- using NEST Schema
+SELECT
+count(main.MAG_AUTO_I) COUNT,
+main.HPIX_1024
+FROM DR1_MAIN main
+WHERE
+main.WAVG_SPREAD_MODEL_I + 3.0*main.WAVG_SPREADERR_MODEL_I < 0.005 and
+main.WAVG_SPREAD_MODEL_I > -1 and
+main.IMAFLAGS_ISO_I = 0 and
+main.MAG_AUTO_I < 21
+GROUP BY main.HPIX_1024
+`
+          break;
+        case "copy-example-4":
+          var query = `--
+-- Example Query --
+-- This query creates a Helpix map of number of galaxies
+-- and their mean magnitude on a resolution of NSIDE = 1024
+-- using NEST Schema
+SELECT count(dr1.MAG_AUTO_I) COUNT,avg(dr1.MAG_AUTO_I) AVERAGE,dr1.HPIX_1024
+FROM DR1_MAIN dr1
+where
+dr1.WAVG_SPREAD_MODEL_I + 3.0*dr1.WAVG_SPREADERR_MODEL_I > 0.005 and
+dr1.WAVG_SPREAD_MODEL_I + 1.0*dr1.WAVG_SPREADERR_MODEL_I > 0.003 and
+dr1.WAVG_SPREAD_MODEL_I - 1.0*dr1.WAVG_SPREADERR_MODEL_I > 0.001 and
+dr1.WAVG_SPREAD_MODEL_I > -1 and
+dr1.IMAFLAGS_ISO_I = 0 and
+dr1.MAG_AUTO_I < 23
+group by dr1.HPIX_1024
+`
+          break;
+        case "copy-example-5":
+          var query = `--
+-- Example Query --
+-- This query selects  a sample of bright galaxies
+SELECT dr1.RA RA, dr1.DEC DEC, dr1.COADD_OBJECT_ID ID
+FROM dr1_main sample(0.01) dr1
+WHERE
+dr1.MAG_AUTO_G < 18 and
+dr1.WAVG_SPREAD_MODEL_I + 3.0*dr1.WAVG_SPREADERR_MODEL_I > 0.005 and
+dr1.WAVG_SPREAD_MODEL_I + 1.0*dr1.WAVG_SPREADERR_MODEL_I > 0.003 and
+dr1.WAVG_SPREAD_MODEL_I - 1.0*dr1.WAVG_SPREADERR_MODEL_I > 0.001 and
+dr1.WAVG_SPREAD_MODEL_I > -1 and
+dr1.IMAFLAGS_ISO_G = 0 and
+dr1.IMAFLAGS_ISO_R = 0 and
+dr1.IMAFLAGS_ISO_I = 0 and
+dr1.FLAGS_G < 4 and
+dr1.FLAGS_R < 4 and
+dr1.FLAGS_I < 4 and
+dr1.NEPOCHS_G > 0 and
+dr1.NEPOCHS_R > 0 and
+dr1.NEPOCHS_I > 0
+`
+          break;
+          default:
+           var query = '';
+           break;
+    }
+  }
+    else {
+      switch (event.target.id) {
       case "copy-example-0":
         var query = `--
 -- Example Query --
@@ -805,6 +993,7 @@ WHERE
         var query = '';
         break;
     }
+  }
     store.dispatch(updateQuery(query));
   }
 
