@@ -20,7 +20,8 @@ import {
   UPDATE_QUERY,
   LOGIN_USER,
   LOGOUT_USER,
-  TRIGGER_HELP_FORM
+  TRIGGER_HELP_FORM,
+  UPDATE_USER_PREFERENCES
 } from '../actions/app.js';
 
 const INITIAL_STATE = {
@@ -96,6 +97,11 @@ const app = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         renewJobToken: action.renewJobToken
+      };
+    case UPDATE_USER_PREFERENCES:
+      return {
+        ...state,
+        preferences: action.preferences
       };
     case TRIGGER_HELP_FORM:
       return {

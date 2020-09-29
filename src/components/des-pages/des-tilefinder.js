@@ -267,7 +267,6 @@ class DESTileFinder extends connect(store)(PageViewElement) {
       refreshStatusIntervalId: {type: Number},
       release: {type: String},
       data: {type: Object},
-      // columnElements: {type: Object},
       allLinks: {type: Object},
     };
   }
@@ -291,7 +290,6 @@ class DESTileFinder extends connect(store)(PageViewElement) {
     this.allLinks = html``;
     this.release = '';
     this.data = null;
-    // this.columnElements = null;
   }
 
   render() {
@@ -367,18 +365,6 @@ class DESTileFinder extends connect(store)(PageViewElement) {
       }
     };
   }
-//   <!--
-//   <paper-dialog class="dialog-position" id="getTiles" with-backdrop on-iron-overlay-opened="patchOverlay">
-//     <h2>Files for ${this.tileName} in ${this.release.toUpperCase()}</h2>
-//     <div id="insideDialog">
-//       ${this.columnElements}
-//     </div>
-
-//     <div class="buttons">
-//       <paper-button class="indigo" raised dialog-confirm>Ok</paper-button><br />
-//     </div>
-//   </paper-dialog>
-// -->
 
   _getFiles(event,release){
     this.release = release.toLowerCase();
@@ -391,24 +377,6 @@ class DESTileFinder extends connect(store)(PageViewElement) {
     
     return;
     
-    // this.data = this.files[this.release];
-    
-    // console.log(this.data);
-    // let columnElements = [];
-    // for (var key in this.data) {
-    //   columnElements.push(html`
-    //   <div>
-    //     <a href="${this.data[key]}" target="_blank" style="text-decoration: none; color: inherit;">
-    //     <paper-button class="download" raised>
-    //     ${key}
-    //     </paper-button>
-    //     </a>
-    //     </div>
-    //   `);
-    // }
-    // this.columnElements = columnElements;
-    // this.shadowRoot.getElementById('getTiles').open();
-    
   } 
 
   stateChanged(state) {
@@ -420,6 +388,11 @@ class DESTileFinder extends connect(store)(PageViewElement) {
 
   _submit(type) {
     this._getTileInfo(type);
+    if (type === 'coords') {
+      this.shadowRoot.querySelector('#custom-tile').value = ''
+    } else {
+      this.shadowRoot.querySelector('#custom-coords').value = ''
+    }
   }
   _getTileInfo(type) {
     this.allLinks = html``;
@@ -515,18 +488,6 @@ class DESTileFinder extends connect(store)(PageViewElement) {
           let caName = "FITS_CATALOG_" + band;
 
           let basePath =  '';
-          // switch (release) {
-          //   case 'sva1':
-          //   case 'y1a1':
-          //     basePath = "data/";
-          //     break;
-          //   case 'dr1':
-          //     basePath = "data/dr1/";
-          //     break;
-          //   default:
-          //     basePath =  "data/desarchive/";
-          //     break;
-          // }
 
           if (response.releases[i].bands[band].image !== '') {
             this.files[release][`"${band}"-band Image`] = response.releases[i].bands[band].image   + "?token=" + localStorage.getItem("token");
@@ -549,7 +510,6 @@ class DESTileFinder extends connect(store)(PageViewElement) {
           if (response.releases[i].flux !== '') {
             this.files[release]['Flux Catalog'] = response.releases[i].flux   + "?token=" + localStorage.getItem("token");
           }
-          // console.log(this.files);
           this.shadowRoot.querySelectorAll(`paper-button.${release}`)[0].disabled = false;
         }
         let links = [];

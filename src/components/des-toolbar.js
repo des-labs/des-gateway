@@ -13,6 +13,7 @@ import '@polymer/paper-dialog/paper-dialog.js';
 import '@vaadin/vaadin-dialog/vaadin-dialog.js'
 import './des-update-info.js';
 import './des-update-pwd.js';
+import './des-update-prefs.js';
 import './des-app-card.js';
 import './des-help-button.js';
 import { menuIcon } from './des-icons.js';
@@ -124,29 +125,11 @@ class DESToolBar extends connect(store)(LitElement) {
     _ClickHandler(e) {
       this.dispatchEvent(new CustomEvent('clickMenu'));
     }
-    _ProfileDialog(e){
-      this.shadowRoot.getElementById("UpdateProfileDialog").open();
-    }
-    _PasswordDialog(e){
-      this.shadowRoot.getElementById("ChangePasswordDialog").open();
-    }
-    patchOverlay(e){
-      //if (e.target.withBackdrop) {
-      //  e.target.parentNode.insertBefore(e.target._backdrop, e.target);
-     // }
-      const overlay = document.querySelector('iron-overlay-backdrop');
-      //const diag = this.shadowRoot.getElementById("UpdateProfileDialog");
-      e.target.parentNode.insertBefore(overlay, e.target);
-      overlay.style.position = "fixed";
-      overlay.style.height = "2000px";
-      overlay.style.width = "3000px";
-      overlay.style.left = "0px";
-
-    }
 
     _closeUpdateProfileDialog(event) {
       this.shadowRoot.getElementById('UpdateProfileDialog').opened = false;
       this.shadowRoot.getElementById('ChangePasswordDialog').opened = false;
+      this.shadowRoot.getElementById('UpdatePrefsDialog').opened = false;
     }
 
     _updateProfileRenderer(root, dialog) {
@@ -172,6 +155,20 @@ class DESToolBar extends connect(store)(LitElement) {
       render(
         html`
           <des-update-pwd @dialogClickCancel="${(e) => {this._closeUpdateProfileDialog(e)}}"></des-update-pwd>
+        `,
+        container
+      )
+    }
+
+    _updatePrefsRenderer(root, dialog) {
+      let container = root.firstElementChild;
+      if (container) {
+        root.removeChild(root.childNodes[0]);
+      }
+      container = root.appendChild(document.createElement('div'));
+      render(
+        html`
+          <des-update-prefs @dialogClickCancel="${(e) => {this._closeUpdateProfileDialog(e)}}"></des-update-prefs>
         `,
         container
       )
@@ -209,6 +206,7 @@ class DESToolBar extends connect(store)(LitElement) {
         }
         </style>
         <vaadin-dialog id="UpdateProfileDialog" aria-label="simple"></vaadin-dialog>
+        <vaadin-dialog id="UpdatePrefsDialog" aria-label="simple"></vaadin-dialog>
         <vaadin-dialog id="ChangePasswordDialog" aria-label="simple"></vaadin-dialog>
         <vaadin-dialog id="notifications-dialog"></vaadin-dialog>
 
@@ -237,6 +235,7 @@ class DESToolBar extends connect(store)(LitElement) {
               <iron-icon style="margin-left:-5px;" icon="arrow-drop-down" slot="dropdown-trigger" alt="menu"></iron-icon>
               <paper-listbox class="profile-listbox" slot="dropdown-content">
                 <a title="Update profile info" href="#" onclick="return false;"><paper-item class="profileItem" @click="${(e) => {this.shadowRoot.getElementById('UpdateProfileDialog').opened = true;}}">Update Profile</paper-item></a>
+                <a title="Update preferences" href="#" onclick="return false;"><paper-item class="profileItem" @click="${(e) => {this.shadowRoot.getElementById('UpdatePrefsDialog').opened = true;}}">Update Preferences</paper-item></a>
                 <a title="Change password" href="#" onclick="return false;"><paper-item class="profileItem" @click="${(e) => {this.shadowRoot.getElementById('ChangePasswordDialog').opened = true;}}">Change Password</paper-item></a>
                 <a title="Logout" href="#" onclick="return false;"><paper-item class="profileItem" @click="${ (e) => {window.location.href = config.frontEndUrl + 'logout';}}">Log out</paper-item></a>
               </paper-listbox>
@@ -259,6 +258,7 @@ class DESToolBar extends connect(store)(LitElement) {
       this.notifications = [];
       this._updateProfileRenderer = this._updateProfileRenderer.bind(this); // need this to invoke class methods in renderers
       this._changePasswordRenderer = this._changePasswordRenderer.bind(this); // need this to invoke class methods in renderers
+      this._updatePrefsRenderer = this._updatePrefsRenderer.bind(this); // need this to invoke class methods in renderers
       this.messagesFetched = false;
       this.newMessages = false;
     }
@@ -278,6 +278,7 @@ class DESToolBar extends connect(store)(LitElement) {
     firstUpdated() {
       this.shadowRoot.getElementById('UpdateProfileDialog').renderer = this._updateProfileRenderer;
       this.shadowRoot.getElementById('ChangePasswordDialog').renderer = this._changePasswordRenderer;
+      this.shadowRoot.getElementById('UpdatePrefsDialog').renderer = this._updatePrefsRenderer;
 
       this.notificationsDialog = this.shadowRoot.querySelector('#notifications-dialog');
       this.notificationsDialog.renderer = (root, dialog) => {

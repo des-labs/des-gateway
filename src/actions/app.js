@@ -13,6 +13,7 @@ export const LOGIN_USER = 'LOGIN_USER';
 export const LOGOUT_USER = 'LOGOUT_USER';
 export const UPDATE_QUERY = 'UPDATE_QUERY';
 export const TRIGGER_HELP_FORM = 'TRIGGER_HELP_FORM';
+export const UPDATE_USER_PREFERENCES = 'UPDATE_USER_PREFERENCES';
 
 // TODO: double request to /profile
 const isauth = () => {
@@ -235,6 +236,13 @@ export const setRenewJobToken = (renewJobToken) => {
   return {
     type: UPDATE_RENEW_JOB_TOKEN,
     renewJobToken
+  };
+};
+
+export const updateUserPreferences = (preferences) => {
+  return {
+    type: UPDATE_USER_PREFERENCES,
+    preferences
   };
 };
 
