@@ -703,7 +703,14 @@ class DESCutout extends connect(store)(PageViewElement) {
     var that = this;
     reader.onload = function(e) {
       var text = reader.result;
-      that._validateCsvFile(text)
+      var textLength = text.split("\n").length;
+      if (textLength < 5001){
+        that._validateCsvFile(text);
+      }
+      else{
+        that.shadowRoot.getElementById('toast-job-failure').text = 'CSV file is too large! Please limit file to 5000 lines.';
+        that.shadowRoot.getElementById('toast-job-failure').show();
+      }
     }
     reader.readAsText(this.csvFile);
   }
