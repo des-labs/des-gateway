@@ -543,7 +543,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
   }
 
   _submitJob(callback) {
-    const Url=config.backEndUrl + "job/submit";
+    const Url=config.backEndUrl + "job/query";
     let query = this._getCurrentQuery();
     let body = this._constructJobSubmitBody(query);
     const param = {

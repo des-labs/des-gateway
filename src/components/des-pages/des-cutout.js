@@ -473,9 +473,8 @@ class DESCutout extends connect(store)(PageViewElement) {
   }
 
   _submitJob(callback) {
-    const Url=config.backEndUrl + "job/submit"
+    const Url=config.backEndUrl + "job/cutout"
     var body = {
-      job: 'cutout',
       username: this.username,
       release: this.release,
       db: this.db,
@@ -700,16 +699,15 @@ class DESCutout extends connect(store)(PageViewElement) {
   _fileChange(event) {
     this.csvFile = this.shadowRoot.getElementById('csv-upload').files[0];
     var reader = new FileReader();
-    var that = this;
-    reader.onload = function(e) {
+    reader.onload = (e) => {
       var text = reader.result;
       var textLength = text.split("\n").length;
       if (textLength < 5001){
-        that._validateCsvFile(text);
+        this._validateCsvFile(text);
       }
       else{
-        that.shadowRoot.getElementById('toast-job-failure').text = 'CSV file is too large! Please limit file to 5000 lines.';
-        that.shadowRoot.getElementById('toast-job-failure').show();
+        this.shadowRoot.getElementById('toast-job-failure').text = 'CSV file is too large! Please limit file to 5000 lines.';
+        this.shadowRoot.getElementById('toast-job-failure').show();
       }
     }
     reader.readAsText(this.csvFile);

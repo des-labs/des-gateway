@@ -1,7 +1,7 @@
 
-const pages_default = []
+const pages_default = ['home', 'help', 'db-access', 'cutout', 'tilefinder', 'tables', 'status']
 const pages_jupyter = [...pages_default, 'jupyter']
-const pages_collaborator = [...pages_default, 'home', 'help', 'db-access', 'cutout', 'tilefinder', 'tables', 'status']
+const pages_collaborator = [...pages_default]
 const pages_admin = [
 	...pages_collaborator, 
 	...pages_jupyter, 
