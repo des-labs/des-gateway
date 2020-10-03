@@ -974,11 +974,12 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       } 
       job.data = typeof(item.data) === 'string' ? JSON.parse(item.data) : null;
       job.query = item.query;
-      job.query_files = typeof(item.query_files) === 'string' ? item.query_files : null;
-      job.cutout_files = typeof(item.cutout_files) === 'string' ? item.cutout_files : null;
+      job.query_files = typeof(item.query_files) === 'object' ? item.query_files : null;
+      job.cutout_files = typeof(item.cutout_files) === 'object' ? item.cutout_files : null;
       job.cutout_positions = typeof(item.cutout_positions) === 'string' ? item.cutout_positions : null;
       job.renewal_token = typeof(item.renewal_token) === 'string' ? item.renewal_token : null;
       job.expiration_date = typeof(item.expiration_date) === 'string' ? item.expiration_date : null;
+      // console.log(JSON.stringify(job, null, 2));
       if (job.type !== 'query' || job.data === null) {
         gridItems.push({job: job});
       }
