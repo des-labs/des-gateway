@@ -111,16 +111,16 @@ class DESHome extends connect(store)(PageViewElement) {
             <a title="Close" href="#" onclick="return false;">
               <iron-icon @click="${(e) => {dialog.opened = false;}}" icon="vaadin:close" style="position: absolute; top: 2rem; right: 2rem; color: darkgray;"></iron-icon>
             </a>
-            <h3>Welcome to <i>DESaccess 2.0 !</i></h3>
-            <div style="max-height: 70vh; overflow: auto; padding: 1rem;">
-              <p>Welcome to the updated Dark Energy Survey data access service. We have revamped this website as well as the DESaccess API to both enhance
+            <h2>Welcome to the new <i>DESaccess !</i></h2>
+            <div style="max-height: 70vh; overflow: auto; padding-left: 1rem; padding-right: 3rem; padding-bottom: 2rem;">
+              <p>Welcome to the updated Dark Energy Survey data access service. We have revamped this website as well as the <a href="${config.frontEndUrl}docs" target="_blank">DESaccess API</a> to both enhance
               the service and ensure its long term sustainability.</p>
               <p>If you encounter problems, first take a look at the available documentation by pressing the red Help button
                 <iron-icon icon="vaadin:question-circle-o" style="color: red;"></iron-icon>
               in the upper right corner of the page. If you think you have discovered a bug, or if you simply have suggestions
               for how to make DESaccess better, please <a href="${config.frontEndUrl}help/form" @click="${(e) => {dialog.opened = false;}}">contact us using the Help Request form</a>.</p>
               <p>As we continue to make improvements and roll out new features, we will inform you of the changes
-              via this site using the new notification system. A notification icon <iron-icon icon="vaadin:bell" style="color: auto;"></iron-icon> will appear in the toolbar when you have new messages. 
+              via this site using the new notification system. A notification icon <iron-icon icon="vaadin:bell" style="color: auto;"></iron-icon> in the toolbar will signal when you have new messages. 
               Occasionally we may also send important announcements by email.</p>
               <p>Sincerely,<br><b>DES Labs Team</b></p>
               
