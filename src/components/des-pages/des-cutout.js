@@ -273,7 +273,12 @@ class DESCutout extends connect(store)(PageViewElement) {
     this.submit_disabled = true;
     this.xsize = 1.0;
     this.ysize = 1.0;
-    this.release = "";
+    if (config.desaccessInterface == 'public'){
+      this.release = "DR1";
+    }
+    else{
+      this.release = "Y6A1";
+    }
     this.rgb_bands = {
       "checked": {
         "g": true,
@@ -303,7 +308,6 @@ class DESCutout extends connect(store)(PageViewElement) {
  
   render() {
     if (config.desaccessInterface == 'public'){
-      this.release="DR1";
       return html`
       <div>
       <div id="submit-container">
@@ -447,7 +451,6 @@ class DESCutout extends connect(store)(PageViewElement) {
     `;
      }
     else {
-      this.release="Y6A1";
       return html`
       <div>
       <div id="submit-container">
