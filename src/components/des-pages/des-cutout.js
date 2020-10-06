@@ -307,294 +307,155 @@ class DESCutout extends connect(store)(PageViewElement) {
   }
  
   render() {
-    if (config.desaccessInterface == 'public'){
-      return html`
-      <div>
-      <div id="submit-container">
-        <paper-button raised  class="indigo"  id="submit-button-cutout" ?disabled="${this.submit_disabled}" @click="${e => this._submit(e)}">
-          Submit Job
-        </paper-button>
-        <paper-spinner id="submit-spinner" class="big"></paper-spinner>
-      </div>
-      <section>
-          <h2>Positions and data set</h2>
-          <div style="display: grid; grid-gap: 1rem; grid-template-columns: 20% 80%;">
+    return html`
+    <div>
+    <div id="submit-container">
+      <paper-button raised  class="indigo"  id="submit-button-cutout" ?disabled="${this.submit_disabled}" @click="${e => this._submit(e)}">
+        Submit Job
+      </paper-button>
+      <paper-spinner id="submit-spinner" class="big"></paper-spinner>
+    </div>
+    <section>
+        <h2>Positions and data set</h2>
+        <div style="display: grid; grid-gap: 1rem; grid-template-columns: 20% 80%;">
 
+          <div>
+            <label id="data-release-tag" style="font-weight: bold;">Data release tag:</label>
             <div>
-              <label id="data-release-tag" style="font-weight: bold;">Data release tag:</label>
-              <div>
-                <paper-radio-group selected="${this.release}" aria-labelledby="data-release-tag">
+              <paper-radio-group selected="${this.release}" aria-labelledby="data-release-tag">
+              ${config.desaccessInterface == 'public' ? html`
                   <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="DR1">DR1</paper-radio-button><br>
-                  <paper-radio-button disabled class="release-button" @change="${e => this.release = e.target.name}" name="DR2">DR2</paper-radio-button><br>
-                </paper-radio-group>
-              </div>
-            </div>
-
-            <div>
-            <p style="margin-top: 0;">Enter positions using RA/DEC coordinates or coadd object ID numbers. Values can be entered manually or by uploading a CSV-formatted text file.</p><p style="color:red;">Limit 10 concurrent jobs per user, 5000 objects per job</p>
-              <iron-autogrow-textarea style="font-family: monospace; width: 90%; margin-left: 0; margin-right: 2rem;" id="position-textarea" max-rows="10" rows=7 placeholder="RA,DEC\n21.5,3.48\n36.6,-15.68\n--- or ---\nCOADD_OBJECT_ID\n61407318\n61407582\n" value=""></iron-autogrow-textarea>
-              <paper-button raised class="indigo" id="bc_uploadFile">
-                <span style="overflow-x: auto; overflow-wrap: break-word;">Upload CSV file</span>
-                <input type="file" id="csv-upload" class="upload" @change="${e => this._fileChange(e)}" accept=".csv, .CSV" />
-              </paper-button>
-              <span id="csv-file-msg" style="margin-left: 2rem;"></span>
-            </div>
-
-          </div>
-      </section>
-
-      <section>
-          <h2>Output format and size</h2>
-          <p>Check all desired output files. FITS format requires selection of one or more bands. RGB color images require selection of exactly three bands.</p>
-          <div class="output-format-grid">
-            <div>
-              <h3>FITS format</h3>
-              <p>FITS format requires selection of <span id="criterion-fits-band-selected">one or more bands</span>.</p>
-              <div>
-              <paper-checkbox @change="${e => this._updateFitsBands(e)}" ?checked="${this.fits}">FITS (FITS format)</paper-checkbox>&nbsp;&nbsp;&nbsp;&nbsp;
-              </div>
-              <div id="fits_bands_selector" style="display: none;">
-                Bands: &nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'g')}" ?checked="${this.fits_bands.checked.g}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'r')}" ?checked="${this.fits_bands.checked.r}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'i')}" ?checked="${this.fits_bands.checked.i}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'z')}" ?checked="${this.fits_bands.checked.z}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'y')}" ?checked="${this.fits_bands.checked.y}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox id="select-all-bands-toggle" @change="${e => this._selectAllFitsBands(e)}" ?checked="${this.fits_all_toggle}" ?disabled="${!this.fits}" style="font-weight: bold; padding-left: 2rem;" id="bc_all_toggle">Select All/None</paper-checkbox>&nbsp;
-              </div>
-              <h3>Color image format</h3>
-              <p>RGB color images require selection of <span id="criterion-three-bands">exactly three bands</span>.</p>
-              <div>
-                <paper-checkbox @change="${e => this._updateRgbTypes(e, 'stiff')}" ?checked="${this.rgb_types_stiff}">Color image (RGB: STIFF format)</paper-checkbox>
-              </div>
-              <div>
-                <paper-checkbox @change="${e => this._updateRgbTypes(e, 'lupton')}" ?checked="${this.rgb_types_lupton}">Color image (RGB: Lupton method)</paper-checkbox>
-              </div>
-
-              <div id="rgb_bands_selector" style="display: none;">
-                Bands: &nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'g')}" ?checked="${this.rgb_bands.checked.g}" ?disabled="${this.rgb_bands.disabled.g}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'r')}" ?checked="${this.rgb_bands.checked.r}" ?disabled="${this.rgb_bands.disabled.r}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'i')}" ?checked="${this.rgb_bands.checked.i}" ?disabled="${this.rgb_bands.disabled.i}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'z')}" ?checked="${this.rgb_bands.checked.z}" ?disabled="${this.rgb_bands.disabled.z}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'y')}" ?checked="${this.rgb_bands.checked.y}" ?disabled="${this.rgb_bands.disabled.y}" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
-              </div>
-            </div>
-            <div>
-              <h3>Cutout size (arcminutes)</h3>
-              <div style="display: grid; grid-gap: 1rem; grid-template-columns: 5% 95%; align-items: center;">
-                <div>
-                  <label id="bc_xsizeSlider" style="font-weight: bold;">X</label>
-                </div>
-                <div>
-                  <paper-slider @change="${e => this.xsize = e.target.value}" id="bc_xsizeSlider" pin min="0.1" max="12" max-markers="10" step="0.1" value="${this.xsize}" expand editable></paper-slider>
-                </div>
-              </div>
-              <div style="display: grid; grid-gap: 1rem; grid-template-columns: 5% 95%; align-items: center;">
-                <div>
-                  <label id="bc_ysizeSlider" style="font-weight: bold;">Y</label>
-                </div>
-                <div>
-                  <paper-slider @change="${e => this.ysize = e.target.value}" id="bc_ysizeSlider" pin min="0.1" max="12" max-markers="10" step="0.1" value="${this.ysize}" expand editable></paper-slider>
-                </div>
-              </div>
+                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="DR2" disabled>DR2</paper-radio-button><br>
+                ` : html`
+                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y6A1">Y6A1</paper-radio-button><br>
+                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y3A2">Y3A2</paper-radio-button><br>
+                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y1A1">Y1A1</paper-radio-button><br>
+                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="SVA1">SVA1</paper-radio-button><br>
+                `
+              }
+              </paper-radio-group>
             </div>
           </div>
-      </section>
-      <section>
-          <h2>Options</h2>
+
           <div>
-            <!-- <label id="custom-job-option" style="font-weight: bold;">Provide a custom job name:</label> -->
-            <!-- aria-labelledby="custom-job-option" -->
-            <paper-input
-              style="max-width: 500px; padding-left:2rem;"
-              placeholder="" value="${this.customJobName}"
-              label="Custom job name (example: my-custom-job.12)"
-              @change="${(e) => {this.customJobName = e.target.value}}"
-              id="custom-job-name" name="custom-job-name"></paper-input>
-            <!-- <paper-input @change="${(e) => {this.customJobName = e.target.value; console.log(e.target.value);}}" always-float-label id="bc_validname" name="name" label="Job Name" placeholder="my-custom-job.12" value="${this.customJobName}" style="max-width: 500px; padding-left:2rem;"></paper-input> -->
-
-            <p id="custom-job-invalid" class="valid-form-element">
-              Custom job name must consist of lower case alphanumeric characters,
-              '-' or '.', and must start and end with an alphanumeric character.
-              Maximum length is 128 characters.
-            </p>
-            <p>Receive an email when the files are ready for download:</p>
-            <div id="email-options">
-              <!-- <p id="email-options-invalid" style="display: none; color: red;">Please enter a valid email address.</p> -->
-              <paper-checkbox
-                @change="${(e) => {this._updateEmailOption(e)}}"
-                style="font-size:16px; padding-left:2rem; padding-top:15px;"
-                id="send-email">Email when complete</paper-checkbox>
-              <paper-input
-                @change="${(e) => {this.email = e.target.value;}}"
-                always-float-label
-                disabled
-                id="custom-email"
-                name="custom-email"
-                label="Email Address"
-                style="max-width: 500px; padding-left:2rem;"
-                placeholder="${this.email}"
-                value="${this.email}"></paper-input>
-                <p id="custom-email-invalid" class="valid-form-element">
-                  Enter a valid email address.
-                </p>
-            </div>
+          <p style="margin-top: 0;">Enter positions using RA/DEC coordinates or coadd object ID numbers. Values can be entered manually or by uploading a CSV-formatted text file.</p><p style="color:inherit;">Limit 10 concurrent jobs per user, 5000 objects per job. Max cutout width/height is 12 arcmin.</p>
+            <iron-autogrow-textarea style="font-family: monospace; width: 90%; margin-left: 0; margin-right: 2rem;" id="position-textarea" max-rows="10" rows=7 placeholder="RA,DEC,XSIZE,YSIZE\n21.5,3.48,2.00,1.00\n36.6,-15.68,1.00,2.00\n--- or ---\nCOADD_OBJECT_ID\n61407318\n61407582\n" value=""></iron-autogrow-textarea>
+            <paper-button raised class="indigo" id="bc_uploadFile">
+              <span style="overflow-x: auto; overflow-wrap: break-word;">Upload CSV file</span>
+              <input type="file" id="csv-upload" class="upload" @change="${e => this._fileChange(e)}" accept=".csv, .CSV" />
+            </paper-button>
+            <span id="csv-file-msg" style="margin-left: 2rem;"></span>
           </div>
-      </section>
-      <div>
-        <paper-toast class="toast-position toast-success" id="toast-job-success" text="Job has been submitted!" duration="7000"> </paper-toast>
-        <paper-toast class="toast-position toast-error" id="toast-job-failure" text="ERROR! There was an error. Please try again" duration="7000"> </paper-toast>
-      </div>
 
-    </div>
-    `;
-     }
-    else {
-      return html`
-      <div>
-      <div id="submit-container">
-        <paper-button raised  class="indigo"  id="submit-button-cutout" ?disabled="${this.submit_disabled}" @click="${e => this._submit(e)}">
-          Submit Job
-        </paper-button>
-        <paper-spinner id="submit-spinner" class="big"></paper-spinner>
-      </div>
-      <section>
-          <h2>Positions and data set</h2>
-          <div style="display: grid; grid-gap: 1rem; grid-template-columns: 20% 80%;">
+        </div>
+    </section>
 
-            <div>
-              <label id="data-release-tag" style="font-weight: bold;">Data release tag:</label>
-              <div>
-                <paper-radio-group selected="${this.release}" aria-labelledby="data-release-tag">
-                <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y6A1">Y6A1</paper-radio-button><br>
-                <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y3A2">Y3A2</paper-radio-button><br>
-                <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y1A1">Y1A1</paper-radio-button><br>
-                <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="SVA1">SVA1</paper-radio-button><br>
-                </paper-radio-group>
-              </div>
-            </div>
-
-            <div>
-            <p style="margin-top: 0;">Enter positions using RA/DEC coordinates or coadd object ID numbers. Values can be entered manually or by uploading a CSV-formatted text file.</p><p style="color:red;">Limit 10 concurrent jobs per user, 5000 objects per job</p>
-              <iron-autogrow-textarea style="font-family: monospace; width: 90%; margin-left: 0; margin-right: 2rem;" id="position-textarea" max-rows="10" rows=7 placeholder="RA,DEC\n21.5,3.48\n36.6,-15.68\n--- or ---\nCOADD_OBJECT_ID\n61407318\n61407582\n" value=""></iron-autogrow-textarea>
-              <paper-button raised class="indigo" id="bc_uploadFile">
-                <span style="overflow-x: auto; overflow-wrap: break-word;">Upload CSV file</span>
-                <input type="file" id="csv-upload" class="upload" @change="${e => this._fileChange(e)}" accept=".csv, .CSV" />
-              </paper-button>
-              <span id="csv-file-msg" style="margin-left: 2rem;"></span>
-            </div>
-
-          </div>
-      </section>
-
-      <section>
-          <h2>Output format and size</h2>
-          <p>Check all desired output files. FITS format requires selection of one or more bands. RGB color images require selection of exactly three bands.</p>
-          <div class="output-format-grid">
-            <div>
-              <h3>FITS format</h3>
-              <p>FITS format requires selection of <span id="criterion-fits-band-selected">one or more bands</span>.</p>
-              <div>
-              <paper-checkbox @change="${e => this._updateFitsBands(e)}" ?checked="${this.fits}">FITS (FITS format)</paper-checkbox>&nbsp;&nbsp;&nbsp;&nbsp;
-              </div>
-              <div id="fits_bands_selector" style="display: none;">
-                Bands: &nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'g')}" ?checked="${this.fits_bands.checked.g}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'r')}" ?checked="${this.fits_bands.checked.r}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'i')}" ?checked="${this.fits_bands.checked.i}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'z')}" ?checked="${this.fits_bands.checked.z}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'y')}" ?checked="${this.fits_bands.checked.y}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox id="select-all-bands-toggle" @change="${e => this._selectAllFitsBands(e)}" ?checked="${this.fits_all_toggle}" ?disabled="${!this.fits}" style="font-weight: bold; padding-left: 2rem;" id="bc_all_toggle">Select All/None</paper-checkbox>&nbsp;
-              </div>
-              <h3>Color image format</h3>
-              <p>RGB color images require selection of <span id="criterion-three-bands">exactly three bands</span>.</p>
-              <div>
-                <paper-checkbox @change="${e => this._updateRgbTypes(e, 'stiff')}" ?checked="${this.rgb_types_stiff}">Color image (RGB: STIFF format)</paper-checkbox>
-              </div>
-              <div>
-                <paper-checkbox @change="${e => this._updateRgbTypes(e, 'lupton')}" ?checked="${this.rgb_types_lupton}">Color image (RGB: Lupton method)</paper-checkbox>
-              </div>
-
-              <div id="rgb_bands_selector" style="display: none;">
-                Bands: &nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'g')}" ?checked="${this.rgb_bands.checked.g}" ?disabled="${this.rgb_bands.disabled.g}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'r')}" ?checked="${this.rgb_bands.checked.r}" ?disabled="${this.rgb_bands.disabled.r}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'i')}" ?checked="${this.rgb_bands.checked.i}" ?disabled="${this.rgb_bands.disabled.i}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'z')}" ?checked="${this.rgb_bands.checked.z}" ?disabled="${this.rgb_bands.disabled.z}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
-                <paper-checkbox @change="${e => this._updateRgbSelection(e, 'y')}" ?checked="${this.rgb_bands.checked.y}" ?disabled="${this.rgb_bands.disabled.y}" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
-              </div>
-            </div>
-            <div>
-              <h3>Cutout size (arcminutes)</h3>
-              <div style="display: grid; grid-gap: 1rem; grid-template-columns: 5% 95%; align-items: center;">
-                <div>
-                  <label id="bc_xsizeSlider" style="font-weight: bold;">X</label>
-                </div>
-                <div>
-                  <paper-slider @change="${e => this.xsize = e.target.value}" id="bc_xsizeSlider" pin min="0.1" max="12" max-markers="10" step="0.1" value="${this.xsize}" expand editable></paper-slider>
-                </div>
-              </div>
-              <div style="display: grid; grid-gap: 1rem; grid-template-columns: 5% 95%; align-items: center;">
-                <div>
-                  <label id="bc_ysizeSlider" style="font-weight: bold;">Y</label>
-                </div>
-                <div>
-                  <paper-slider @change="${e => this.ysize = e.target.value}" id="bc_ysizeSlider" pin min="0.1" max="12" max-markers="10" step="0.1" value="${this.ysize}" expand editable></paper-slider>
-                </div>
-              </div>
-            </div>
-          </div>
-      </section>
-      <section>
-          <h2>Options</h2>
+    <section>
+        <h2>Output format and size</h2>
+        <p>Check all desired output files. FITS format requires selection of one or more bands. RGB color images require selection of exactly three bands.</p>
+        <div class="output-format-grid">
           <div>
-            <!-- <label id="custom-job-option" style="font-weight: bold;">Provide a custom job name:</label> -->
-            <!-- aria-labelledby="custom-job-option" -->
-            <paper-input
-              style="max-width: 500px; padding-left:2rem;"
-              placeholder="" value="${this.customJobName}"
-              label="Custom job name (example: my-custom-job.12)"
-              @change="${(e) => {this.customJobName = e.target.value}}"
-              id="custom-job-name" name="custom-job-name"></paper-input>
-            <!-- <paper-input @change="${(e) => {this.customJobName = e.target.value; console.log(e.target.value);}}" always-float-label id="bc_validname" name="name" label="Job Name" placeholder="my-custom-job.12" value="${this.customJobName}" style="max-width: 500px; padding-left:2rem;"></paper-input> -->
+            <h3>FITS format</h3>
+            <p>FITS format requires selection of <span id="criterion-fits-band-selected">one or more bands</span>.</p>
+            <div>
+            <paper-checkbox @change="${e => this._updateFitsBands(e)}" ?checked="${this.fits}">FITS (FITS format)</paper-checkbox>&nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
+            <div id="fits_bands_selector" style="display: none;">
+              Bands: &nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'g')}" ?checked="${this.fits_bands.checked.g}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'r')}" ?checked="${this.fits_bands.checked.r}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'i')}" ?checked="${this.fits_bands.checked.i}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'z')}" ?checked="${this.fits_bands.checked.z}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'y')}" ?checked="${this.fits_bands.checked.y}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox id="select-all-bands-toggle" @change="${e => this._selectAllFitsBands(e)}" ?checked="${this.fits_all_toggle}" ?disabled="${!this.fits}" style="font-weight: bold; padding-left: 2rem;" id="bc_all_toggle">Select All/None</paper-checkbox>&nbsp;
+            </div>
+            <h3>Color image format</h3>
+            <p>RGB color images require selection of <span id="criterion-three-bands">exactly three bands</span>.</p>
+            <div>
+              <paper-checkbox @change="${e => this._updateRgbTypes(e, 'stiff')}" ?checked="${this.rgb_types_stiff}">Color image (RGB: STIFF format)</paper-checkbox>
+            </div>
+            <div>
+              <paper-checkbox @change="${e => this._updateRgbTypes(e, 'lupton')}" ?checked="${this.rgb_types_lupton}">Color image (RGB: Lupton method)</paper-checkbox>
+            </div>
 
-            <p id="custom-job-invalid" class="valid-form-element">
-              Custom job name must consist of lower case alphanumeric characters,
-              '-' or '.', and must start and end with an alphanumeric character.
-              Maximum length is 128 characters.
-            </p>
-            <p>Receive an email when the files are ready for download:</p>
-            <div id="email-options">
-              <!-- <p id="email-options-invalid" style="display: none; color: red;">Please enter a valid email address.</p> -->
-              <paper-checkbox
-                @change="${(e) => {this._updateEmailOption(e)}}"
-                style="font-size:16px; padding-left:2rem; padding-top:15px;"
-                id="send-email">Email when complete</paper-checkbox>
-              <paper-input
-                @change="${(e) => {this.email = e.target.value;}}"
-                always-float-label
-                disabled
-                id="custom-email"
-                name="custom-email"
-                label="Email Address"
-                style="max-width: 500px; padding-left:2rem;"
-                placeholder="${this.email}"
-                value="${this.email}"></paper-input>
-                <p id="custom-email-invalid" class="valid-form-element">
-                  Enter a valid email address.
-                </p>
+            <div id="rgb_bands_selector" style="display: none;">
+              Bands: &nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateRgbSelection(e, 'g')}" ?checked="${this.rgb_bands.checked.g}" ?disabled="${this.rgb_bands.disabled.g}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateRgbSelection(e, 'r')}" ?checked="${this.rgb_bands.checked.r}" ?disabled="${this.rgb_bands.disabled.r}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateRgbSelection(e, 'i')}" ?checked="${this.rgb_bands.checked.i}" ?disabled="${this.rgb_bands.disabled.i}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateRgbSelection(e, 'z')}" ?checked="${this.rgb_bands.checked.z}" ?disabled="${this.rgb_bands.disabled.z}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateRgbSelection(e, 'y')}" ?checked="${this.rgb_bands.checked.y}" ?disabled="${this.rgb_bands.disabled.y}" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
             </div>
           </div>
-      </section>
-      <div>
-        <paper-toast class="toast-position toast-success" id="toast-job-success" text="Job has been submitted!" duration="7000"> </paper-toast>
-        <paper-toast class="toast-position toast-error" id="toast-job-failure" text="ERROR! There was an error. Please try again" duration="7000"> </paper-toast>
-      </div>
+          <div>
+            <h3>Default cutout size (arcminutes)</h3>
+            <div style="display: grid; grid-gap: 1rem; grid-template-columns: 5% 95%; align-items: center;">
+              <div>
+                <label id="bc_xsizeSlider" style="font-weight: bold;">X</label>
+              </div>
+              <div>
+                <paper-slider @change="${e => this.xsize = e.target.value}" id="bc_xsizeSlider" pin min="0.1" max="12" max-markers="10" step="0.1" value="${this.xsize}" expand editable></paper-slider>
+              </div>
+            </div>
+            <div style="display: grid; grid-gap: 1rem; grid-template-columns: 5% 95%; align-items: center;">
+              <div>
+                <label id="bc_ysizeSlider" style="font-weight: bold;">Y</label>
+              </div>
+              <div>
+                <paper-slider @change="${e => this.ysize = e.target.value}" id="bc_ysizeSlider" pin min="0.1" max="12" max-markers="10" step="0.1" value="${this.ysize}" expand editable></paper-slider>
+              </div>
+            </div>
+          </div>
+        </div>
+    </section>
+    <section>
+        <h2>Options</h2>
+        <div>
+          <!-- <label id="custom-job-option" style="font-weight: bold;">Provide a custom job name:</label> -->
+          <!-- aria-labelledby="custom-job-option" -->
+          <paper-input
+            style="max-width: 500px; padding-left:2rem;"
+            placeholder="" value="${this.customJobName}"
+            label="Custom job name (example: my-custom-job.12)"
+            @change="${(e) => {this.customJobName = e.target.value}}"
+            id="custom-job-name" name="custom-job-name"></paper-input>
+          <!-- <paper-input @change="${(e) => {this.customJobName = e.target.value; console.log(e.target.value);}}" always-float-label id="bc_validname" name="name" label="Job Name" placeholder="my-custom-job.12" value="${this.customJobName}" style="max-width: 500px; padding-left:2rem;"></paper-input> -->
 
+          <p id="custom-job-invalid" class="valid-form-element">
+            Custom job name must consist of lower case alphanumeric characters,
+            '-' or '.', and must start and end with an alphanumeric character.
+            Maximum length is 128 characters.
+          </p>
+          <p>Receive an email when the files are ready for download:</p>
+          <div id="email-options">
+            <!-- <p id="email-options-invalid" style="display: none; color: red;">Please enter a valid email address.</p> -->
+            <paper-checkbox
+              @change="${(e) => {this._updateEmailOption(e)}}"
+              style="font-size:16px; padding-left:2rem; padding-top:15px;"
+              id="send-email">Email when complete</paper-checkbox>
+            <paper-input
+              @change="${(e) => {this.email = e.target.value;}}"
+              always-float-label
+              disabled
+              id="custom-email"
+              name="custom-email"
+              label="Email Address"
+              style="max-width: 500px; padding-left:2rem;"
+              placeholder="${this.email}"
+              value="${this.email}"></paper-input>
+              <p id="custom-email-invalid" class="valid-form-element">
+                Enter a valid email address.
+              </p>
+          </div>
+        </div>
+    </section>
+    <div>
+      <paper-toast class="toast-position toast-success" id="toast-job-success" text="Job has been submitted!" duration="7000"> </paper-toast>
+      <paper-toast class="toast-position toast-error" id="toast-job-failure" text="ERROR! There was an error. Please try again" duration="7000"> </paper-toast>
     </div>
-    `;
-  }
+
+  </div>
+  `;
 }
 
 
@@ -896,10 +757,11 @@ class DESCutout extends connect(store)(PageViewElement) {
       } else {
         var textareaID = 'position-textarea'
         that.positions = 'INVALID';
-        that.shadowRoot.getElementById('csv-file-msg').innerHTML = 'Please use valid CSV syntax and column headers.';
+        that.shadowRoot.getElementById('csv-file-msg').innerHTML = `Error: ${data.msg}`;
         that.shadowRoot.getElementById('csv-file-msg').style.color = 'red';
         that.shadowRoot.getElementById(textareaID).style['border-color'] = 'red';
         that.shadowRoot.getElementById(textareaID).style['border-color'] = 'red';
+        console.log(JSON.stringify(data));
       }
     })
   }
