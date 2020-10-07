@@ -37,7 +37,7 @@ class DESHome extends connect(store)(PageViewElement) {
         <div class="horizontal layout around justified">
           ${this.accessPages.includes('db-access') ? html`
             <a style="text-decoration: none; text-transform: none; color:black;" href="db-access" tabindex="-1">
-              <des-home-card heading="DB ACCESS" image="images/home-query.png" alt="Query" desc="Oracle SQL web client" name="query" ></des-home-card>
+              <des-home-card heading="DB ACCESS" image="images/home-query.png" alt="Query" desc="Oracle DB web client" name="query" ></des-home-card>
             </a>
           ` : html``}
           ${this.accessPages.includes('tables') ? html`
