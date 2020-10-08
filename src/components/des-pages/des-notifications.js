@@ -13,6 +13,7 @@ import '@vaadin/vaadin-grid/vaadin-grid-selection-column.js';
 import '@vaadin/vaadin-icons/vaadin-icons.js';
 import '@polymer/paper-spinner/paper-spinner.js';
 import '@polymer/iron-autogrow-textarea/iron-autogrow-textarea.js';
+import '@polymer/paper-checkbox/paper-checkbox.js';
 
 class DESNotifications extends connect(store)(PageViewElement) {
   static get styles() {
@@ -26,6 +27,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
       accessPages: {type: Array},
       grid: {type: Object},
       newMessageTitle: {type: String},
+      sendEmail: {type: Boolean},
       newMessageBody: {type: String}
     };
   }
@@ -36,6 +38,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
     this.newMessageTitle = '';
     this.newMessageBody = '';
     this.newMessageRoles = '';
+    this.sendEmail = false;
   }
 
   render() {
@@ -183,6 +186,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
             </div>
             <paper-button @click="${(e) => {dialog.newMessageBody = document.querySelector('#new-msg-body').value; dialog.opened = false; this._createMessage();}}" class="des-button" raised>Create Message</paper-button>
             <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo" raised>Cancel</paper-button>
+            <paper-checkbox @change="${(e) => {this.sendEmail = e.target.checked;}}" ?checked="${this.sendEmail}">Send email also?</paper-checkbox>
           </div>
         `,
         container
@@ -242,6 +246,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
             </div>
             <paper-button @click="${(e) => {dialog.editMessageBody = document.querySelector('#edit-msg-body').value; dialog.opened = false; this._editMessage();}}" class="des-button" raised>Edit Message</paper-button>
             <paper-button @click="${(e) => {dialog.opened = false;}}" class="indigo" raised>Cancel</paper-button>
+            <paper-checkbox @change="${(e) => {this.sendEmail = e.target.checked;}}" ?checked="${this.sendEmail}">Send email also?</paper-checkbox>
           </div>
         `,
         container
@@ -274,7 +279,8 @@ class DESNotifications extends connect(store)(PageViewElement) {
     let body = {
       'title': this.newMessageTitle,
       'body': this.newMessageBody,
-      'roles': msgRoles
+      'roles': msgRoles,
+      'email': this.sendEmail
     };
     const param = {
       method: "PUT",
@@ -351,7 +357,8 @@ class DESNotifications extends connect(store)(PageViewElement) {
       'id': this.messageToEdit.id,
       'title': this.editMessageTitle,
       'body': this.editMessageBody,
-      'roles': msgRoles
+      'roles': msgRoles,
+      'email': this.sendEmail
     };
     const param = {
       method: "POST",
@@ -421,6 +428,7 @@ class DESNotifications extends connect(store)(PageViewElement) {
       return response.json()
     })
     .then(data => {
+      this.shadowRoot.querySelector('paper-spinner').active = false;
       if (data.status === "ok") {
         // console.log(JSON.stringify(data.users, null, 2));
         this.notifications = data.messages;
