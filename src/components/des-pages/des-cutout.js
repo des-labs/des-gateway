@@ -500,6 +500,7 @@ class DESCutout extends connect(store)(PageViewElement) {
       // rgb_minimum: null,
       // rgb_stretch: null,
       // rgb_asinh: null,
+      dev: true,
       return_list: true
     };
     if (this.shadowRoot.getElementById('send-email').checked) {
@@ -509,10 +510,10 @@ class DESCutout extends connect(store)(PageViewElement) {
       body.job_name = this.customJobName;
     }
     if (this.rgb_types_stiff || this.rgb_types_lupton) {
-      body.colors_rgb = this._getSelectedBands(this.rgb_bands).join(',');
+      body.colors_rgb = this._getSelectedBands(this.rgb_bands).join('');
     }
     if (body.make_fits) {
-      body.colors_fits = this._getSelectedBands(this.fits_bands).join(',');
+      body.colors_fits = this._getSelectedBands(this.fits_bands).join('');
     }
     const param = {
       method: "PUT",
