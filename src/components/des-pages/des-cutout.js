@@ -714,7 +714,7 @@ class DESCutout extends connect(store)(PageViewElement) {
     reader.onload = (e) => {
       var text = reader.result;
       var textLength = text.split("\n").length;
-      if (textLength < 5001){
+      if (textLength <= 5001){
         this._validateCsvFile(text);
       }
       else{
