@@ -495,13 +495,11 @@ class DESCutout extends connect(store)(PageViewElement) {
       ysize: this.ysize,
       make_fits: this.fits,
       make_rgb_stiff: this.rgb_types_stiff,
-      make_rgb_lupton: this.rgb_types_lupton,
+      make_rgb_lupton: this.rgb_types_lupton
       // TODO: Implement Lupton RGB format options
       // rgb_minimum: null,
       // rgb_stretch: null,
       // rgb_asinh: null,
-      dev: true,
-      return_list: true
     };
     if (this.shadowRoot.getElementById('send-email').checked) {
       body.email = this.email;
