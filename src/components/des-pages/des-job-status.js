@@ -514,15 +514,47 @@ class DESJobStatus extends connect(store)(PageViewElement) {
           break;
         case 'cutout':
           let positionTable = [];
-          if (job.cutout_positions !== null) {
-            var rows = job.cutout_positions.split('\n');
-            for (let r in rows) {
-              var cells = rows[r].split(',')
-              if (cells.length > 0 && cells[0] !== '') {
-                positionTable.push(cells);
+          if (job.cutout_summary !== null) {
+            // var cutout_summary_text = JSON.stringify(job.cutout_summary, null, 2);
+            let tableHeaders = [
+              'RA',
+              'DEC',
+              'COADD_OBJECT_ID',
+              'TILENAME',
+              'XSIZE',
+              'YSIZE',
+              'MAKE_FITS',
+              'COLORS_FITS',
+              'MAKE_RGB_STIFF',
+              'RGB_STIFF_COLORS',
+              'MAKE_RGB_LUPTON',
+              'RGB_LUPTON_COLORS',
+              'SEXAGECIMAL',
+              'RGB_MINIMUM',
+              'RGB_STRETCH',
+              'RGB_ASINH',
+            ]
+            positionTable.push(tableHeaders);
+            for (let pos in job.cutout_summary.cutouts) {
+              var position = job.cutout_summary.cutouts[pos];
+              var tableRow = [];
+              for (let header in tableHeaders) {
+                tableRow.push(position[tableHeaders[header]]);
               }
+              positionTable.push(tableRow)
             }
+          } else{
+            var cutout_summary_text = '';
           }
+          // if (job.cutout_positions !== null) {
+          //   var rows = job.cutout_positions.split('\n');
+          //   for (let r in rows) {
+          //     var cells = rows[r].split(',')
+          //     if (cells.length > 0 && cells[0] !== '') {
+          //       positionTable.push(cells);
+          //     }
+          //   }
+          // }
           if (job.cutout_files !== null) {
             var numFiles = job.cutout_files.length;
           } else {
@@ -555,6 +587,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
             th, td {
               text-align: left;
               border-bottom: 1px solid #ddd;
+              border-right: 1px solid #ddd;
             }
           </style>
             <div></div><div></div>
@@ -563,7 +596,10 @@ class DESJobStatus extends connect(store)(PageViewElement) {
                 <a title="View all files" target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/cutout/${job.id}/">
                   <paper-button raised>
                     <iron-icon style="margin-right: 10px;" icon="vaadin:folder-open"></iron-icon>
-                    View Files (${numFiles})
+                    ${job.status === 'init' || job.status === 'started' ? 
+                      html`View Files` :
+                      html`View Files (${numFiles})`
+                    }
                   </paper-button>
                 </a>
               </div>
@@ -580,44 +616,53 @@ class DESJobStatus extends connect(store)(PageViewElement) {
                 `
               }
             </div>
-            <div>
-              <div id="positions" class="file-list-box" style=""><span class="monospace-column">
-              ${job.cutout_positions === null ?
-                html``:
-                html`
-                  <table>
-                  ${positionTable.map(row => html`
-                    <tr>
-                      ${row.map(cell => html`
-                        <td>
-                          ${cell}
-                        </td>
-                      `)}
-                    </tr>
-                  `)}
-                  </table>
-                `
-              }
-              </span></div>
-              <div class="file-list-box" style=""><span class="monospace-column">
-              ${job.cutout_files === null ?
-                html``:
-                html`
-                  <p><a title="Download archive file" target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/cutout/${job.id}.tar.gz">
-                    Download compressed archive file containing all job files (<code>.tar.gz</code>)
-                  </a></p>
-                  <ul style="list-style-type: square; margin: 0; padding: 0;">
-                    ${job.cutout_files.map(i => html`
-                      <li>
-                        <a target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/cutout/${i}">${i.split('/').splice(1).join('/')}</a>
-                      </li>
+            ${job.status === 'init' || job.status === 'started' ? 
+            html`<div>Job in progress...</div>` :
+            html`
+              <div>
+                <div id="positions" class="file-list-box" style=""><span class="monospace-column">
+                ${true || job.cutout_summary === null ?
+                  html``:
+                  html`<pre>${cutout_summary_text}</pre>
+                  `
+                }
+                ${job.cutout_summary === null ?
+                  html``:
+                  html`
+                    <table>
+                    ${positionTable.map(row => html`
+                      <tr>
+                        ${row.map(cell => html`
+                          <td>
+                            ${cell}
+                          </td>
+                        `)}
+                      </tr>
                     `)}
-                  </ul>
-                `
-              }
-              </span></div>
+                    </table>
+                  `
+                }
+                </span></div>
+                <div class="file-list-box" style=""><span class="monospace-column">
+                ${job.cutout_files === null ?
+                  html``:
+                  html`
+                    <p><a title="Download archive file" target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/cutout/${job.id}.tar.gz">
+                      Download compressed archive file containing all job files (<code>.tar.gz</code>)
+                    </a></p>
+                    <ul style="list-style-type: square; margin: 0; padding: 0;">
+                      ${job.cutout_files.map(i => html`
+                        <li>
+                          <a target="_blank" href="${config.frontEndOrigin}/${config.fileServerRootPath}/${this.username}/cutout/${i}">${i.split('/').splice(1).join('/')}</a>
+                        </li>
+                      `)}
+                    </ul>
+                  `
+                }
+                </span></div>
 
-            </div>
+              </div>
+            `}
           `;
           break;
         default:
@@ -976,6 +1021,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       job.query = item.query;
       job.query_files = typeof(item.query_files) === 'object' ? item.query_files : null;
       job.cutout_files = typeof(item.cutout_files) === 'object' ? item.cutout_files : null;
+      job.cutout_summary = typeof(item.cutout_summary) === 'object' ? item.cutout_summary : null;
       job.cutout_positions = typeof(item.cutout_positions) === 'string' ? item.cutout_positions : null;
       job.renewal_token = typeof(item.renewal_token) === 'string' ? item.renewal_token : null;
       job.expiration_date = typeof(item.expiration_date) === 'string' ? item.expiration_date : null;

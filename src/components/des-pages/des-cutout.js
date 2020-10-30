@@ -338,7 +338,7 @@ class DESCutout extends connect(store)(PageViewElement) {
           </div>
 
           <div>
-          <p style="margin-top: 0;">Enter positions using RA/DEC coordinates or coadd object ID numbers. Values can be entered manually or by uploading a CSV-formatted text file.</p><p style="color:inherit;">Limit 10 concurrent jobs per user, 5000 objects per job. Max cutout width/height is 12 arcmin.</p>
+          <p style="margin-top: 0;">Enter cutout positions as a CSV-formatted table, specifying positions using RA/DEC coordinates or coadd object ID numbers. Values can be entered manually or by uploading a CSV-formatted text file. See the help system for more details.</p><p style="color:inherit;">Limit 10 concurrent jobs per user, ${config.maxCutoutsPerJob} positions per job. Max cutout width/height is 12 arcmin.</p>
             <iron-autogrow-textarea style="font-family: monospace; width: 90%; margin-left: 0; margin-right: 2rem;" id="position-textarea" max-rows="10" rows=7 placeholder="RA,DEC,XSIZE,YSIZE\n21.5,3.48,2.00,1.00\n36.6,-15.68,1.00,2.00\n--- or ---\nCOADD_OBJECT_ID\n61407318\n61407582\n" value=""></iron-autogrow-textarea>
             <paper-button raised class="indigo" id="bc_uploadFile">
               <span style="overflow-x: auto; overflow-wrap: break-word;">Upload CSV file</span>
@@ -510,7 +510,10 @@ class DESCutout extends connect(store)(PageViewElement) {
       body.job_name = this.customJobName;
     }
     if (this.rgb_types_stiff || this.rgb_types_lupton) {
-      body.colors_rgb = this._getSelectedBands(this.rgb_bands).join('');
+      // body.colors_rgb = this._getSelectedBands(this.rgb_bands).join('');
+      // For simplicity of the interface, apply the same color set to both RGB types
+      body.rgb_stiff_colors = this._getSelectedBands(this.rgb_bands).join('');
+      body.rgb_lupton_colors = this._getSelectedBands(this.rgb_bands).join('');
     }
     if (body.make_fits) {
       body.colors_fits = this._getSelectedBands(this.fits_bands).join('');
@@ -714,12 +717,19 @@ class DESCutout extends connect(store)(PageViewElement) {
     var reader = new FileReader();
     reader.onload = (e) => {
       var text = reader.result;
-      var textLength = text.split("\n").length;
-      if (textLength < 5001){
+      // Count lines in the file, ignoring blank lines
+      var textLength = 0; //text.split("\n").length;
+      var lines = text.split("\n");
+      for (let line in lines) {
+        if (lines[line].trim() !== '') {
+          textLength++;
+        }
+      }
+      if (textLength <= config.maxCutoutsPerJob + 1){
         this._validateCsvFile(text);
       }
       else{
-        this.shadowRoot.getElementById('toast-job-failure').text = 'CSV file is too large! Please limit file to 5000 lines.';
+        this.shadowRoot.getElementById('toast-job-failure').text = `CSV file is too large! Please limit file to ${config.maxCutoutsPerJob} lines.`;
         this.shadowRoot.getElementById('toast-job-failure').show();
       }
     }
@@ -735,33 +745,34 @@ class DESCutout extends connect(store)(PageViewElement) {
       }),
       method: "POST"
     };
-    var that = this;
     fetch(Url, param)
     .then(response => {
       return response.json()
     })
     .then(data => {
       if (data.status === "ok") {
-        // if (data.type === "coords") {
-        //   var textareaID = 'coords-textarea'
-        //   that.tabIdx = 1
-        // } else {
-        //   var textareaID = 'coadd-id-textarea'
-        //   that.tabIdx = 0
-        // }
-        var textareaID = 'position-textarea'
-        that.positions = data.csv;
-        that.shadowRoot.getElementById(textareaID).value = data.csv;
-        that.shadowRoot.getElementById('csv-file-msg').innerHTML = 'Positions validated and processed.';
-        that.shadowRoot.getElementById('csv-file-msg').style.color = 'green';
-        that.shadowRoot.getElementById(textareaID).style['border-color'] = 'green';
+        if (data.valid) {
+          var textareaID = 'position-textarea'
+          this.positions = data.csv;
+          this.shadowRoot.getElementById(textareaID).value = data.csv;
+          this.shadowRoot.getElementById('csv-file-msg').innerHTML = 'Positions validated and processed.';
+          this.shadowRoot.getElementById('csv-file-msg').style.color = 'green';
+          this.shadowRoot.getElementById(textareaID).style['border-color'] = 'green';
+        } else {
+          var textareaID = 'position-textarea'
+          // this.positions = 'INVALID';
+          this.shadowRoot.getElementById('csv-file-msg').innerHTML = `Invalid: ${data.msg}`;
+          this.shadowRoot.getElementById('csv-file-msg').style.color = 'red';
+          this.shadowRoot.getElementById(textareaID).style['border-color'] = 'red';
+          this.shadowRoot.getElementById(textareaID).style['border-color'] = 'red';
+        }
       } else {
         var textareaID = 'position-textarea'
-        that.positions = 'INVALID';
-        that.shadowRoot.getElementById('csv-file-msg').innerHTML = `Error: ${data.msg}`;
-        that.shadowRoot.getElementById('csv-file-msg').style.color = 'red';
-        that.shadowRoot.getElementById(textareaID).style['border-color'] = 'red';
-        that.shadowRoot.getElementById(textareaID).style['border-color'] = 'red';
+        // this.positions = 'ERROR VALIDATNG ';
+        this.shadowRoot.getElementById('csv-file-msg').innerHTML = `Error validating input: ${data.msg}`;
+        this.shadowRoot.getElementById('csv-file-msg').style.color = 'red';
+        this.shadowRoot.getElementById(textareaID).style['border-color'] = 'red';
+        this.shadowRoot.getElementById(textareaID).style['border-color'] = 'red';
         console.log(JSON.stringify(data));
       }
     })

@@ -18,19 +18,37 @@ class DESHelpCutout extends LitElement {
       </h3></a>
       <p>The Cutout Service allows you to download raw or color image data based on input coordinates and areal dimensions.</p>
       <div class="help-content-grid">
-        <div>
+        <div style="width: 100%;">
           <p>
             Select the data release tag associated with the data set you
             wish to access. In the text box, enter the positions in the sky
-            that designate the centers of your cutout images. The text must
-            be CSV-formatted, with a header row containing either <b>RA,DEC</b>
-            or <b>COADD_OBJECT_ID</b>, specifying whether subsequent rows
-            contain ID numbers for the desired Coadd tiles or sky coordinates
-            in RA/DEC units.
+            that designate the centers of your cutout images in the form of a CSV-formatted table, with a header row naming the table columns for subsequent lines. 
+            Each position must be specified using either RA/DEC sky coordinates or Coadd tile ID. 
+            Columns can be in any order. 
+            Omitted values will be set to the default parameter values you specify using the other form elements as described below. 
           </p>
-        </div>
-        <div class="image-container">
-          <img src="images/help/cutout-release-and-positions.png">
+          <p>This example shows all possible columns you can include:
+          </p>
+<pre>
+RA,DEC,COADD_OBJECT_ID,XSIZE,YSIZE,COLORS_FITS,RGB_STIFF_COLORS,RGB_LUPTON_COLORS,RGB_MINIMUM,RGB_STRETCH,RGB_ASINH,MAKE_FITS,MAKE_RGB_STIFF,MAKE_RGB_LUPTON
+46.275669,-34.256000,,0.90,1.30,g,gry;riy,,,,,true,false,true
+,,61407409,1.1,0.8,z,,riy,0.9,40.0,11.0,true,,true
+</pre>
+          <p>
+          This example shows the minimum columns you must include when specifying positions only by coordinates:
+          </p>
+<pre>
+RA,DEC
+46.275669,-34.256000
+</pre>
+          <p>
+          or only by Coadd ID
+          </p>
+<pre>
+COADD_OBJECT_ID
+61407409
+61407435
+</pre>
         </div>
         <div>
           <p>
