@@ -14,6 +14,7 @@ import '@vaadin/vaadin-icons/vaadin-icons.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/iron-image/iron-image.js';
 import { loadPage, updateQuery } from '../../actions/app.js';
+import '@polymer/paper-spinner/paper-spinner.js';
 
 
 class DESJobStatus extends connect(store)(PageViewElement) {
@@ -47,6 +48,14 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         vaadin-grid {
           height: 70vh;
           max-width: 90vw;
+        }
+        paper-spinner.big {
+          float: left; 
+          left: 0px; 
+          top: 0px; 
+          z-index: 1;
+          height: 80px;
+          width:  80px;
         }
         @media (min-width: 1001px) {
           vaadin-grid {
@@ -116,6 +125,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       }
     </style>
     <section>
+      <paper-spinner class="big"></paper-spinner>
       <vaadin-grid .multiSort="${true}" style="">
         <vaadin-grid-selection-column auto-select></vaadin-grid-selection-column>
         <vaadin-grid-column auto-width flex-grow="0" text-align="center" .renderer="${this.rendererStatus}" .headerRenderer="${this._headerRendererStatus}"></vaadin-grid-column>
@@ -621,11 +631,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
             html`
               <div>
                 <div id="positions" class="file-list-box" style=""><span class="monospace-column">
-                ${true || job.cutout_summary === null ?
-                  html``:
-                  html`<pre>${cutout_summary_text}</pre>
-                  `
-                }
                 ${job.cutout_summary === null ?
                   html``:
                   html`
@@ -834,6 +839,9 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     .then(data => {
       if (data.status === "ok") {
         // console.log(JSON.stringify(data, null, 2));
+        // TODO: Figure out how to update vaadin-grid immediately here
+        this.shadowRoot.querySelector('paper-spinner[class="big"]').active = true;
+        this._fetchJobUpdates([jobInfo.id]);
       } else {
         console.log(JSON.stringify(data, null, 2));
       }
@@ -957,7 +965,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
 
   }
 
-  _updateStatus() {
+  _updateStatusAll() {
     const Url=config.backEndUrl + "job/status"
     let body = {
       'job-id': 'all',
@@ -982,7 +990,180 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       } else {
         console.log(JSON.stringify(data, null, 2));
       }
+      this.shadowRoot.querySelector('paper-spinner[class="big"]').active = false;
     });
+  }
+
+  _updateStatus() {
+    const Url=config.backEndUrl + "job/list"
+    const param = {
+      method: "GET",
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem("token")
+      }
+    };
+    fetch(Url, param)
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      if (data.status === "ok") {
+        // console.log(`Number of jobs in /job/list: ${data.jobs.length}`);
+        // console.log(JSON.stringify(data, null, 2));
+        // console.log(`Fetched job list (${data.jobs.length})`);
+        // console.log(`Fetched job list (${data.jobs.length}): ${JSON.stringify(data.jobs.map((e) => {return e.job_id}), null, 2)}`);
+        this._reconcileStatusTable(data.jobs);
+      } else {
+        console.log(JSON.stringify(data, null, 2));
+      }
+      this.shadowRoot.querySelector('paper-spinner[class="big"]').active = false;
+    });
+  }
+
+  _reconcileStatusTable(jobs) {
+    const grid = this.shadowRoot.querySelector('vaadin-grid');
+
+    // console.log(`Current grid items (${grid.items.length})`);
+    // console.log(`Current grid items (${grid.items.length}): ${JSON.stringify(grid.items.map((e) => {return e.job.id}), null, 2)}`);
+    let gridItems = [];
+
+    let newJobIds = [];
+    let oldJobIds = [];
+    let updatedJobIds = [];
+    for (let i in jobs) {
+      // If the fetched job ID is not listed in the table, it is a new job that needs to be added
+      var idx = grid.items.map((e) => {return e.job.id}).indexOf(jobs[i].job_id);
+      if (idx < 0) {
+        newJobIds.push(jobs[i].job_id);
+        // console.log(`New job: ${jobs[i].job_id}`);
+      } else {
+        // If the job exists in the table, detect status changes indicating updated info is needed
+        var tableJobStatus = grid.items[idx].job.status;
+        var newJobStatus = jobs[i].job_status;
+        if (tableJobStatus !== newJobStatus) {
+          updatedJobIds.push(jobs[i].job_id);
+          // console.log(`Updated job: ${jobs[i].job_id}`);
+        }
+      }
+    }
+    for (let i in grid.items) {
+      // If a job in the table is missing from the fetched job IDs, it must be deleted
+      var idx = jobs.map((e) => {return e.job_id}).indexOf(grid.items[i].job.id);
+      if (idx < 0) {
+        oldJobIds.push(grid.items[i].job.id);
+      }
+    }
+
+    // Remove the old jobs
+    for (let i in grid.items) {
+      if (oldJobIds.indexOf(grid.items[i].job.id) < 0) {
+        gridItems.push(grid.items[i]);
+      } 
+      // else {
+        // console.log(`Deleting old job: ${grid.items[i].job.id}`);
+      // }
+    }
+    grid.items = gridItems;
+    grid.recalculateColumnWidths();
+
+    // Remove any redundant job IDs
+    var jobsIdsToAdd = newJobIds.concat(updatedJobIds);
+    var jobIdSet = new Set(jobsIdsToAdd);
+    jobsIdsToAdd = Array.from(jobIdSet);
+    this._fetchJobUpdates(jobsIdsToAdd);
+  }
+
+  _fetchJobUpdates(jobIds) {
+    for (let i in jobIds) {
+      var jobId = jobIds[i];
+      console.log(`Fetching status of job: ${jobId}`);
+      const Url=config.backEndUrl + "job/status"
+      let body = {
+        'job-id': jobId,
+      };
+      const param = {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem("token")
+        },
+        body: JSON.stringify(body)
+      };
+      fetch(Url, param)
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+        if (data.status === "ok") {
+          // console.log(JSON.stringify(data, null, 2));
+          this._addJobToGridData(data.jobs);
+        } else {
+          console.log(JSON.stringify(data, null, 2));
+        }
+      });
+    }
+    this._updateLastUpdatedDisplay();
+  }
+
+  _addJobToGridData(jobs) {
+    // TODO: This code is redundant with `_updateGridData` and should be moved to separate functions
+    let grid = this.shadowRoot.querySelector('vaadin-grid');
+    let gridItems = grid.items;
+    let gridItemsOriginal = grid.items;
+    let ctr = 0
+    jobs.forEach((item, index, array) => {
+      let job = {};
+      job.id = item.job_id;
+      // console.log(`Adding job to table: ${JSON.stringify(job.id)}`);
+      job.name = item.job_name;
+      job.status = item.job_status;
+      job.type = item.job_type;
+      job.time_start = item.job_time_start;
+      job.time_complete = item.job_time_complete;
+      job.time_submitted = '0000-00-00 00:00:00';
+      if (item.job_time_submitted) {
+        job.time_submitted = this.convertToLocalTime(item.job_time_submitted);
+      } 
+      job.data = typeof(item.data) === 'string' ? JSON.parse(item.data) : null;
+      job.query = item.query;
+      job.query_files = typeof(item.query_files) === 'object' ? item.query_files : null;
+      job.cutout_files = typeof(item.cutout_files) === 'object' ? item.cutout_files : null;
+      job.cutout_summary = typeof(item.cutout_summary) === 'object' ? item.cutout_summary : null;
+      job.cutout_positions = typeof(item.cutout_positions) === 'string' ? item.cutout_positions : null;
+      job.renewal_token = typeof(item.renewal_token) === 'string' ? item.renewal_token : null;
+      job.expiration_date = typeof(item.expiration_date) === 'string' ? item.expiration_date : null;
+      // console.log(JSON.stringify(job, null, 2));
+      if (job.type !== 'query' || job.data === null) {
+
+        var idx = gridItems.map((e) => {return e.job.id}).indexOf(job.id);
+        if (idx > -1) {
+          gridItems[idx] = {job: job};
+        } else {
+          gridItems.push({job: job});
+        }
+      }
+      ctr++;
+      if (ctr === array.length) {
+        grid.items = gridItems;
+        var newJobs = new Set([...(new Set(grid.items))].filter(x => !(new Set(gridItemsOriginal)).has(x)));
+        console.log(JSON.stringify(newJobs, null, 2));
+
+        let dedupSelItems = [];
+        for (var i in grid.selectedItems) {
+          if (dedupSelItems.map((e) => {return e.job.id}).indexOf(grid.selectedItems[i].job.id) < 0) {
+            dedupSelItems.push(grid.selectedItems[i]);
+          }
+        }
+        grid.selectedItems = [];
+        for (var i in grid.items) {
+          if (dedupSelItems.map((e) => {return e.job.id}).indexOf(grid.items[i].job.id) > -1) {
+            grid.selectItem(grid.items[i]);
+          }
+        }
+        grid.recalculateColumnWidths();
+      }
+    })
+
   }
 
   _updateLastUpdatedDisplay() {
@@ -998,6 +1179,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   }
 
   _updateGridData(jobs) {
+    // TODO: This code is redundant with `_addJobToGridData` and should be moved to separate functions
     let grid = this.shadowRoot.querySelector('vaadin-grid');
     let gridItems = []
     // If there are no jobs in the returned list, allow an empty table
@@ -1165,7 +1347,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
         if (this._page === 'status') {
           this._updateStatus();
         }
-      }, 5000);
+      }, 10000);
     }
   }
 
@@ -1174,7 +1356,8 @@ class DESJobStatus extends connect(store)(PageViewElement) {
     const dialog = this.shadowRoot.getElementById('deleteConfirmDialog');
     dialog.renderer = this._deleteConfirmDialogRenderer;
     // Trigger an immediate job status update upon page load
-    this._updateStatus();
+    this.shadowRoot.querySelector('paper-spinner[class="big"]').active = true;
+    this._updateStatusAll();
   }
 
   updated(changedProps) {
@@ -1183,7 +1366,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       switch (propName) {
         case 'active':
           if (this.active) {
-            this._updateStatus()
+            this._updateStatusAll()
           }
           break;
         case '_selectedItems':
