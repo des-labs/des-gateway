@@ -532,12 +532,14 @@ class DESDbAccess extends connect(store)(PageViewElement) {
       /* Removing comments from query string */
       this.editor = this.shadowRoot.querySelector('.CodeMirror').CodeMirror;
       let query_lines = this.editor.doc.getValue().split('\n');
-      let i;
-      for (i = 0; i < query_lines.length; i++) {
+      let filteredQuery = [];
+      for (let i = 0; i < query_lines.length; i++) {
         if (query_lines[i].startsWith('--') == false && query_lines[i] !== "") {
-          query += ' ' + query_lines[i];
+          filteredQuery.push(query_lines[i]);
         }
       }
+      query = filteredQuery.join('\n');
+      console.log(query);
     }
     return query;
   }
@@ -841,7 +843,8 @@ class DESDbAccess extends connect(store)(PageViewElement) {
         var query = `--
 -- Example Query --
 -- This query selects 0.001% of the data and returns only five rows
-SELECT RA, DEC, MAG_AUTO_G, TILENAME
+SELECT 
+  RA, DEC, MAG_AUTO_G, TILENAME
 FROM DR1_MAIN sample(0.001)
 FETCH FIRST 5 ROWS ONLY
 `
@@ -853,9 +856,9 @@ FETCH FIRST 5 ROWS ONLY
 SELECT ALPHAWIN_J2000 RAP,DELTAWIN_J2000 DECP, MAG_AUTO_G, TILENAME
 FROM DR1_MAIN
 WHERE
-RA BETWEEN 40.0 and 41.0 and
-DEC BETWEEN -41 and -40 and
-ROWNUM < 1001
+  RA BETWEEN 40.0 and 41.0 and
+  DEC BETWEEN -41 and -40 and
+  ROWNUM < 1001
 `
         break;
       case "copy-example-2":
@@ -863,21 +866,21 @@ ROWNUM < 1001
 -- Example Query --
 -- This query selects stars around the center of glubular cluster M2
 SELECT
-COADD_OBJECT_ID,RA,DEC,
-MAG_AUTO_G G,
-MAG_AUTO_R R,
-WAVG_MAG_PSF_G G_PSF,
-WAVG_MAG_PSF_R R_PSF
+  COADD_OBJECT_ID,RA,DEC,
+  MAG_AUTO_G G,
+  MAG_AUTO_R R,
+  WAVG_MAG_PSF_G G_PSF,
+  WAVG_MAG_PSF_R R_PSF
 FROM DR1_MAIN
 WHERE
-RA between 323.36-0.12 and 323.36+0.12 and
-DEC between -0.82-0.12 and -0.82+0.12 and
-WAVG_SPREAD_MODEL_I + 3.0*WAVG_SPREADERR_MODEL_I < 0.005 and
-WAVG_SPREAD_MODEL_I > -1 and
-IMAFLAGS_ISO_G = 0 and
-IMAFLAGS_ISO_R = 0 and
-FLAGS_G < 4 and
-FLAGS_R < 4
+  RA between 323.36-0.12 and 323.36+0.12 and
+  DEC between -0.82-0.12 and -0.82+0.12 and
+  WAVG_SPREAD_MODEL_I + 3.0*WAVG_SPREADERR_MODEL_I < 0.005 and
+  WAVG_SPREAD_MODEL_I > -1 and
+  IMAFLAGS_ISO_G = 0 and
+  IMAFLAGS_ISO_R = 0 and
+  FLAGS_G < 4 and
+  FLAGS_R < 4
 `
           break;
         case "copy-example-3":
@@ -887,14 +890,14 @@ FLAGS_R < 4
 -- and their mean magnitude on a resolution of NSIDE = 1024
 -- using NEST Schema
 SELECT
-count(main.MAG_AUTO_I) COUNT,
-main.HPIX_1024
+  count(main.MAG_AUTO_I) COUNT,
+  main.HPIX_1024
 FROM DR1_MAIN main
 WHERE
-main.WAVG_SPREAD_MODEL_I + 3.0*main.WAVG_SPREADERR_MODEL_I < 0.005 and
-main.WAVG_SPREAD_MODEL_I > -1 and
-main.IMAFLAGS_ISO_I = 0 and
-main.MAG_AUTO_I < 21
+  main.WAVG_SPREAD_MODEL_I + 3.0*main.WAVG_SPREADERR_MODEL_I < 0.005 and
+  main.WAVG_SPREAD_MODEL_I > -1 and
+  main.IMAFLAGS_ISO_I = 0 and
+  main.MAG_AUTO_I < 21
 GROUP BY main.HPIX_1024
 `
           break;
@@ -906,14 +909,14 @@ GROUP BY main.HPIX_1024
 -- using NEST Schema
 SELECT count(dr1.MAG_AUTO_I) COUNT,avg(dr1.MAG_AUTO_I) AVERAGE,dr1.HPIX_1024
 FROM DR1_MAIN dr1
-where
-dr1.WAVG_SPREAD_MODEL_I + 3.0*dr1.WAVG_SPREADERR_MODEL_I > 0.005 and
-dr1.WAVG_SPREAD_MODEL_I + 1.0*dr1.WAVG_SPREADERR_MODEL_I > 0.003 and
-dr1.WAVG_SPREAD_MODEL_I - 1.0*dr1.WAVG_SPREADERR_MODEL_I > 0.001 and
-dr1.WAVG_SPREAD_MODEL_I > -1 and
-dr1.IMAFLAGS_ISO_I = 0 and
-dr1.MAG_AUTO_I < 23
-group by dr1.HPIX_1024
+WHERE
+  dr1.WAVG_SPREAD_MODEL_I + 3.0*dr1.WAVG_SPREADERR_MODEL_I > 0.005 and
+  dr1.WAVG_SPREAD_MODEL_I + 1.0*dr1.WAVG_SPREADERR_MODEL_I > 0.003 and
+  dr1.WAVG_SPREAD_MODEL_I - 1.0*dr1.WAVG_SPREADERR_MODEL_I > 0.001 and
+  dr1.WAVG_SPREAD_MODEL_I > -1 and
+  dr1.IMAFLAGS_ISO_I = 0 and
+  dr1.MAG_AUTO_I < 23
+GROUP BY dr1.HPIX_1024
 `
           break;
         case "copy-example-5":
@@ -923,20 +926,20 @@ group by dr1.HPIX_1024
 SELECT dr1.RA RA, dr1.DEC DEC, dr1.COADD_OBJECT_ID ID
 FROM dr1_main sample(0.01) dr1
 WHERE
-dr1.MAG_AUTO_G < 18 and
-dr1.WAVG_SPREAD_MODEL_I + 3.0*dr1.WAVG_SPREADERR_MODEL_I > 0.005 and
-dr1.WAVG_SPREAD_MODEL_I + 1.0*dr1.WAVG_SPREADERR_MODEL_I > 0.003 and
-dr1.WAVG_SPREAD_MODEL_I - 1.0*dr1.WAVG_SPREADERR_MODEL_I > 0.001 and
-dr1.WAVG_SPREAD_MODEL_I > -1 and
-dr1.IMAFLAGS_ISO_G = 0 and
-dr1.IMAFLAGS_ISO_R = 0 and
-dr1.IMAFLAGS_ISO_I = 0 and
-dr1.FLAGS_G < 4 and
-dr1.FLAGS_R < 4 and
-dr1.FLAGS_I < 4 and
-dr1.NEPOCHS_G > 0 and
-dr1.NEPOCHS_R > 0 and
-dr1.NEPOCHS_I > 0
+  dr1.MAG_AUTO_G < 18 and
+  dr1.WAVG_SPREAD_MODEL_I + 3.0*dr1.WAVG_SPREADERR_MODEL_I > 0.005 and
+  dr1.WAVG_SPREAD_MODEL_I + 1.0*dr1.WAVG_SPREADERR_MODEL_I > 0.003 and
+  dr1.WAVG_SPREAD_MODEL_I - 1.0*dr1.WAVG_SPREADERR_MODEL_I > 0.001 and
+  dr1.WAVG_SPREAD_MODEL_I > -1 and
+  dr1.IMAFLAGS_ISO_G = 0 and
+  dr1.IMAFLAGS_ISO_R = 0 and
+  dr1.IMAFLAGS_ISO_I = 0 and
+  dr1.FLAGS_G < 4 and
+  dr1.FLAGS_R < 4 and
+  dr1.FLAGS_I < 4 and
+  dr1.NEPOCHS_G > 0 and
+  dr1.NEPOCHS_R > 0 and
+  dr1.NEPOCHS_I > 0
 `
           break;
           default:
@@ -950,7 +953,8 @@ dr1.NEPOCHS_I > 0
         var query = `--
 -- Example Query --
 -- This query selects 0.001% of the data and returns only five rows
-SELECT RA, DEC, MAG_AUTO_G, TILENAME
+SELECT 
+  RA, DEC, MAG_AUTO_G, TILENAME
 FROM Y3_GOLD_2_2 sample(0.001)
 FETCH FIRST 5 ROWS ONLY
 `
@@ -962,9 +966,9 @@ FETCH FIRST 5 ROWS ONLY
 SELECT ALPHAWIN_J2000 RAP,DELTAWIN_J2000 DECP, MAG_AUTO_G, TILENAME
 FROM Y3_GOLD_2_2
 WHERE
-RA BETWEEN 40.0 and 41.0 and
-DEC BETWEEN -41 and -40 and
-ROWNUM < 1001
+  RA BETWEEN 40.0 and 41.0 and
+  DEC BETWEEN -41 and -40 and
+  ROWNUM < 1001
 `
         break;
       case "copy-example-2":

@@ -236,8 +236,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
   }
 
   _copyQueryToDbAccessPage(event, query, dialog) {
-    query = query.replace(/(  )+/g, '\n');
-    // console.log(`Updating query to ${query}`);
     store.dispatch(updateQuery(query));
     store.dispatch(loadPage('db-access', this.accessPages));
     dialog.opened = false;
@@ -250,8 +248,6 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       if (!container) {
         container = root.appendChild(document.createElement('div'));
       }
-      // let viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-      // viewportHeight = viewportHeight === 0 ? 300 : viewportHeight;
       render(
         html`
         <style>
@@ -518,7 +514,7 @@ class DESJobStatus extends connect(store)(PageViewElement) {
               </a>
             </div>
             <div>
-              <textarea rows="6" style="border: 1px solid #CCCCCC; font-family: monospace; width: 80%; height: 100%;">${job.query.replace(/(  )+/g, '\n')}</textarea>
+              <textarea rows="6" style="border: 1px solid #CCCCCC; font-family: monospace; width: 80%; height: 100%;">${job.query}</textarea>
             </div>
           `;
           break;
