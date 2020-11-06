@@ -54,8 +54,8 @@ class DESJobStatus extends connect(store)(PageViewElement) {
           left: 0px; 
           top: 0px; 
           z-index: 1;
-          height: 80px;
-          width:  80px;
+          height: 35px;
+          width:  35px;
         }
         @media (min-width: 1001px) {
           vaadin-grid {
