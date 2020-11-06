@@ -19,7 +19,7 @@ export const HelpStyles = css`
   pre {
     font-size: 0.7rem;
     background-color: #484848;
-    color: lime;
+    color: white;
     padding: 1rem;
     overflow-x: auto;
   }

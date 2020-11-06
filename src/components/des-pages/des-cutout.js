@@ -339,7 +339,7 @@ class DESCutout extends connect(store)(PageViewElement) {
 
           <div>
           <p style="margin-top: 0;">Enter cutout positions as a CSV-formatted table, specifying positions using RA/DEC coordinates or coadd object ID numbers. Values can be entered manually or by uploading a CSV-formatted text file. See the help system for more details.</p><p style="color:inherit;">Limit 10 concurrent jobs per user, ${config.maxCutoutsPerJob} positions per job. Max cutout width/height is 12 arcmin.</p>
-            <iron-autogrow-textarea style="font-family: monospace; width: 90%; margin-left: 0; margin-right: 2rem;" id="position-textarea" max-rows="10" rows=7 placeholder="RA,DEC,XSIZE,YSIZE\n21.5,3.48,2.00,1.00\n36.6,-15.68,1.00,2.00\n--- or ---\nCOADD_OBJECT_ID\n61407318\n61407582\n" value=""></iron-autogrow-textarea>
+            <iron-autogrow-textarea style="font-family: monospace; width: 90%; margin-left: 0; margin-right: 2rem;" id="position-textarea" max-rows="10" rows=7 placeholder="RA,DEC,COADD_OBJECT_ID,XSIZE,YSIZE\n21.5,3.48,,2.00,1.00\n,,61407409,,\n36.6,-15.68,,1.00,2.00\n(See Help for more examples)" value=""></iron-autogrow-textarea>
             <paper-button raised class="indigo" id="bc_uploadFile">
               <span style="overflow-x: auto; overflow-wrap: break-word;">Upload CSV file</span>
               <input type="file" id="csv-upload" class="upload" @change="${e => this._fileChange(e)}" accept=".csv, .CSV" />
@@ -753,7 +753,7 @@ class DESCutout extends connect(store)(PageViewElement) {
           var textareaID = 'position-textarea'
           this.positions = data.csv;
           this.shadowRoot.getElementById(textareaID).value = data.csv;
-          this.shadowRoot.getElementById('csv-file-msg').innerHTML = 'Positions validated and processed.';
+          this.shadowRoot.getElementById('csv-file-msg').innerHTML = 'Positions validated.';
           this.shadowRoot.getElementById('csv-file-msg').style.color = 'green';
           this.shadowRoot.getElementById(textareaID).style['border-color'] = 'green';
         } else {

@@ -100,6 +100,138 @@ COADD_OBJECT_ID
         <div class="image-container">
           <img src="images/help/cutout-options.png">
         </div>
+
+        <div>
+        <p>
+        When a cutout job is complete, there are three files generated: <code>cutout_[JOB_ID].log</code>, <code>positions_[JOB_ID].csv</code>, and <code>summary.json</code>. The first two files contain the log output and a CSV-formatted table of the processed positions table, which is synthesized from the hierarchical compilation of the input CSV-formatted positions table, then the default parameter values specified by the user, and then the system defaults. The <code>summary.json</code> file contains the complete set of information about the job results in a format amenable to both programmatic parsing and human readability. The following is an example of this file:
+        </p>
+        </div>
+        <div style="width: 100%;">
+<pre>
+{
+  "options": {
+    "colors_fits": "y",
+    "db": "DESDR",
+    "jobid": "27ddedf1ba3646a8b552cb0718290331",
+    "make_fits": true,
+    "make_rgb_lupton": true,
+    "make_rgb_stiff": true,
+    "release": "DR1",
+    "rgb_lupton_colors": "izy",
+    "rgb_stiff_colors": "riz",
+    "username": "jtest",
+    "xsize": 1.5,
+    "ysize": 0.5,
+    "tiledir": "auto"
+  },
+  "cutouts": [
+    {
+      "RA": 21.58813,
+      "DEC": 3.48611,
+      "COADD_OBJECT_ID": null,
+      "XSIZE": 1.5,
+      "YSIZE": 0.5,
+      "FITS_COLORS": "g",
+      "RGB_STIFF_COLORS": "gry;riy",
+      "RGB_LUPTON_COLORS": "gry",
+      "RGB_MINIMUM": 1.0,
+      "RGB_STRETCH": 50.0,
+      "RGB_ASINH": 10.0,
+      "MAKE_FITS": 1.0,
+      "MAKE_RGB_STIFF": 1.0,
+      "MAKE_RGB_LUPTON": 1.0,
+      "COLORS_FITS": "y",
+      "POSITION_TYPE": "coord",
+      "RA_ADJUSTED": 21.58813,
+      "FILES": [
+        "DESJ012621.1512+032909.9960_y.fits",
+        "DESJ012621.1512+032909.9960_g.fits",
+        "DESJ012621.1512+032909.9960_r.fits",
+        "DESJ012621.1512+032909.9960_i.fits",
+        "DESJ012621.1512+032909.9960_gry_stiff.png",
+        "DESJ012621.1512+032909.9960_riy_stiff.png",
+        "DESJ012621.1512+032909.9960_gry_lupton.png"
+      ],
+      "TILEDIR": "/des003/desarchive/multiepoch/Y3A1/r2624/DES0126+0335/p01/coadd/",
+      "TILENAME": "DES0126+0335",
+      "SEXAGECIMAL": "DESJ012621.1512+032909.9960",
+      "ALPHAWIN_J2000": 21.58813,
+      "DELTAWIN_J2000": 3.48611
+    },
+    {
+      "RA": 21.57213,
+      "DEC": 3.78611,
+      "COADD_OBJECT_ID": null,
+      "XSIZE": 0.9,
+      "YSIZE": 1.3,
+      "FITS_COLORS": "rg",
+      "RGB_STIFF_COLORS": "gry;riy",
+      "RGB_LUPTON_COLORS": "gry",
+      "RGB_MINIMUM": 1.0,
+      "RGB_STRETCH": 50.0,
+      "RGB_ASINH": 10.0,
+      "MAKE_FITS": 1.0,
+      "MAKE_RGB_STIFF": 1.0,
+      "MAKE_RGB_LUPTON": 0.0,
+      "COLORS_FITS": "y",
+      "POSITION_TYPE": "coord",
+      "RA_ADJUSTED": 21.57213,
+      "FILES": [
+        "DESJ012617.3112+034709.9960_y.fits",
+        "DESJ012617.3112+034709.9960_g.fits",
+        "DESJ012617.3112+034709.9960_r.fits",
+        "DESJ012617.3112+034709.9960_i.fits",
+        "DESJ012617.3112+034709.9960_gry_stiff.png",
+        "DESJ012617.3112+034709.9960_riy_stiff.png"
+      ],
+      "TILEDIR": "/des003/desarchive/multiepoch/Y3A1/r2624/DES0126+0335/p01/coadd/",
+      "TILENAME": "DES0126+0335",
+      "SEXAGECIMAL": "DESJ012617.3112+034709.9960",
+      "ALPHAWIN_J2000": 21.57213,
+      "DELTAWIN_J2000": 3.78611
+    },
+    {
+      "RA": 46.29566,
+      "DEC": -34.256,
+      "COADD_OBJECT_ID": null,
+      "XSIZE": 0.9,
+      "YSIZE": 1.3,
+      "FITS_COLORS": "iz",
+      "RGB_STIFF_COLORS": "gry;riy",
+      "RGB_LUPTON_COLORS": "gry",
+      "RGB_MINIMUM": 1.1,
+      "RGB_STRETCH": 60.0003,
+      "RGB_ASINH": 11.12,
+      "MAKE_FITS": 1.0,
+      "MAKE_RGB_STIFF": 0.0,
+      "MAKE_RGB_LUPTON": 0.0,
+      "COLORS_FITS": "y",
+      "POSITION_TYPE": "coord",
+      "RA_ADJUSTED": 46.29566,
+      "FILES": [
+        "DESJ030510.9584-341521.6000_y.fits"
+      ],
+      "TILEDIR": "/des003/desarchive/multiepoch/Y3A1/r2674/DES0305-3415/p01/coadd/",
+      "TILENAME": "DES0305-3415",
+      "SEXAGECIMAL": "DESJ030510.9584-341521.6000",
+      "ALPHAWIN_J2000": 46.29566,
+      "DELTAWIN_J2000": -34.256
+    }
+  ],
+  "query_time": "0.32",
+  "unmatched_positions": {
+    "coord": {
+      "RA": [],
+      "DEC": []
+    },
+    "coadd": []
+  },
+  "processing_time": "48.07",
+  "size_on_disk": "6.08 MB",
+  "number_of_files": 14
+}
+</pre>
+        </div>
       </div>
     `;
   }
