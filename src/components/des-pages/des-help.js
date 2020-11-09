@@ -129,7 +129,7 @@ class DESHelp extends connect(store)(PageViewElement) {
           <section id="api-section">
             <div>
               <h3>API Documentation</h3>
-              <p>Everything you can do on this website can also be done by an external client app using the DESaccess Application Programming Interface (API). See the <a href="${config.frontEndUrl}docs/" target="_blank">API Documentation</a> for more details.</p>
+              <p>Everything you can do on this website can also be done by an external client app using the DESaccess Application Programming Interface (API). See the <a href="${config.frontEndUrl}docs/api/" target="_blank">API Documentation</a> and the <a href="${config.frontEndUrl}docs/" target="_blank">general DESaccess documentation</a> for more details.</p>
             </div>
           </section>
           ${this.accessPages.includes('db-access') ? html`

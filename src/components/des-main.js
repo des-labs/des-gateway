@@ -194,6 +194,10 @@ class DESMain extends connect(store)(LitElement) {
           ${this.accessPages.includes('ticket')    ? this._renderMenuItem('DES Ticket', 'ticket', 'vaadin:clipboard-user') : html ``}
           ${this.accessPages.includes('users')    ? this._renderMenuItem('User Management', 'users', 'vaadin:users') : html ``}
           ${this.accessPages.includes('notifications')    ? this._renderMenuItem('Notifications', 'notifications', 'vaadin:envelope-open-o') : html ``}
+          <a href="${config.frontEndUrl + 'docs'}" target="_blank">
+            <iron-icon icon="vaadin:open-book" style="color: black; margin-right: 1rem;"></iron-icon>
+            Docs
+          </a>
           ${this.accessPages.includes('help')  ? this._renderMenuItem('Help', 'help', 'vaadin:question-circle-o') : html ``}
           <div style="display: grid; grid-template-columns: 25% 1fr; position: absolute; bottom: 50px;left: 10px;">
             <div>
