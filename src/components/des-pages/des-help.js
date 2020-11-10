@@ -87,87 +87,19 @@ class DESHelp extends connect(store)(PageViewElement) {
             provides multiple tools you can use to access data from
             the <a href="https://www.darkenergysurvey.org/" target="_blank">Dark Energy Survey</a>.
             </p>
+            <p class="red-links">Visit the <a href="${config.frontEndUrl}docs/" target="_blank">DESaccess Documentation</a> to learn more, and contact us using the button below if you need more assistance.
+            </p>
             <div style="text-align: center;">
               <paper-button @click="${(e) => {this.helpFormDialog.opened = true; }}" raised style="font-size: 1rem; margin: 1rem; padding-left: 2rem; padding-right: 2rem;"><iron-icon icon="vaadin:comments-o" style="height: 3rem; margin-right: 1rem;"></iron-icon>Contact us for help</paper-button>
             </div>
-            <p>
-            Follow the links below to learn more about the available apps and features:</p>
-            <ul style="list-style-type: none; line-height: 2rem;">
-            <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:external-browser"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('api-section'),100);}}">API Documentation
-            </a></li>
-            ${this.accessPages.includes('db-access') ? html`
-              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:code"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('db-access-section'),100);}}">DB Access
-            </a></li>
-            ` : html``}
-            ${this.accessPages.includes('tables') ? html`
-              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:table"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('tables-section'),100);}}">DB Tables
-            </a></li>
-            ` : html``}
-            ${this.accessPages.includes('cutout') && this.database !== 'desoper' ? html`
-              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:scissors"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('cutout-section'),100);}}">Cutout Service
-            </a></li>
-            ` : html``}
-            ${this.accessPages.includes('status') ? html`
-              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:clipboard-user"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('status-section'),100);}}">Job Status
-            </a></li>
-            ` : html``}
-            ${this.accessPages.includes('tilefinder') ? html`
-              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:globe-wire"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('tilefinder-section'),100);}}">TileFinder
-            </a></li>
-            ` : html``}
-            ${this.accessPages.includes('jupyter') ? html`
-              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:notebook"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('jupyter-section'),100);}}">Jupyter
-            </a></li>
-            ` : html``}
-            ${this.accessPages.includes('ticket') ? html`
-              <li><iron-icon style="color: black; margin-right: 1rem;" icon="vaadin:clipboard-user"></iron-icon><a href="#" onclick="return false;" @click="${(e) => {scrollToElement(this.shadowRoot.getElementById('ticket-section'),100);}}">DES Ticket
-            </a></li>
-            ` : html``}
-            </ul>
           </section>
 
           <section id="api-section">
             <div>
               <h3>API Documentation</h3>
-              <p>Everything you can do on this website can also be done by an external client app using the DESaccess Application Programming Interface (API). See the <a href="${config.frontEndUrl}docs/api/" target="_blank">API Documentation</a> and the <a href="${config.frontEndUrl}docs/" target="_blank">general DESaccess documentation</a> for more details.</p>
+              <p>Everything you can do on this website can also be done by an external client app using the DESaccess Application Programming Interface (API). See the <a href="${config.frontEndUrl}docs/api/" target="_blank">API Documentation</a> for more details.</p>
             </div>
           </section>
-          ${this.accessPages.includes('db-access') ? html`
-          <section id="db-access-section">
-            <des-help-db-access></des-help-db-access>
-          </section>
-          ` : html``}
-          ${this.accessPages.includes('tables') ? html`
-          <section id="tables-section">
-            <des-help-tables></des-help-tables>
-          </section>
-          ` : html``}
-          ${this.accessPages.includes('cutout') && this.database !== 'desoper' ? html`
-          <section id="cutout-section">
-            <des-help-cutout></des-help-cutout>
-          </section>
-          ` : html``}
-          ${this.accessPages.includes('status') ? html`
-          <section id="status-section">
-            <des-help-status></des-help-status>
-          </section>
-          ` : html``}
-          ${this.accessPages.includes('tilefinder') ? html`
-          <section id="tilefinder-section">
-            <des-help-tilefinder></des-help-tilefinder>
-          </section>
-          ` : html``}
-          ${this.accessPages.includes('jupyter') ? html`
-          <section id="jupyter-section">
-          <des-help-jupyter></des-help-jupyter>
-          </section>
-          ` : html``}
-          ${this.accessPages.includes('ticket') ? html`
-          <section id="ticket-section">
-            <h3>DES Ticket</h3>
-            <p>DESDM team members with admin privileges can use the DES Ticket app to resolve common user problems like password resets.</p>
-          </section>
-          ` : html``}
         </div>
       </section>
       <vaadin-dialog id="help-form-dialog"></vaadin-dialog>
