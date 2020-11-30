@@ -1118,7 +1118,8 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       job.time_complete = item.job_time_complete;
       job.time_submitted = '0000-00-00 00:00:00';
       if (item.job_time_submitted) {
-        job.time_submitted = this.convertToLocalTime(item.job_time_submitted);
+        let job_time_submitted = item.job_time_submitted.replace(' ','T') + 'Z';
+        job.time_submitted = this.convertToLocalTime(job_time_submitted);
       } 
       job.data = typeof(item.data) === 'string' ? JSON.parse(item.data) : null;
       job.query = item.query;
@@ -1193,7 +1194,8 @@ class DESJobStatus extends connect(store)(PageViewElement) {
       job.time_complete = item.job_time_complete;
       job.time_submitted = '0000-00-00 00:00:00';
       if (item.job_time_submitted) {
-        job.time_submitted = this.convertToLocalTime(item.job_time_submitted);
+        let job_time_submitted = item.job_time_submitted.replace(' ','T') + 'Z';
+        job.time_submitted = this.convertToLocalTime(job_time_submitted);
       } 
       job.data = typeof(item.data) === 'string' ? JSON.parse(item.data) : null;
       job.query = item.query;
