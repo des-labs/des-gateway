@@ -12,8 +12,7 @@ export const validatePassword = function(password) {
 export const convertToLocalTime = function(datetimeString) {
 
   let inputDateTime = Date.parse(datetimeString);
-  let timeOffsetSecondsUTC = (new Date()).getTimezoneOffset()*60*1000;
-  let displayTime = new Date(inputDateTime-timeOffsetSecondsUTC);
+  let displayTime = new Date(inputDateTime);
   let convertedDateTime = 
     displayTime.getFullYear() + "/" + (((displayTime.getMonth()+1) < 10)?"0":"") + (displayTime.getMonth()+1) + "/" + ((displayTime.getDate() < 10)?"0":"") + displayTime.getDate()
     + ' ' +
