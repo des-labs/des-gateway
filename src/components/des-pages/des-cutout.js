@@ -325,7 +325,7 @@ class DESCutout extends connect(store)(PageViewElement) {
               <paper-radio-group selected="${this.release}" aria-labelledby="data-release-tag">
               ${config.desaccessInterface == 'public' ? html`
                   <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="DR1">DR1</paper-radio-button><br>
-                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="DR2" disabled>DR2</paper-radio-button><br>
+                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="DR2">DR2</paper-radio-button><br>
                 ` : html`
                   <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y6A1">Y6A1</paper-radio-button><br>
                   <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y3A2">Y3A2</paper-radio-button><br>
