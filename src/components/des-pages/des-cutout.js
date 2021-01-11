@@ -274,10 +274,10 @@ class DESCutout extends connect(store)(PageViewElement) {
     this.xsize = 1.0;
     this.ysize = 1.0;
     if (config.desaccessInterface == 'public'){
-      this.release = "DR1";
+      this.release = "DR2";
     }
     else{
-      this.release = "Y6A1";
+      this.release = "Y6A2";
     }
     this.rgb_bands = {
       "checked": {
@@ -327,7 +327,7 @@ class DESCutout extends connect(store)(PageViewElement) {
                   <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="DR1">DR1</paper-radio-button><br>
                   <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="DR2">DR2</paper-radio-button><br>
                 ` : html`
-                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y6A1">Y6A1</paper-radio-button><br>
+                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y6A2">Y6A2</paper-radio-button><br>
                   <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y3A2">Y3A2</paper-radio-button><br>
                   <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y1A1">Y1A1</paper-radio-button><br>
                   <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="SVA1">SVA1</paper-radio-button><br>

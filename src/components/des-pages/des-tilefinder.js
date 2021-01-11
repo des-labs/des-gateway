@@ -207,7 +207,7 @@ class DESTileFinder extends connect(store)(PageViewElement) {
             max-width: 500px;
           }
 
-          paper-button.y6a1 {
+          paper-button.y6a2 {
             background-color: var(--paper-purple-500);
             color: white;
           }
@@ -226,6 +226,11 @@ class DESTileFinder extends connect(store)(PageViewElement) {
           }
           paper-button.dr1 {
               background-color: black;
+              color: white;
+
+          }
+          paper-button.dr2 {
+              background-color: var(--paper-red-500);
               color: white;
 
           }
@@ -332,8 +337,9 @@ class DESTileFinder extends connect(store)(PageViewElement) {
 
         ${config.desaccessInterface === 'public' ? html`
         <paper-button disabled raised class="dr1"  @click="${(e) => this._getFiles(e,'DR1')}">DR1</paper-button>
+        <paper-button disabled raised class="dr2"  @click="${(e) => this._getFiles(e,'DR2')}">DR2</paper-button>
         ` : html`
-        <paper-button disabled raised class="y6a1" @click="${(e) => this._getFiles(e,'Y6A1')}">Y6A1</paper-button>
+        <paper-button disabled raised class="y6a2" @click="${(e) => this._getFiles(e,'Y6A2')}">Y6A2</paper-button>
         <paper-button disabled raised class="y3a2" @click="${(e) => this._getFiles(e,'Y3A2')}">Y3A2</paper-button>
         <paper-button disabled raised class="y1a1" @click="${(e) => this._getFiles(e,'Y1A1')}">Y1A1</paper-button>
         <paper-button disabled raised class="sva1" @click="${(e) => this._getFiles(e,'SVA1')}">SVA1</paper-button>
@@ -407,9 +413,10 @@ class DESTileFinder extends connect(store)(PageViewElement) {
       this.shadowRoot.querySelectorAll("paper-button.sva1")[0].disabled = true;
       this.shadowRoot.querySelectorAll("paper-button.y1a1")[0].disabled = true;
       this.shadowRoot.querySelectorAll("paper-button.y3a2")[0].disabled = true;
-      this.shadowRoot.querySelectorAll("paper-button.y6a1")[0].disabled = true;
+      this.shadowRoot.querySelectorAll("paper-button.y6a2")[0].disabled = true;
     } else {
       this.shadowRoot.querySelectorAll("paper-button.dr1")[0].disabled = true;
+      this.shadowRoot.querySelectorAll("paper-button.dr2")[0].disabled = true;
     }
 
     let body = {}
@@ -475,27 +482,26 @@ class DESTileFinder extends connect(store)(PageViewElement) {
       this.raCorners = response.racmin + ", " + response.racmax;
       this.decCorners = response.deccmin + ", " + response.deccmax;
 
-      // console.log(response.releases);
+      console.log(response.releases);
       for (let i = 0; i < response.releases.length; i++) {
         let release = response.releases[i]["release"].toLowerCase();
         this.files[release] = {}
-        if (release === 'y6a1' || release === 'dr1'){
+        if (release === 'y6a2' || release === 'dr2'){
           this.nObjects = response.releases[i]["num_objects"];
         }
         for (let band in response.releases[i].bands) {
 
-          let imName = "FITS_IMAGE_" + band;
-          let caName = "FITS_CATALOG_" + band;
-
-          let basePath =  '';
-
+          if (response.releases[i].tiff_image !== '') {
+            this.files[release][`Color Image (TIFF)`] = response.releases[i].tiff_image   + "?token=" + localStorage.getItem("token");
+          }
           if (response.releases[i].bands[band].image !== '') {
             this.files[release][`"${band}"-band Image`] = response.releases[i].bands[band].image   + "?token=" + localStorage.getItem("token");
-            // this.files[release][imName] = config.backEndUrl + basePath + response.releases[i].bands[band].image   + "?token=" + localStorage.getItem("token");
+          }
+          if (response.releases[i].bands[band].image_nobkg !== '') {
+            this.files[release][`"${band}"-band Image (no background subtraction)`] = response.releases[i].bands[band].image_nobkg   + "?token=" + localStorage.getItem("token");
           }
           if (response.releases[i].bands[band].catalog !== '') {
             this.files[release][`"${band}"-band Catalog`] = response.releases[i].bands[band].catalog   + "?token=" + localStorage.getItem("token");
-            // this.files[release][caName] = config.backEndUrl + basePath + response.releases[i].bands[band].catalog   + "?token=" + localStorage.getItem("token");
           }
           if (response.releases[i].detection !== '') {
             // Color combination of bands R,I,Z typically, used to detect source objects
