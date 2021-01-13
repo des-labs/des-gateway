@@ -1,6 +1,6 @@
 --
 -- Example Query --
--- This query creates a Helpix map of number of stars
+-- This query creates a Healpix map of number of stars
 -- and their mean magnitude on a resolution of NSIDE = 1024
 -- using NEST Schema
 SELECT
