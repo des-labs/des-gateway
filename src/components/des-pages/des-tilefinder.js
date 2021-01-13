@@ -486,8 +486,10 @@ class DESTileFinder extends connect(store)(PageViewElement) {
       for (let i = 0; i < response.releases.length; i++) {
         let release = response.releases[i]["release"].toLowerCase();
         this.files[release] = {}
-        if (release === 'y6a2' || release === 'dr2'){
+        if (response.releases[i]["num_objects"] !== 0 && response.releases[i]["num_objects"] !== '') {
           this.nObjects = response.releases[i]["num_objects"];
+        } else {
+          this.nObjects = '(varies by release)';
         }
         for (let band in response.releases[i].bands) {
 
