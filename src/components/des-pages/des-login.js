@@ -21,6 +21,7 @@ import { loginUser,
 import {config, rbac_bindings} from '../des-config.js';
 import '@polymer/paper-toast/paper-toast.js';
 import '@vaadin/vaadin-dialog/vaadin-dialog.js'
+import '@polymer/iron-image/iron-image.js';
 import { validateEmailAddress } from '../utils.js';
 
 
@@ -58,6 +59,10 @@ class DESLogin extends connect(store)(PageViewElement) {
           background: url('images/DESDM_logo.png');
           background-size: cover;
         }
+        .card-content {
+          padding-top: 0px;
+          padding-bottom: 0px;
+        }
       `
     ];
   }
@@ -76,6 +81,15 @@ class DESLogin extends connect(store)(PageViewElement) {
         <paper-card class="loginBox">
           <div style="cursor:default;" class="box-watermark-logo"></div>
           <h2>DESaccess Login</h2>
+          <div class="card-content">
+            <p>
+              <b>DES<i>access</i></b> is an open source set of tools created at <a href="http://deslabs.ncsa.illinois.edu/" target="_blank">NCSA</a>, used as a primary research tool by scientists around the globe, to access and analyze astronomical data from the <a href="https://www.darkenergysurvey.org/" target="_blank">Dark Energy Survey</a>. The most popular tools include querying the Oracle DB hosting the DES data and generating cutouts from astronomical images.
+            </p>
+            <p>
+              To learn more, <a href="${config.frontEndUrl}docs/apps.html" target="_blank">explore the app docs</a> and <a href="https://des.ncsa.illinois.edu/releases/dr2" target="_blank">read the latest data release documentation</a>.
+            </p>
+            <hr>
+          </div>
           <div class="card-content">
             ${config.desaccessInterface === 'private' ? html`` : html`
               <p>If you do not have an account, 
@@ -136,7 +150,22 @@ class DESLogin extends connect(store)(PageViewElement) {
             If you are unable to login, use the help form <a href="https://des.ncsa.illinois.edu/" target="_blank">here instead</a>.
             </p> 
           </div>
-        </paper-card>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 4fr; position: relative; justify-items: center;">
+            <div>
+            </div>
+            <div>
+              <a href="https://www.nsf.gov/" target="_blank" alt="NSF Logo" title="National Science Foundation">
+                <iron-image src="images/NSF_4-Color_bitmap_Logo_100px.png" sizing="contain" style="width: 60px; height: 100px;"></iron-image>
+              </a>
+            </div>
+            <div>
+                <a href="http://www.ncsa.illinois.edu/" target="_blank" alt="NCSA Logo" title="National Center for Supercomputing Applications">
+                <iron-image src="images/NCSA_FullColor_RGB.png" sizing="contain" style="width: 180px; height: 100px;"></iron-image>
+                </a>
+              </div>
+            </div>
+          </div>
+          </paper-card>
       </section>
       <vaadin-dialog id="register-form-dialog"></vaadin-dialog>
       <paper-toast name="register" class="toast-position toast-success" text="Your registration form was received. Check your email for an activation link." duration="600000"></paper-toast>
