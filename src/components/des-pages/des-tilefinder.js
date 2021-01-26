@@ -21,6 +21,10 @@ import { SharedStyles } from '../styles/shared-styles.js';
 import {config} from '../des-config.js';
 import { store } from '../../store.js';
 
+import {Runtime, Inspector} from "@observablehq/runtime";
+// import notebook from "@observablehq/how-to-embed-a-notebook-in-a-react-app";
+import notebook from "@d3/world-map";
+
 class DESTileFinder extends connect(store)(PageViewElement) {
 
   static get styles() {
@@ -301,6 +305,7 @@ class DESTileFinder extends connect(store)(PageViewElement) {
     return html`
     <div>
       <section>
+        <div id="observable"></div>
         <div style="font-size: 2rem; font-weight: bold;">
           DES TileFinder
           <paper-spinner class="big"></paper-spinner>
@@ -370,8 +375,9 @@ class DESTileFinder extends connect(store)(PageViewElement) {
         this._submit('name');
       }
     };
+    new Runtime().module(notebook, Inspector.into(this.shadowRoot.querySelector('#observable')));
   }
-
+  
   _getFiles(event,release){
     this.release = release.toLowerCase();
     
