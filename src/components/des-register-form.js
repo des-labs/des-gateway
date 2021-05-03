@@ -107,13 +107,13 @@ class DESRegisterForm extends connect(store)(LitElement) {
 
     // Validate first name
     el = this.shadowRoot.querySelector('paper-input[name="firstname"]');
-    criterion = el.value.length > 0;
+    criterion = this._validateName(el.value);
     el.invalid = !criterion;
     validForm = criterion && validForm;
 
     // Validate last name
     el = this.shadowRoot.querySelector('paper-input[name="lastname"]');
-    criterion = el.value.length > 0;
+    criterion = this._validateName(el.value);
     el.invalid = !criterion;
     validForm = criterion && validForm;
 
@@ -156,6 +156,11 @@ class DESRegisterForm extends connect(store)(LitElement) {
   _validateUsername(username) {
     const re = /^[a-z]+[a-z0-9]{2,15}$/;
     return re.test(username);
+  }
+
+  _validateName(name) {
+    const re = /^[a-zA-Z]+[a-zA-Z0-9]{1,29}$/;
+    return re.test(name);
   }
 
   _submitRegisterForm(event) {
