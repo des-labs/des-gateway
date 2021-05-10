@@ -314,7 +314,7 @@ class DESDbAccess extends connect(store)(PageViewElement) {
 
         </div>
         <div class="query-input-container">
-          <p>Insert your query in the box below. Data results for "Quick" Jobs (30 sec.) will be displayed at the bottom.</p>
+          <p>Insert your query in the box below. <b>Queries must begin with the word SELECT</b>. Data results for "Quick" Jobs (30 sec.) will be displayed at the bottom.</p>
           <div id="queryBox" class="query-input-box">
               <wc-codemirror id="query-input-editor" mode="sql" src="images/${queryExample}"></wc-codemirror>
           </div>
