@@ -281,27 +281,27 @@ class DESCutout extends connect(store)(PageViewElement) {
     }
     this.rgb_bands = {
       "checked": {
-        "g": true,
-        "r": true,
-        "i": true,
+        "y": false,
         "z": false,
-        "y": false
+        "i": true,
+        "r": true,
+        "g": true
       },
       "disabled": {
-        "g": true,
-        "r": true,
-        "i": true,
+        "y": true,
         "z": true,
-        "y": true
+        "i": true,
+        "r": true,
+        "g": true
       }
     };
     this.fits_bands = {
       "checked": {
-        "g": true,
-        "r": true,
-        "i": true,
+        "y": false,
         "z": false,
-        "y": false
+        "i": true,
+        "r": true,
+        "g": true
       }
     };
   }
@@ -362,11 +362,11 @@ class DESCutout extends connect(store)(PageViewElement) {
             </div>
             <div id="fits_bands_selector" style="display: none;">
               Bands: &nbsp;&nbsp;
-              <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'g')}" ?checked="${this.fits_bands.checked.g}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
-              <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'r')}" ?checked="${this.fits_bands.checked.r}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
-              <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'i')}" ?checked="${this.fits_bands.checked.i}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
-              <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'z')}" ?checked="${this.fits_bands.checked.z}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
               <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'y')}" ?checked="${this.fits_bands.checked.y}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'z')}" ?checked="${this.fits_bands.checked.z}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'i')}" ?checked="${this.fits_bands.checked.i}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'r')}" ?checked="${this.fits_bands.checked.r}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateFitsBandsSelection(e, 'g')}" ?checked="${this.fits_bands.checked.g}" ?disabled="${!this.fits}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
               <paper-checkbox id="select-all-bands-toggle" @change="${e => this._selectAllFitsBands(e)}" ?checked="${this.fits_all_toggle}" ?disabled="${!this.fits}" style="font-weight: bold; padding-left: 2rem;" id="bc_all_toggle">Select All/None</paper-checkbox>&nbsp;
             </div>
             <h3>Color image format</h3>
@@ -380,11 +380,11 @@ class DESCutout extends connect(store)(PageViewElement) {
 
             <div id="rgb_bands_selector" style="display: none;">
               Bands: &nbsp;&nbsp;
-              <paper-checkbox @change="${e => this._updateRgbSelection(e, 'g')}" ?checked="${this.rgb_bands.checked.g}" ?disabled="${this.rgb_bands.disabled.g}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
-              <paper-checkbox @change="${e => this._updateRgbSelection(e, 'r')}" ?checked="${this.rgb_bands.checked.r}" ?disabled="${this.rgb_bands.disabled.r}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
-              <paper-checkbox @change="${e => this._updateRgbSelection(e, 'i')}" ?checked="${this.rgb_bands.checked.i}" ?disabled="${this.rgb_bands.disabled.i}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
-              <paper-checkbox @change="${e => this._updateRgbSelection(e, 'z')}" ?checked="${this.rgb_bands.checked.z}" ?disabled="${this.rgb_bands.disabled.z}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
               <paper-checkbox @change="${e => this._updateRgbSelection(e, 'y')}" ?checked="${this.rgb_bands.checked.y}" ?disabled="${this.rgb_bands.disabled.y}" style="font-size:16px; padding-top:15px;" id="bc_Yband">Y</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateRgbSelection(e, 'z')}" ?checked="${this.rgb_bands.checked.z}" ?disabled="${this.rgb_bands.disabled.z}" style="font-size:16px; padding-top:15px;" id="bc_zband">z</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateRgbSelection(e, 'i')}" ?checked="${this.rgb_bands.checked.i}" ?disabled="${this.rgb_bands.disabled.i}" style="font-size:16px; padding-top:15px;" id="bc_iband">i</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateRgbSelection(e, 'r')}" ?checked="${this.rgb_bands.checked.r}" ?disabled="${this.rgb_bands.disabled.r}" style="font-size:16px; padding-top:15px;" id="bc_rband">r</paper-checkbox>&nbsp;&nbsp;
+              <paper-checkbox @change="${e => this._updateRgbSelection(e, 'g')}" ?checked="${this.rgb_bands.checked.g}" ?disabled="${this.rgb_bands.disabled.g}" style="font-size:16px; padding-top:15px;" id="bc_gband">g</paper-checkbox>&nbsp;&nbsp;
             </div>
           </div>
           <div>
