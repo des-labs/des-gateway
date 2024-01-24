@@ -340,9 +340,6 @@ class DESTileFinder extends connect(store)(PageViewElement) {
         <paper-button disabled raised class="dr2"  @click="${(e) => this._getFiles(e,'DR2')}">DR2</paper-button>
         ` : html`
         <paper-button disabled raised class="y6a2" @click="${(e) => this._getFiles(e,'Y6A2')}">Y6A2</paper-button>
-        <paper-button disabled raised class="y3a2" @click="${(e) => this._getFiles(e,'Y3A2')}">Y3A2</paper-button>
-        <paper-button disabled raised class="y1a1" @click="${(e) => this._getFiles(e,'Y1A1')}">Y1A1</paper-button>
-        <paper-button disabled raised class="sva1" @click="${(e) => this._getFiles(e,'SVA1')}">SVA1</paper-button>
         `}
         <br><br>
         <!-- Click <a href="https://desar2.cosmology.illinois.edu/DESFiles/desarchive/OPS/multiepoch/"> here</a> to get access to all campaign tiles<a href></a> -->
@@ -410,9 +407,9 @@ class DESTileFinder extends connect(store)(PageViewElement) {
     this.nObjects = '';
     this.displayTile = '';
     if (config.desaccessInterface !== 'public') {
-      this.shadowRoot.querySelectorAll("paper-button.sva1")[0].disabled = true;
-      this.shadowRoot.querySelectorAll("paper-button.y1a1")[0].disabled = true;
-      this.shadowRoot.querySelectorAll("paper-button.y3a2")[0].disabled = true;
+      // this.shadowRoot.querySelectorAll("paper-button.sva1")[0].disabled = true;
+      // this.shadowRoot.querySelectorAll("paper-button.y1a1")[0].disabled = true;
+      // this.shadowRoot.querySelectorAll("paper-button.y3a2")[0].disabled = true;
       this.shadowRoot.querySelectorAll("paper-button.y6a2")[0].disabled = true;
     } else {
       this.shadowRoot.querySelectorAll("paper-button.dr1")[0].disabled = true;

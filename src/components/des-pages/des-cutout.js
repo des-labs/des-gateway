@@ -328,9 +328,6 @@ class DESCutout extends connect(store)(PageViewElement) {
                   <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="DR2">DR2</paper-radio-button><br>
                 ` : html`
                   <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y6A2">Y6A2</paper-radio-button><br>
-                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y3A2">Y3A2</paper-radio-button><br>
-                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="Y1A1">Y1A1</paper-radio-button><br>
-                  <paper-radio-button class="release-button" @change="${e => this.release = e.target.name}" name="SVA1">SVA1</paper-radio-button><br>
                 `
               }
               </paper-radio-group>
