@@ -90,7 +90,9 @@ class DESHelp extends connect(store)(PageViewElement) {
             <p class="red-links">Visit the <a href="${config.frontEndUrl}docs/" target="_blank">DESaccess Documentation</a> to learn more, and contact us using the button below if you need more assistance.
             </p>
             <div style="text-align: center;">
-              <paper-button @click="${(e) => {this.helpFormDialog.opened = true; }}" raised style="font-size: 1rem; margin: 1rem; padding-left: 2rem; padding-right: 2rem;"><iron-icon icon="vaadin:comments-o" style="height: 3rem; margin-right: 1rem;"></iron-icon>Contact us for help</paper-button>
+            <a href="mailto:desaccess-admins@lists.ncsa.illinois.edu?subject=DESaccess%20Help%20Request">
+              <paper-button raised style="font-size: 1rem; margin: 1rem; padding-left: 2rem; padding-right: 2rem;"><iron-icon icon="vaadin:comments-o" style="height: 3rem; margin-right: 1rem;"></iron-icon>Contact us for help</paper-button>
+            </a>
             </div>
           </section>
 
