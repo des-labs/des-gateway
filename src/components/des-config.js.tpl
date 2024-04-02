@@ -6,7 +6,7 @@ let cnf = {
   "apiPath"  : "{{API_ROOT_PATH}}",
   "ticketAuth": "{{TICKET_AUTH}}",
   "desaccessInterface": "{{DESACCESS_INTERFACE}}",
-  "maxCutoutsPerJob": {{LIMIT_CUTOUTS_CUTOUTS_PER_JOB}}
+  "maxCutoutsPerJob": "{{LIMIT_CUTOUTS_CUTOUTS_PER_JOB}}"
 }
 
 
